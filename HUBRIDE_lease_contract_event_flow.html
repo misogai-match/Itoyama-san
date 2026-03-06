@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUBRIDE リース契約 イベントフロー</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 24px 16px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  
+  /* Header */
+  .header { text-align: center; margin-bottom: 32px; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #f8fafc; letter-spacing: 1px; }
+  .header p { font-size: 13px; color: #94a3b8; margin-top: 6px; }
+
+  /* Timeline */
+  .timeline-wrap { overflow-x: auto; padding-bottom: 16px; margin-bottom: 8px; }
+  .timeline { display: flex; align-items: center; min-width: 1200px; position: relative; padding: 0 30px; }
+  .timeline-line { position: absolute; top: 50%; left: 30px; right: 30px; height: 3px; background: linear-gradient(90deg, #64748b, #3b82f6, #10b981, #f59e0b, #ef4444, #8b5cf6, #ec4899, #06b6d4); border-radius: 2px; transform: translateY(-50%); pointer-events: none; }
+
+  .event-node { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 110px; cursor: pointer; z-index: 2; }
+  .event-node .phase-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .event-node .circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.25s; border: 3px solid; position: relative; }
+  .event-node.milestone .circle { width: 56px; height: 56px; font-size: 24px; }
+  .event-node .title-label { font-size: 11px; font-weight: 600; color: #cbd5e1; margin-top: 6px; text-align: center; line-height: 1.3; max-width: 100px; transition: color 0.2s; }
+  .event-node:hover .title-label, .event-node.active .title-label { color: #f8fafc; }
+  .event-node:hover .circle { transform: scale(1.1); }
+
+  /* Detail panel */
+  .detail-panel { margin-top: 24px; background: #1e293b; border-radius: 12px; overflow: hidden; display: none; animation: fadeIn 0.3s; }
+  .detail-panel.show { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .detail-header { padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+  .detail-header .icon { font-size: 28px; }
+  .detail-header .info h3 { font-size: 17px; font-weight: 700; color: #f8fafc; }
+  .detail-header .info .phase { font-size: 12px; font-weight: 600; }
+  
+  .detail-desc { padding: 12px 24px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; font-size: 13px; color: #94a3b8; white-space: pre-line; line-height: 1.6; }
+  
+  .detail-columns { display: flex; flex-wrap: wrap; }
+  .detail-col { flex: 1; min-width: 280px; padding: 16px 24px; }
+  .detail-col:first-child { border-right: 1px solid #334155; }
+  .detail-col .col-title { font-size: 12px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .detail-col .col-title span { font-size: 14px; }
+  .detail-col .risk-item { font-size: 13px; color: #e2e8f0; margin-bottom: 8px; padding-left: 12px; line-height: 1.5; border-left: 2px solid; }
+  .company-col .col-title { color: #fbbf24; }
+  .company-col .risk-item { border-left-color: #fbbf2444; }
+  .customer-col .col-title { color: #60a5fa; }
+  .customer-col .risk-item { border-left-color: #60a5fa44; }
+
+  /* Full list */
+  .toggle-btn { display: block; margin: 24px auto 0; background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+  .toggle-btn:hover { background: #1e293b; color: #e2e8f0; }
+  
+  .full-list { margin-top: 20px; display: none; }
+  .full-list.show { display: block; }
+  .full-item { display: flex; gap: 16px; margin-bottom: 16px; background: #1e293b; border-radius: 10px; padding: 16px; border-left: 4px solid; }
+  .full-item .fi-left { min-width: 160px; }
+  .full-item .fi-phase { font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .full-item .fi-title { font-size: 15px; font-weight: 700; color: #f8fafc; margin-top: 2px; }
+  .full-item .fi-desc { font-size: 12px; color: #94a3b8; margin-top: 6px; white-space: pre-line; line-height: 1.5; }
+  .full-item .fi-right { flex: 1; display: flex; gap: 16px; flex-wrap: wrap; }
+  .full-item .fi-col { flex: 1; min-width: 200px; }
+  .full-item .fi-col-title { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .full-item .fi-col-item { font-size: 12px; color: #cbd5e1; margin-bottom: 4px; line-height: 1.4; }
+
+  /* Key numbers */
+  .key-numbers { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .key-num { background: #1e293b; border-radius: 8px; padding: 12px 18px; text-align: center; min-width: 120px; }
+  .key-num .kn-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+  .key-num .kn-value { font-size: 18px; font-weight: 800; color: #f8fafc; margin-top: 2px; }
+  .key-num .kn-sub { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+
+  .footer { text-align: center; margin-top: 24px; font-size: 11px; color: #475569; }
+
+  @media (max-width: 640px) {
+    .detail-col:first-child { border-right: none; border-bottom: 1px solid #334155; }
+    .full-item { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>HUBRIDE リース契約 イベントフロー</h1>
+    <p>v33ベース｜契約前 → 納車 → リース → 出口｜各イベントをクリックして詳細表示</p>
+  </div>
+
+  <div class="timeline-wrap">
+    <div class="timeline" id="timeline">
+      <div class="timeline-line"></div>
+    </div>
+  </div>
+
+  <div class="detail-panel" id="detailPanel"></div>
+
+  <button class="toggle-btn" id="toggleBtn" onclick="toggleFullList()">全イベント一覧を表示</button>
+  <div class="full-list" id="fullList"></div>
+
+  <div class="key-numbers">
+    <div class="key-num"><div class="kn-label">契約手数料</div><div class="kn-value">¥40,000</div><div class="kn-sub">7日以内入金</div></div>
+    <div class="key-num"><div class="kn-label">引渡し目途</div><div class="kn-value">1ヶ月以内</div><div class="kn-sub">努力義務</div></div>
+    <div class="key-num"><div class="kn-label">最低契約期間</div><div class="kn-value">3ヶ月</div><div class="kn-sub">未満は解約金</div></div>
+    <div class="key-num"><div class="kn-label">遅延損害金</div><div class="kn-value">年14.6%</div><div class="kn-sub">支払期日翌日〜</div></div>
+    <div class="key-num"><div class="kn-label">免責金額</div><div class="kn-value">¥100,000</div><div class="kn-sub">車両保険/1事故</div></div>
+  </div>
+
+  <div class="footer">株式会社インターシフト｜HUBRIDE事業部｜v33ベース｜2026.03.05</div>
+</div>
+
+<script>
+const events = [
+  { id:1, phase:"契約前", title:"申込み・審査", desc:"申込書提出・本人確認書類・審査実施", color:"#64748b", icon:"📋", milestone:false,
+    companyRisks:["虚偽申告リスク → 発覚時は契約解除可（第2条4項）","反社チェック漏れ → 反社排除条項の実効性低下"],
+    customerNotes:["審査落ちの可能性あり（理由非開示）","必要書類の準備（免許証等）"] },
+  { id:2, phase:"契約前", title:"契約成立", desc:"電子契約サービスによる承諾通知\n別紙2（利用目的確認書）取得", color:"#3b82f6", icon:"📝", milestone:false,
+    companyRisks:["別紙2の取得漏れ → 目的外利用時の解除根拠が弱体化（運用ガイドNG集）","連帯保証人の要否判断 → 極度額の設定確認"],
+    customerNotes:["契約条件（リース料・最低3ヶ月等）の確認","利用目的の誓約（白ナンバー限定）","クーリングオフ非適用の理解"] },
+  { id:3, phase:"契約後", title:"契約手数料入金", desc:"契約成立後7日以内に4万円入金\n入金確認をもって車両手配を開始", color:"#10b981", icon:"💰", milestone:true,
+    companyRisks:["未入金リスク → 7日超過時のキャンセル処理ルール要整備","入金確認オペレーション → 確認遅延＝手配遅延"],
+    customerNotes:["7日以内の入金義務（遅延時は契約不成立リスク）","手数料は返還なし（契約事務手数料の対価）"] },
+  { id:4, phase:"手配中", title:"車両手配・仕入れ", desc:"オークション仕入れ\nIoT装置（GPS）設置\n整備・車検・登録", color:"#f59e0b", icon:"🔧", milestone:false,
+    companyRisks:["仕入コスト管理 → 25万円（乗り出し・GPS込み）上限遵守","IoT設置漏れ → 資産保全スキームの根幹が崩壊","整備遅延 → 引渡し1ヶ月超過リスク"],
+    customerNotes:["引渡し時期は確約されない（努力義務）","整備・部品取寄せ等による遅延の可能性あり"] },
+  { id:5, phase:"手配中", title:"任意保険手配", desc:"始期＝引渡完了日に合わせて付保\n対人・対物・車両保険", color:"#f59e0b", icon:"🛡️", milestone:false,
+    companyRisks:["保険始期のズレ → 無保険期間が発生すると運行供用者責任を直接負う","保険料コスト → 月1万円/台の維持コスト管理"],
+    customerNotes:["保険はリース料に含まれる（別途負担なし）","車両保険の免責10万円は自己負担"] },
+  { id:6, phase:"引渡し", title:"引渡し・立会い検査", desc:"甲担当者立会い\n内外装検査・走行距離確認\n写真撮影（4面+メーター+IoT）\n車両状態確認書（別紙3）署名", color:"#ef4444", icon:"🚗", milestone:true,
+    companyRisks:["エビデンス取得漏れ → 返却時の破損トラブルで立証困難","写真記録の保管 → 最低3年間の保管義務","担当者不在での引渡し → 立会い義務違反"],
+    customerNotes:["検査に参加する義務（代理人可）","確認書に記載ない傷は引渡し後発生と推定される","この日がリース開始日（起算日）になる"] },
+  { id:7, phase:"リース開始", title:"初月リース料支払い", desc:"引渡完了日に全額前払い\nリース期間の起算日＝引渡完了日", color:"#8b5cf6", icon:"📅", milestone:true,
+    companyRisks:["初月未払い → 即座に支払遅延カウント開始","起算日の記録管理 → 顧客ごとに支払日が異なる運用負荷"],
+    customerNotes:["引渡日に初月リース料を支払う義務","日割りなし → 月途中でも1ヶ月分全額"] },
+  { id:8, phase:"リース中", title:"毎月リース料支払い", desc:"応当日（引渡日と同日）までに前払い\n支払状況を継続記録・評価", color:"#8b5cf6", icon:"🔄", milestone:false,
+    companyRisks:["滞納7日超放置 → 回収率低下・持ち逃げリスク上昇","催告記録の保存 → 法的手続の前提条件"],
+    customerNotes:["支払遅延7日超で無催告解除リスク","遅延損害金 年14.6%","支払実績が売買移行の評価材料"] },
+  { id:9, phase:"リース中", title:"3ヶ月最低期間満了", desc:"与信構築期間の完了\n実績評価の中間判定", color:"#ec4899", icon:"⏱️", milestone:true,
+    companyRisks:["早期解約時の解約金回収 → 70%計算の正確な適用","評価基準の客観性確保 → IoTデータ・支払履歴"],
+    customerNotes:["3ヶ月未満解約は解約金あり","良好実績 → 売買移行協議のチャンス","14日前通知で中途解約可能に"] },
+  { id:10, phase:"出口", title:"売買移行 / 継続 / 返却", desc:"売買契約への移行協議（優遇措置あり）\nリース継続（自動更新）\n車両返却・原状回復", color:"#06b6d4", icon:"🏁", milestone:true,
+    companyRisks:["返却時の破損 → 修復費用は全額別途請求（手数料とは別）","売買移行時の信販審査 → SBI等への実績データ提供","車両の再商品化コスト管理"],
+    customerNotes:["返却時は原状回復義務（通常損耗は除く）","売買移行なら値引き・手数料減免・信販推薦の優遇あり","信用スコア改善の成果を活かせるタイミング"] }
+];
+
+let selectedId = null;
+
+function render() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '<div class="timeline-line"></div>';
+  
+  events.forEach(ev => {
+    const isActive = selectedId === ev.id;
+    const node = document.createElement('div');
+    node.className = 'event-node' + (ev.milestone ? ' milestone' : '') + (isActive ? ' active' : '');
+    node.onclick = () => { selectedId = selectedId === ev.id ? null : ev.id; render(); };
+
+    const bg = isActive ? ev.color : ev.color + '33';
+    const shadow = isActive ? '0 0 20px ' + ev.color + '66' : (ev.milestone ? '0 0 12px ' + ev.color + '44' : 'none');
+
+    node.innerHTML = `
+      <div class="phase-label" style="color:${ev.color}">${ev.phase}</div>
+      <div class="circle" style="background:${bg}; border-color:${ev.color}; box-shadow:${shadow}">${ev.icon}</div>
+      <div class="title-label">${ev.title}</div>
+    `;
+    tl.appendChild(node);
+  });
+
+  const panel = document.getElementById('detailPanel');
+  if (selectedId) {
+    const ev = events.find(e => e.id === selectedId);
+    panel.className = 'detail-panel show';
+    panel.style.borderColor = ev.color + '44';
+    panel.innerHTML = `
+      <div class="detail-header" style="background:${ev.color}22; border-bottom:1px solid ${ev.color}33">
+        <div class="icon">${ev.icon}</div>
+        <div class="info">
+          <h3>${ev.title}</h3>
+          <div class="phase" style="color:${ev.color}">${ev.phase}</div>
+        </div>
+      </div>
+      <div class="detail-desc">${ev.desc}</div>
+      <div class="detail-columns">
+        <div class="detail-col company-col">
+          <div class="col-title"><span>🏢</span> 当社リスク・注意点</div>
+          ${ev.companyRisks.map(r => `<div class="risk-item">${r}</div>`).join('')}
+        </div>
+        <div class="detail-col customer-col">
+          <div class="col-title"><span>👤</span> お客様側の注意点</div>
+          ${ev.customerNotes.map(r => `<div class="risk-item">${r}</div>`).join('')}
+        </div>
+      </div>
+    `;
+  } else {
+    panel.className = 'detail-panel';
+    panel.innerHTML = '';
+  }
+}
+
+function toggleFullList() {
+  const fl = document.getElementById('fullList');
+  const btn = document.getElementById('toggleBtn');
+  const isShow = fl.classList.contains('show');
+  
+  if (isShow) {
+    fl.classList.remove('show');
+    btn.textContent = '全イベント一覧を表示';
+  } else {
+    fl.classList.add('show');
+    btn.textContent = '一覧を閉じる';
+    fl.innerHTML = events.map(ev => `
+      <div class="full-item" style="border-left-color:${ev.color}">
+        <div class="fi-left">
+          <div class="fi-phase" style="color:${ev.color}">${ev.phase}</div>
+          <div class="fi-title">${ev.icon} ${ev.title}</div>
+          <div class="fi-desc">${ev.desc}</div>
+        </div>
+        <div class="fi-right">
+          <div class="fi-col">
+            <div class="fi-col-title" style="color:#fbbf24">🏢 当社</div>
+            ${ev.companyRisks.map(r => `<div class="fi-col-item">• ${r}</div>`).join('')}
+          </div>
+          <div class="fi-col">
+            <div class="fi-col-title" style="color:#60a5fa">👤 お客様</div>
+            ${ev.customerNotes.map(r => `<div class="fi-col-item">• ${r}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+render();
+</script>
+
+</body>
+</html>
