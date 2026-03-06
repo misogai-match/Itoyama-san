@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUBRIDE 競合調査：走行距離制限・事故負担 比較表</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px 16px; }
+  .container { max-width: 1300px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; color: #f8fafc; text-align: center; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #94a3b8; text-align: center; margin-bottom: 24px; }
+  
+  .section-title { font-size: 17px; font-weight: 700; color: #60a5fa; margin: 28px 0 12px; padding-left: 12px; border-left: 3px solid #3b82f6; }
+  
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+  th { background: #1e3a5f; color: #f8fafc; padding: 10px 8px; text-align: left; font-weight: 600; border: 1px solid #334155; white-space: nowrap; }
+  td { padding: 10px 8px; border: 1px solid #334155; vertical-align: top; line-height: 1.5; }
+  tr:nth-child(even) td { background: #1e293b; }
+  tr:nth-child(odd) td { background: #0f172a; }
+  tr.hubride td { background: #1a2744; border-left: 3px solid #fbbf24; }
+  tr.hubride td:first-child { color: #fbbf24; font-weight: 700; }
+  
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin: 2px 2px; }
+  .tag-new { background: #10b98133; color: #10b981; }
+  .tag-used { background: #f59e0b33; color: #f59e0b; }
+  .tag-short { background: #8b5cf633; color: #8b5cf6; }
+  .tag-low { background: #ef444433; color: #ef4444; }
+  .tag-ins { background: #06b6d433; color: #06b6d4; }
+  
+  .insight-box { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
+  .insight-box h3 { font-size: 15px; color: #fbbf24; margin-bottom: 8px; }
+  .insight-box p { font-size: 13px; line-height: 1.7; color: #cbd5e1; }
+  .insight-box .rec { color: #10b981; font-weight: 600; }
+  
+  .footer { text-align: center; font-size: 11px; color: #475569; margin-top: 24px; }
+  
+  .overflow-x { overflow-x: auto; }
+  .note { font-size: 11px; color: #64748b; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>HUBRIDE 競合調査：走行距離制限・事故負担 比較表</h1>
+  <p class="subtitle">v34契約書改訂のための業界ベンチマーク｜2026年3月調査</p>
+
+  <!-- ===== Executive Summary ===== -->
+  <div style="background:linear-gradient(135deg,#1e3a5f,#1e293b); border:1px solid #3b82f6; border-radius:10px; padding:20px 24px; margin-bottom:24px;">
+    <h2 style="font-size:17px; color:#fbbf24; margin-bottom:12px;">調査結果の要点</h2>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;">
+      <div style="flex:1; min-width:220px; background:#0f172a; border-radius:8px; padding:14px 16px; border-left:3px solid #10b981;">
+        <div style="font-size:11px; color:#94a3b8; font-weight:600;">走行距離制限</div>
+        <div style="font-size:22px; font-weight:800; color:#f8fafc; margin:4px 0;">3,000km/月</div>
+        <div style="font-size:12px; color:#10b981;">業界標準1,000〜1,500kmの2〜3倍</div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:4px;">低価格中古車のため残存価値への影響は限定的。顧客に有利な設定で差別化</div>
+      </div>
+      <div style="flex:1; min-width:220px; background:#0f172a; border-radius:8px; padding:14px 16px; border-left:3px solid #f59e0b;">
+        <div style="font-size:11px; color:#94a3b8; font-weight:600;">超過料金</div>
+        <div style="font-size:22px; font-weight:800; color:#f8fafc; margin:4px 0;">6円/km</div>
+        <div style="font-size:12px; color:#f59e0b;">Hondaマンスリー準拠（業界最安水準）</div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:4px;">業界相場5〜15円/km。抑止力として十分で顧客にも受け入れやすい</div>
+      </div>
+      <div style="flex:1; min-width:220px; background:#0f172a; border-radius:8px; padding:14px 16px; border-left:3px solid #ef4444;">
+        <div style="font-size:11px; color:#94a3b8; font-weight:600;">事故時顧客負担上限</div>
+        <div style="font-size:22px; font-weight:800; color:#f8fafc; margin:4px 0;">20万円/事故</div>
+        <div style="font-size:12px; color:#ef4444;">車両保険未加入（対人対物のみ）</div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:4px;">乗り出し25万円に対し合理的。KINTO・Hondaは保険込み免責5万だが月額コストが高い</div>
+      </div>
+    </div>
+    <div style="font-size:13px; color:#cbd5e1; line-height:1.7; border-top:1px solid #334155; padding-top:12px;">
+      <strong style="color:#f8fafc;">結論：</strong>HUBRIDEの走行距離3,000km/月はHondaマンスリーオーナーの3倍、KINTOの2倍で業界最大級。事故負担20万円は車両保険を月額に含めない分、月額リース料を抑えられる構造。<strong style="color:#fbbf24;">「審査が通らない層に、業界最大級の走行距離で、月額4万円コミコミ」</strong>というポジショニングが成立する。
+    </div>
+  </div>
+
+  <!-- ===== 調査対象7社 ===== -->
+  <div style="background:#1e293b; border:1px solid #334155; border-radius:10px; padding:20px 24px; margin-bottom:24px;">
+    <h2 style="font-size:15px; color:#60a5fa; margin-bottom:14px;">調査対象7社の選定理由</h2>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:280px;">
+        <div style="font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px;">大手サブスク（業界標準のベンチマーク）</div>
+        <div style="font-size:13px; color:#e2e8f0; margin-bottom:6px; padding-left:10px; border-left:2px solid #3b82f644;">
+          <strong>KINTO</strong>（トヨタ）— 新車サブスクの王道。保険込み。走行距離・免責の基準値として
+        </div>
+        <div style="font-size:13px; color:#e2e8f0; margin-bottom:6px; padding-left:10px; border-left:2px solid #3b82f644;">
+          <strong>Hondaマンスリーオーナー</strong> — 中古車・月単位・審査なし。<span style="color:#fbbf24;">HUBRIDEに最も近いモデル</span>
+        </div>
+        <div style="font-size:13px; color:#e2e8f0; margin-bottom:6px; padding-left:10px; border-left:2px solid #3b82f644;">
+          <strong>ニコノリ</strong>（ニコニコカーリース）— 新車・中古車両方。審査が甘いことで有名
+        </div>
+      </div>
+      <div style="flex:1; min-width:280px;">
+        <div style="font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px;">短期・中古車特化（HUBRIDEの直接競合帯）</div>
+        <div style="font-size:13px; color:#e2e8f0; margin-bottom:6px; padding-left:10px; border-left:2px solid #f59e0b44;">
+          <strong>定額カルモくん</strong> — 中古車の短期リースで急成長中。走行距離1,500km/月で業界最長クラス
+        </div>
+        <div style="font-size:13px; color:#e2e8f0; margin-bottom:6px; padding-left:10px; border-left:2px solid #f59e0b44;">
+          <strong>リースナブル</strong> — 月750kmと厳しめだが超過15円/km。いつでも解約可
+        </div>
+        <div style="font-size:13px; color:#e2e8f0; margin-bottom:6px; padding-left:10px; border-left:2px solid #f59e0b44;">
+          <strong>コスモMyカーリース</strong> — 500/1,000/1,500kmの3プラン選択制。ガソリン割引あり
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 走行距離制限 比較 ===== -->
+  <div class="section-title">1. 走行距離制限の比較</div>
+  <div class="overflow-x">
+  <table>
+    <tr>
+      <th style="min-width:140px">サービス名</th>
+      <th>タイプ</th>
+      <th>月間上限</th>
+      <th>計算方法</th>
+      <th>超過料金</th>
+      <th>備考</th>
+    </tr>
+    <tr>
+      <td><strong>KINTO</strong><br>(トヨタ)</td>
+      <td><span class="tag tag-new">新車</span></td>
+      <td><strong>1,500km/月</strong></td>
+      <td>契約期間トータルで計算<br>(3年=54,000km)</td>
+      <td><strong>11円/km</strong><br>(レクサス・EV: 22円/km)</td>
+      <td>月単位の超過はOK。返却時の総走行距離で精算</td>
+    </tr>
+    <tr>
+      <td><strong>Hondaマンスリー<br>オーナー</strong></td>
+      <td><span class="tag tag-used">中古車</span><span class="tag tag-short">月単位</span></td>
+      <td><strong>1,000km/月</strong><br>(事業用: 3,000km)</td>
+      <td>利用月数×1,000kmのトータル</td>
+      <td><strong>6円/km</strong></td>
+      <td>審査なし（クレカ必須）。最も安い超過料金</td>
+    </tr>
+    <tr>
+      <td><strong>ニコノリ</strong></td>
+      <td><span class="tag tag-new">新車</span><span class="tag tag-used">中古車</span></td>
+      <td><strong>500〜1,000km/月</strong><br>(自分で設定可)</td>
+      <td>5年で30,000km or 60,000km等</td>
+      <td><strong>3〜10円/km</strong><br>(契約時に確認)</td>
+      <td>「もらえるパック」は走行距離無制限。設定自由度が高い</td>
+    </tr>
+    <tr>
+      <td><strong>定額カルモくん</strong></td>
+      <td><span class="tag tag-new">新車</span><span class="tag tag-used">中古車</span></td>
+      <td><strong>1,500km/月</strong></td>
+      <td>契約期間トータル</td>
+      <td><strong>5〜15円/km</strong></td>
+      <td>業界最長クラス。7年以上なら無制限</td>
+    </tr>
+    <tr>
+      <td><strong>リースナブル</strong></td>
+      <td><span class="tag tag-new">新車</span><span class="tag tag-used">中古車</span></td>
+      <td><strong>750km/月</strong></td>
+      <td>月単位</td>
+      <td><strong>15円/km</strong></td>
+      <td>月額最安クラスだが距離制限厳しめ。250km単位で延長オプションあり</td>
+    </tr>
+    <tr>
+      <td><strong>コスモMyカーリース</strong></td>
+      <td><span class="tag tag-new">新車</span><span class="tag tag-used">中古車</span></td>
+      <td><strong>500/1,000/1,500km</strong><br>(3プランから選択)</td>
+      <td>月単位</td>
+      <td>非公開（要問合せ）</td>
+      <td>ガソリン割引あり。距離が短いほど月額安い</td>
+    </tr>
+    <tr class="hubride">
+      <td>HUBRIDE<br>(v34案)</td>
+      <td><span class="tag tag-used">中古車</span><span class="tag tag-short">月単位</span><span class="tag tag-low">低信用</span></td>
+      <td><strong>3,000km/月</strong><br>(1日100km相当)</td>
+      <td>月単位（引渡日起算）</td>
+      <td><strong>？円/km</strong><br>(要決定)</td>
+      <td>卒業型リース。保険込み。IoT装置で距離モニタリング可能</td>
+    </tr>
+  </table>
+  </div>
+
+  <!-- ===== 事故負担 比較 ===== -->
+  <div class="section-title">2. 事故時の顧客負担の比較</div>
+  <div class="overflow-x">
+  <table>
+    <tr>
+      <th style="min-width:140px">サービス名</th>
+      <th>車両保険</th>
+      <th>事故時の自己負担</th>
+      <th>全損時</th>
+      <th>備考</th>
+    </tr>
+    <tr>
+      <td><strong>KINTO</strong></td>
+      <td><span class="tag tag-ins">車両保険込み</span></td>
+      <td><strong>最大5万円/事故</strong><br>(免責金額)</td>
+      <td>自己負担なし<br>(保険でカバー)</td>
+      <td>任意保険が月額に含まれる。等級に関係なく一律料金。業界最手厚い</td>
+    </tr>
+    <tr>
+      <td><strong>Hondaマンスリー<br>オーナー</strong></td>
+      <td><span class="tag tag-ins">車両保険込み</span></td>
+      <td><strong>最大5万円/事故</strong><br>(免責金額)</td>
+      <td>別途NOC<br>(2〜5万円)</td>
+      <td>任意保険込み。修理期間中の営業補償（NOC）が別途発生</td>
+    </tr>
+    <tr>
+      <td><strong>ニコノリ</strong></td>
+      <td>任意保険は別途<br>(オプションあり)</td>
+      <td><strong>自己負担あり</strong><br>(保険未加入なら全額)</td>
+      <td>強制解約＋<br>残リース料精算</td>
+      <td>専用保険加入で全損時の負担をゼロにできる</td>
+    </tr>
+    <tr>
+      <td><strong>定額カルモくん</strong></td>
+      <td>任意保険は別途</td>
+      <td><strong>自己負担あり</strong><br>(自身の保険で対応)</td>
+      <td>強制解約＋<br>違約金</td>
+      <td>任意保険は自分で加入。事故リスクは利用者側</td>
+    </tr>
+    <tr>
+      <td><strong>リースナブル</strong></td>
+      <td>任意保険は別途</td>
+      <td><strong>自己負担あり</strong></td>
+      <td>いつでも解約可<br>(状態により差額)</td>
+      <td>中途解約可能なため全損リスクは相対的に低い</td>
+    </tr>
+    <tr class="hubride">
+      <td>HUBRIDE<br>(v34案)</td>
+      <td>対人対物のみ<br><span style="color:#ef4444">車両保険なし</span></td>
+      <td><strong>最大20万円/事故</strong></td>
+      <td>車両時価＋未払リース料<br>＋残存期間70%</td>
+      <td>車両保険未加入のため、修復費は乙負担（上限20万円）。仕入25万の車両に対しバランス良い設定</td>
+    </tr>
+  </table>
+  </div>
+
+  <!-- ===== 分析・推奨 ===== -->
+  <div class="section-title">3. 分析と推奨値</div>
+  
+  <div class="insight-box">
+    <h3>走行距離制限の推奨</h3>
+    <p>
+      業界標準は<strong>月間1,000〜1,500km</strong>。HUBRIDEの顧客は通勤利用が主で、平均的なドライバー（月560km程度）よりやや多い想定。MTGでは1日100km≒<strong>月間3,000km</strong>が決定済み。
+    </p>
+    <p style="margin-top:8px">
+      <span class="rec">推奨：月間3,000km（暫定）</span> — 業界平均の2〜3倍の余裕設定。HUBRIDEの顧客にとって不満が出にくい水準。ただし車両の残存価値への影響は限定的（もともと低価格中古車のため）。
+    </p>
+    <p style="margin-top:8px">
+      <span class="rec">超過料金の推奨：6〜8円/km</span> — Hondaマンスリーオーナー（6円）が最安、業界平均は5〜15円。HUBRIDEの車両は低価格中古車のため、過走行による価値下落は限定的。<strong>6円/km</strong>がバランス良い。抑止力としては十分で、顧客にも受け入れやすい。
+    </p>
+  </div>
+
+  <div class="insight-box">
+    <h3>事故時負担上限の推奨</h3>
+    <p>
+      KINTO・Hondaマンスリーオーナーは車両保険込みで<strong>免責5万円</strong>。しかしHUBRIDEは車両保険未加入のため直接比較はできない。
+    </p>
+    <p style="margin-top:8px">
+      MTGでの決定：<strong>20万円を上限</strong>（乗り出し価格≒25万円のうち、車両仕入10万＋登録諸費用≒20万が実質的な車両価値）。
+    </p>
+    <p style="margin-top:8px">
+      <span class="rec">推奨：20万円上限で確定</span> — 仕入価格に対して合理的な水準。これ以上の損害は当社側で吸収する構造（IoTによる事前リスク管理で補完）。全損時は別途（車両時価＋未払リース料＋残存3ヶ月70%）で回収。
+    </p>
+  </div>
+
+  <div class="insight-box">
+    <h3>HUBRIDEの競争優位性</h3>
+    <p>
+      走行距離3,000km/月はHondaマンスリーオーナーの3倍、KINTOの2倍。事故負担20万円はKINTOの5万円より高いが、そもそも車両保険料（月1〜2万円相当）がリース料に含まれていない分、月額が安い。<br>
+      <strong>ポジショニング：「審査が通らない層に、業界最大級の走行距離制限で、月額4万円コミコミ」</strong>
+    </p>
+  </div>
+
+  <div class="section-title">4. v34契約書への反映サマリ</div>
+  <div class="overflow-x">
+  <table>
+    <tr><th>項目</th><th>確定値</th><th>根拠</th></tr>
+    <tr><td>月間走行距離上限</td><td><strong>3,000km</strong></td><td>MTG決定。1日100km。業界平均の2-3倍で顧客に有利</td></tr>
+    <tr><td>超過料金</td><td><strong>6円/km</strong></td><td>Hondaマンスリー準拠。業界最安水準。低価格中古車のため妥当</td></tr>
+    <tr><td>事故時顧客負担上限</td><td><strong>20万円/事故</strong></td><td>MTG決定。乗り出し25万に対し合理的。全損は別途</td></tr>
+    <tr><td>車両保険</td><td><strong>未加入（対人対物のみ）</strong></td><td>車両保険の月額コスト（1-2万）が顧客負担増に直結するため見送り</td></tr>
+    <tr><td>保険表記</td><td><strong>「対人・対物保険」に修正</strong></td><td>車両保険未加入のため「車両保険」の記載を削除</td></tr>
+    <tr><td>連帯保証極度額</td><td><strong>100万円</strong></td><td>MTG決定</td></tr>
+  </table>
+  </div>
+  
+  <p class="note">※ 各社の情報は2026年3月時点の公式サイト・FAQ等に基づく。料金・条件は変更される可能性あり。</p>
+  <div class="footer">株式会社インターシフト｜HUBRIDE事業部｜CFO 磯貝｜2026.03.06</div>
+</div>
+</body>
+</html>
