@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャリアビジョン定例 議事録 | 2026年3月27日</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f9fb;
+  --card: #ffffff;
+  --border: #e8eaed;
+  --text1: #1a1a2e;
+  --text2: #5f6368;
+  --text3: #9aa0a6;
+  --red: #c5221f;
+  --red-bg: rgba(197,34,31,0.06);
+  --green: #137333;
+  --green-bg: rgba(19,115,51,0.06);
+  --blue: #1a73e8;
+  --blue-bg: #e8f0fe;
+  --orange: #e37400;
+  --orange-bg: rgba(227,116,0,0.07);
+  --yellow: #f9ab00;
+  --yellow-bg: rgba(249,171,0,0.07);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text1); line-height:1.8; font-size:14px; }
+.container { max-width:800px; margin:0 auto; padding:32px 24px; }
+.header { margin-bottom:32px; }
+.header .tag { display:inline-block; background:var(--blue-bg); color:var(--blue); font-size:11px; font-weight:600; padding:4px 12px; border-radius:20px; margin-bottom:12px; letter-spacing:0.5px; }
+.header h1 { font-size:22px; font-weight:700; margin-bottom:8px; line-height:1.4; }
+.header .meta { font-size:12px; color:var(--text3); }
+.header .meta span { margin-right:16px; }
+.status-bar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+.status-item { display:flex; align-items:center; gap:6px; font-size:12px; padding:6px 14px; border-radius:8px; font-weight:500; }
+.status-red { background:var(--red-bg); color:var(--red); }
+.status-green { background:var(--green-bg); color:var(--green); }
+.status-blue { background:var(--blue-bg); color:var(--blue); }
+
+.agenda-table { width:100%; border-collapse:collapse; margin-bottom:32px; background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.agenda-table th { background:#f1f3f4; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text2); padding:10px 16px; text-align:left; font-weight:600; }
+.agenda-table td { padding:10px 16px; border-top:1px solid var(--border); font-size:13px; }
+.agenda-table tr:hover { background:#f8f9fb; }
+.badge { display:inline-block; font-size:10px; font-weight:600; padding:2px 8px; border-radius:4px; }
+.badge-red { background:var(--red-bg); color:var(--red); }
+.badge-yellow { background:var(--yellow-bg); color:var(--orange); }
+.badge-orange { background:var(--orange-bg); color:var(--orange); }
+
+.section { margin-bottom:32px; }
+.section-title { font-size:16px; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--blue); display:flex; align-items:center; gap:8px; }
+.section-num { background:var(--blue); color:#fff; font-size:12px; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
+
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
+.card h3 { font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text1); }
+.card p, .card li { font-size:13px; color:var(--text2); line-height:1.7; }
+.card ul { padding-left:20px; }
+.card li { margin-bottom:4px; }
+
+.quote { border-left:3px solid var(--blue); padding:12px 16px; margin:12px 0; background:var(--blue-bg); border-radius:0 8px 8px 0; font-size:13px; color:var(--text1); font-style:italic; }
+
+.task-table { width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:16px; }
+.task-table th { background:#f1f3f4; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text2); padding:8px 12px; text-align:left; font-weight:600; }
+.task-table td { padding:8px 12px; border-top:1px solid var(--border); font-size:12px; }
+
+.callout { padding:16px 20px; border-radius:12px; margin:16px 0; font-size:13px; }
+.callout-red { background:var(--red-bg); border-left:3px solid var(--red); }
+.callout-blue { background:var(--blue-bg); border-left:3px solid var(--blue); }
+.callout-orange { background:var(--orange-bg); border-left:3px solid var(--orange); }
+
+.summary-section { margin-top:40px; }
+.summary-title { font-size:18px; font-weight:700; margin-bottom:20px; text-align:center; }
+
+.message-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:12px; border-left:3px solid var(--blue); }
+.message-card h4 { font-size:13px; font-weight:600; color:var(--blue); margin-bottom:8px; }
+.message-card p { font-size:13px; color:var(--text2); line-height:1.7; }
+
+.footer { margin-top:40px; padding-top:20px; border-top:1px solid var(--border); font-size:11px; color:var(--text3); text-align:center; }
+
+.priority-label { font-size:12px; font-weight:700; margin:20px 0 8px; padding:6px 12px; border-radius:6px; display:inline-block; }
+.priority-high { background:var(--red-bg); color:var(--red); }
+.priority-now { background:var(--orange-bg); color:var(--orange); }
+.priority-mid { background:var(--blue-bg); color:var(--blue); }
+
+@media (max-width:600px) {
+  .container { padding:16px; }
+  .header h1 { font-size:18px; }
+  .status-bar { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="tag">Meeting Minutes</div>
+  <h1>キャリアビジョン定例 議事録</h1>
+  <div class="meta">
+    <span>2026年3月27日（金）14:00〜</span>
+    <span>オンライン会議</span>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-item status-red">🔴 複数の重要アクション未完了</div>
+  <div class="status-item status-blue">👥 磯貝（顧問）・本間氏・鈴木氏</div>
+</div>
+
+<!-- アジェンダ一覧 -->
+<table class="agenda-table">
+<tr><th>#</th><th>アジェンダ</th><th>重要度</th></tr>
+<tr><td>1</td><td>東日本銀行 面談準備（4/8）</td><td><span class="badge badge-red">最重要</span></td></tr>
+<tr><td>2</td><td>銀行提出資料の改善指摘</td><td><span class="badge badge-red">最重要</span></td></tr>
+<tr><td>3</td><td>人事評価制度の設計方針</td><td><span class="badge badge-yellow">重要</span></td></tr>
+<tr><td>4</td><td>財務データアクセス問題</td><td><span class="badge badge-yellow">重要</span></td></tr>
+<tr><td>5</td><td>ヴィアエボ社財務整理</td><td><span class="badge badge-yellow">重要</span></td></tr>
+<tr><td>6</td><td>グループ各社の経理状況</td><td><span class="badge badge-orange">継続課題</span></td></tr>
+</table>
+
+<!-- セクション1 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">1</div> 東日本銀行 面談準備（4/8）</div>
+
+  <div class="card">
+    <h3>背景・経緯</h3>
+    <ul>
+      <li>前回（約半年前）の面談では融資見送り</li>
+      <li>実績が出たことを受けて再アプローチ → 面談が実現</li>
+      <li>第7期決算書＋1月までの試算表をベースに再提案予定</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>① 面談前に「当たりをつける」べき</h3>
+    <div class="quote">再来週の面談だが、事前に資料を送付し「これでいけそうですか？」と打診すべき。お互い忙しい中で会うのだから、最初からNGなら時間の無駄になる。</div>
+    <ul>
+      <li>月次が締まったタイミングで、試算表・半期レポートを事前送付</li>
+      <li>電話で見立てを確認し、感触を探る</li>
+      <li>実質的支配者の論点についても事前にインプット</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>② 提案の「3つのシナリオ」を準備せよ</h3>
+    <ul>
+      <li><strong>計画達成シナリオ</strong> — 計画通りの成長数値</li>
+      <li><strong>上振れシナリオ</strong> — 上回った場合の追加収益力</li>
+      <li><strong>下振れシナリオ</strong> — 下回っても安心できる材料</li>
+    </ul>
+    <div class="quote">この3つが揃うと非常に伝わりやすい（磯貝）</div>
+  </div>
+
+  <div class="card">
+    <h3>③ 融資金額を明示すること</h3>
+    <ul>
+      <li>「いくら借りたい」を明確に打ち出すべき</li>
+      <li>銀行員は稟議書を書く立場 → 判断を丸投げされると困る</li>
+      <li>金額・使途・返済計画をセットで提示</li>
+    </ul>
+  </div>
+
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>1</td><td>半期実績＋通期見通しの資料を事前送付</td><td>鈴木</td><td>〜4/4頃</td></tr>
+  <tr><td>2</td><td>3シナリオの数値整理</td><td>鈴木</td><td>面談前</td></tr>
+  <tr><td>3</td><td>電話で事前の感触確認</td><td>鈴木</td><td>資料送付後</td></tr>
+  <tr><td>4</td><td>融資希望額の確定・使途の明確化</td><td>鈴木</td><td>面談前</td></tr>
+  </table>
+</div>
+
+<!-- セクション2 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">2</div> 銀行提出資料の改善指摘</div>
+
+  <div class="callout callout-red">
+    <strong>根本的な課題：「すごさがわからない」</strong> — 数字だけが並んでおり、良いのか悪いのかが伝わらない。外部への訴求力が不足。「謙遜がすぎる」。
+  </div>
+
+  <div class="card">
+    <h3>改善の方向性</h3>
+    <ul>
+      <li><strong>前年比データの追加</strong> — YoY比較グラフ、「＋○○%」の伸び率を明示</li>
+      <li><strong>グラフ化・ビジュアル化</strong> — ダッシュボード形式、パッと見て「すごい」と感じる構成</li>
+      <li><strong>達成率・予算対比の強調</strong> — YTD / MTD の区分を明確に</li>
+      <li><strong>詰め込みすぎの解消</strong> — 詳細はアペンディックスへ。メインは1KPIずつ大きく</li>
+      <li><strong>月次レポート送付</strong> — 「いらないと言われるぐらい出せ」</li>
+    </ul>
+  </div>
+
+  <div class="quote">作っているなら毎月送り付けた方がいい。融資の「質」にこだわるフェーズへ移行。銀行間で競争させる状況を目指す。</div>
+
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>5</td><td>前年同期比グラフの作成</td><td>鈴木</td><td>4/8面談前</td></tr>
+  <tr><td>6</td><td>ダッシュボード資料の再構成</td><td>鈴木</td><td>4/8面談前</td></tr>
+  <tr><td>7</td><td>達成率・予算対比の可視化</td><td>鈴木</td><td>4/8面談前</td></tr>
+  <tr><td>8</td><td>月次レポート定期送付体制の構築</td><td>鈴木</td><td>4月〜</td></tr>
+  </table>
+</div>
+
+<!-- セクション3 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">3</div> 人事評価制度の設計方針</div>
+
+  <div class="card">
+    <h3>背景・課題</h3>
+    <ul>
+      <li>社員エンゲージメントが上がりきっていない</li>
+      <li>採用目標：今期32名 → 来期50名</li>
+      <li>役割等級制度（ボード方式）・7グレード制を採用</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>磯貝顧問の提案：AI活用評価</h3>
+    <ul>
+      <li><strong>定量面</strong> → CRM連携で完全自動化</li>
+      <li><strong>定性面</strong> → 社長のエッセンスをAIに叩き込み、常時フィードバック</li>
+      <li><strong>頻度</strong> → 半期・四半期ではなく「毎日」レベルで可能</li>
+    </ul>
+    <div class="quote">規模が大きくなったら無理。今やるからこそ、完全AIネイティブなグロース企業が出来上がる。</div>
+  </div>
+
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>9</td><td>CRM開発着手</td><td>本間</td><td>3期目目標</td></tr>
+  <tr><td>10</td><td>評価制度AI連携設計</td><td>本間</td><td>段階的</td></tr>
+  <tr><td>11</td><td>現行評価制度の運用開始</td><td>本間</td><td>早期</td></tr>
+  </table>
+</div>
+
+<!-- セクション4 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">4</div> 財務データアクセス問題</div>
+
+  <div class="callout callout-orange">
+    <strong>磯貝顧問の懸念：</strong> 仕訳日記帳レベルでの財務情報アクセスが必要。BS/PLの月次データだけでは不十分。
+  </div>
+
+  <div class="quote">キャリアビジョンの仕訳に直接アクセスできない状況がすごく嫌。ボンと新情報が出てきて見ていなかったということが起きる。</div>
+
+  <div class="card">
+    <h3>ライトフィット／ディルバンス</h3>
+    <p>布川さんが財務を担当する方向。「誰がやっても良いが、早くやってほしい」。中途半端な状態が一番良くない。</p>
+  </div>
+
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>12</td><td>仕訳日記帳・BS・PLを磯貝顧問へ提出</td><td>本間</td><td>即時</td></tr>
+  <tr><td>13</td><td>財務データ定期共有体制の構築</td><td>本間</td><td>4月〜</td></tr>
+  <tr><td>14</td><td>ライトフィット/ディルバンス財務情報取得</td><td>本間</td><td>早急</td></tr>
+  <tr><td>15</td><td>会計アカウントの磯貝アクセス権付与検討</td><td>本間＋布川</td><td>早急</td></tr>
+  </table>
+</div>
+
+<!-- セクション5 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">5</div> ヴィアエボ社・グループ各社</div>
+
+  <div class="card">
+    <h3>ヴィアエボ社</h3>
+    <ul>
+      <li>PL・CF（営業/投資/財務）の資料が西先生に提出済み</li>
+      <li>曽田さんとの面談では約40人規模</li>
+      <li>部門別会計（ProNetix / ヴィアエボ）の適切な分離が重要</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>グループ各社</h3>
+    <ul>
+      <li><strong>ProNetix</strong> — 順調に推移（優等生）</li>
+      <li><strong>セオテック</strong> — 決算書の提出が遅い。利益は出ているが管理が甘くなっている懸念</li>
+    </ul>
+  </div>
+
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>16</td><td>ヴィアエボ社のPL・CFを磯貝顧問へ提出</td><td>本間</td><td>即時</td></tr>
+  </table>
+</div>
+
+<!-- 全宿題一覧 -->
+<div class="summary-section">
+  <div class="summary-title">全宿題一覧</div>
+
+  <div class="priority-label priority-high">🔴 最優先（4/8 東日本銀行面談前）</div>
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>1</td><td>半期実績＋通期見通し資料を銀行へ事前送付</td><td>鈴木</td><td>〜4/4</td></tr>
+  <tr><td>2</td><td>3シナリオ数値整理</td><td>鈴木</td><td>面談前</td></tr>
+  <tr><td>3</td><td>電話で事前打診</td><td>鈴木</td><td>資料送付後</td></tr>
+  <tr><td>4</td><td>融資希望額・使途の確定</td><td>鈴木</td><td>面談前</td></tr>
+  <tr><td>5</td><td>前年同期比グラフ作成</td><td>鈴木</td><td>面談前</td></tr>
+  <tr><td>6</td><td>ダッシュボード再構成</td><td>鈴木</td><td>面談前</td></tr>
+  <tr><td>7</td><td>達成率・予算対比の可視化</td><td>鈴木</td><td>面談前</td></tr>
+  </table>
+
+  <div class="priority-label priority-now">🟠 即時対応</div>
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>12</td><td>仕訳日記帳・BS・PLを磯貝顧問へ提出</td><td>本間</td><td>即時</td></tr>
+  <tr><td>14</td><td>ライトフィット/ディルバンス財務情報</td><td>本間</td><td>早急</td></tr>
+  <tr><td>16</td><td>ヴィアエボ社PL・CF提出</td><td>本間</td><td>即時</td></tr>
+  </table>
+
+  <div class="priority-label priority-mid">🔵 中期対応</div>
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>担当</th><th>期限</th></tr>
+  <tr><td>8</td><td>月次レポート定期送付体制</td><td>鈴木</td><td>4月〜</td></tr>
+  <tr><td>9</td><td>CRM自社開発着手</td><td>本間</td><td>3期目</td></tr>
+  <tr><td>10</td><td>評価制度AI連携設計</td><td>本間</td><td>段階的</td></tr>
+  <tr><td>13</td><td>財務データ定期共有体制</td><td>本間</td><td>4月〜</td></tr>
+  <tr><td>15</td><td>会計アカウント磯貝アクセス権</td><td>本間＋布川</td><td>早急</td></tr>
+  </table>
+</div>
+
+<!-- 磯貝メッセージ -->
+<div class="summary-section">
+  <div class="summary-title">磯貝顧問の重要メッセージ</div>
+
+  <div class="message-card">
+    <h4>銀行対応の姿勢転換</h4>
+    <p>今までは「借りたい」がゴールだった。成功体験ができた以上、今度は「質」にこだわりたい。スプレッドにこだわり、銀行間で競わせる状況を目指す。</p>
+  </div>
+
+  <div class="message-card">
+    <h4>自社の実力への自信を持て</h4>
+    <p>自分たちのすごさをもっと自覚すべき。外部には「すごいだろう」とアピールしなければならない。こんなにできている会社はほかにない。</p>
+  </div>
+
+  <div class="message-card">
+    <h4>AI活用は「今」しかない</h4>
+    <p>規模が大きくなったら無理。今やるからこそ、完全AIネイティブなグロース企業が出来上がる。テクノロジーだけでなく人間力との両輪が回せるのがキャリアビジョンの強み。</p>
+  </div>
+
+  <div class="message-card">
+    <h4>情報の透明性は経営の基盤</h4>
+    <p>仕訳レベルでの情報把握ができれば、分析の精度が全然違う。早くやりたい、ちゃんとやりたい。それだけ。</p>
+  </div>
+</div>
+
+<div class="footer">
+  会議トランスクリプト＋Gemini議事録を統合し、Claude Opus 4.6が作成<br>
+  2026年3月27日 ｜ キャリアビジョン定例
+</div>
+
+</div>
+</body>
+</html>
