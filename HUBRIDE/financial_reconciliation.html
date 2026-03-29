@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インターシフト 財務データ整合性レポート</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', 'Hiragino Sans', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.6; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+h1 { font-size: 1.8rem; color: #f8fafc; margin-bottom: 8px; }
+.subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 24px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.full-width { grid-column: 1 / -1; }
+.card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+.card h2 { font-size: 1.15rem; color: #f1f5f9; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #334155; }
+.card h3 { font-size: 0.95rem; color: #cbd5e1; margin: 12px 0 8px; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.badge-ok { background: #064e3b; color: #6ee7b7; }
+.badge-warn { background: #713f12; color: #fbbf24; }
+.badge-alert { background: #7f1d1d; color: #fca5a5; }
+.badge-info { background: #1e3a5f; color: #7dd3fc; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { background: #0f172a; color: #94a3b8; padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #334155; }
+td { padding: 7px 12px; border-bottom: 1px solid #1e293b; }
+tr:hover td { background: #1e293b; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.positive { color: #6ee7b7; }
+.negative { color: #fca5a5; }
+.highlight-row { background: #1e3a5f !important; }
+.highlight-row td { border-bottom-color: #2563eb; }
+.section-label { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.big-number { font-size: 2rem; font-weight: 700; }
+.small-label { font-size: 0.8rem; color: #64748b; }
+.kpi-row { display: flex; gap: 16px; margin-bottom: 16px; }
+.kpi-box { flex: 1; background: #0f172a; border-radius: 8px; padding: 14px; text-align: center; }
+.kpi-value { font-size: 1.5rem; font-weight: 700; }
+.kpi-label { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+.finding { padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85rem; }
+.finding-ok { background: #064e3b33; border-left: 3px solid #6ee7b7; }
+.finding-warn { background: #713f1233; border-left: 3px solid #fbbf24; }
+.finding-alert { background: #7f1d1d33; border-left: 3px solid #fca5a5; }
+.finding-info { background: #1e3a5f33; border-left: 3px solid #7dd3fc; }
+.tab-nav { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab-btn { padding: 6px 16px; border-radius: 6px; border: 1px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+.tab-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+.tab-btn:hover { border-color: #64748b; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.waterfall { display: flex; align-items: flex-end; gap: 4px; height: 120px; margin: 12px 0; }
+.wf-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.wf-bar-inner { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; transition: height 0.3s; }
+.wf-bar-label { font-size: 0.65rem; color: #94a3b8; margin-top: 4px; writing-mode: horizontal-tb; text-align: center; }
+.wf-bar-value { font-size: 0.65rem; color: #e2e8f0; margin-bottom: 2px; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #94a3b8; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+.flow-diagram { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px 0; flex-wrap: wrap; }
+.flow-box { padding: 12px 18px; border-radius: 8px; text-align: center; min-width: 120px; }
+.flow-arrow { color: #64748b; font-size: 1.5rem; }
+.tooltip { position: relative; cursor: help; border-bottom: 1px dotted #64748b; }
+.note { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 0.8rem; color: #94a3b8; }
+.note strong { color: #e2e8f0; }
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .kpi-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📊 インターシフト 財務データ整合性レポート</h1>
+  <p class="subtitle">BS/PL月次推移 × 仕訳帳 × 入出金サマリ × KINTONEチェックシート ｜ 2026年3月29日作成</p>
+
+  <!-- TAB NAVIGATION -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('overview')">📋 全体サマリ</button>
+    <button class="tab-btn" onclick="showTab('reconcile')">🔍 整合性チェック</button>
+    <button class="tab-btn" onclick="showTab('pl')">💰 P&L分析</button>
+    <button class="tab-btn" onclick="showTab('bs')">🏦 BS分析</button>
+    <button class="tab-btn" onclick="showTab('cashflow')">💧 資金繰り</button>
+    <button class="tab-btn" onclick="showTab('hubride')">🚗 HUBRIDE部門</button>
+  </div>
+
+  <!-- TAB 1: OVERVIEW -->
+  <div id="overview" class="tab-content active">
+    <div class="grid-3">
+      <div class="card">
+        <div class="section-label">当期純利益（累計・11月~2月）</div>
+        <div class="big-number negative">▲22,443,014</div>
+        <div class="small-label">経常利益 ▲22,443,014（特別損益なし）</div>
+      </div>
+      <div class="card">
+        <div class="section-label">普通預金残高（2月末・BS）</div>
+        <div class="big-number negative">1,710,262</div>
+        <div class="small-label">11月末 31.9M → 2月末 1.7M（▲30.2M）</div>
+      </div>
+      <div class="card">
+        <div class="section-label">短期借入金（2月末）</div>
+        <div class="big-number" style="color:#fbbf24;">110,311,000</div>
+        <div class="small-label">11月 61.5M → 2月 110.3M（+48.8M増）</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <h2>⚡ 主要ファインディングス</h2>
+      <div class="finding finding-alert">
+        <strong>🔴 資金急減:</strong> 普通預金が4ヶ月で▲30.2M減少（31.9M→1.7M）。短期借入金+48.8Mで延命しているが、キャッシュバーンが売上を上回っている。
+      </div>
+      <div class="finding finding-warn">
+        <strong>🟡 BS vs 入出金サマリ 不一致:</strong> 2月末 BS普通預金=¥1,710,262 vs サマリ月末残高=¥7,097,094（差額▲¥5,386,832）。12月・1月はBS＞サマリ、2月はサマリ＞BS。原因調査が必要。
+      </div>
+      <div class="finding finding-warn">
+        <strong>🟡 仕訳帳 vs BS変動 定常差異:</strong> 毎月▲370万円前後の定常差異あり。普通預金以外の口座（小口現金等）への資金移動、または仕訳帳の期間集計方法の差異が原因の可能性。
+      </div>
+      <div class="finding finding-ok">
+        <strong>🟢 PL売上高 vs 仕訳帳:</strong> 差額=消費税10%で一致（PL税抜 vs 仕訳帳税込）。整合性OK。
+      </div>
+      <div class="finding finding-ok">
+        <strong>🟢 3月入出金サマリ:</strong> 3月は入金＞出金（+¥22.9M）で月末残高¥29.9Mに回復。大口入金の実行を確認。
+      </div>
+      <div class="finding finding-info">
+        <strong>🔵 HUBRIDE部門:</strong> 仕訳帳ベースで毎月1億超の取引。PL売上内「車両」が最大セグメント（累計¥70.0M）。
+      </div>
+    </div>
+
+    <!-- Data Source Summary -->
+    <div class="card">
+      <h2>📁 データソース一覧</h2>
+      <table>
+        <tr><th>ソース</th><th>種別</th><th>期間</th><th>レコード数</th><th>ステータス</th></tr>
+        <tr><td>貸借対照表 月次推移</td><td>会計CSV</td><td>11月~10月（2月まで実績）</td><td>187行</td><td><span class="badge badge-ok">読込済</span></td></tr>
+        <tr><td>損益計算書 月次推移</td><td>会計CSV</td><td>11月~10月（2月まで実績）</td><td>125行</td><td><span class="badge badge-ok">読込済</span></td></tr>
+        <tr><td>仕訳帳</td><td>会計CSV</td><td>2025/11/01~2026/05/08</td><td>4,252行</td><td><span class="badge badge-ok">読込済</span></td></tr>
+        <tr><td>入出金サマリ-インター</td><td>Excel</td><td>1月~3月確定＋4月予測</td><td>37シート</td><td><span class="badge badge-ok">読込済</span></td></tr>
+        <tr><td>KINTONEチェックシート</td><td>Excel(.xlsm)</td><td>車両取引</td><td>430件</td><td><span class="badge badge-ok">読込済</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2: RECONCILIATION -->
+  <div id="reconcile" class="tab-content">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>🔍 整合性チェック①：BS普通預金 vs 入出金サマリ月末残高</h2>
+      <table>
+        <tr><th>月末</th><th class="num">BS普通預金</th><th class="num">入出金サマリ</th><th class="num">差額</th><th>方向</th><th>備考</th></tr>
+        <tr><td>12月末</td><td class="num">19,909,597</td><td class="num">13,189,019</td><td class="num positive">+6,720,578</td><td><span class="badge badge-warn">BS＞サマリ</span></td><td>サマリに未反映の入金あり？</td></tr>
+        <tr><td>1月末</td><td class="num">11,819,277</td><td class="num">7,202,087</td><td class="num positive">+4,617,190</td><td><span class="badge badge-warn">BS＞サマリ</span></td><td>同上、差額縮小</td></tr>
+        <tr class="highlight-row"><td>2月末</td><td class="num">1,710,262</td><td class="num">7,097,094</td><td class="num negative">▲5,386,832</td><td><span class="badge badge-alert">逆転！</span></td><td>BSに反映済・サマリ未反映の出金？</td></tr>
+      </table>
+      <div class="note">
+        <strong>分析:</strong> 12月・1月はBS＞サマリだが、2月で逆転してサマリ＞BSになっている。
+        考えられる原因：①入出金サマリの集計範囲がBSと異なる（暦月 vs 締日） ②BSには未決済の振替仕訳が含まれる
+        ③サマリには予測値（未確定取引）が混入している可能性 → <strong>西先生に確認推奨</strong>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <h2>🔍 整合性チェック②：BS普通預金変動 vs 仕訳帳NET</h2>
+      <table>
+        <tr><th>月</th><th class="num">BS普通預金変動</th><th class="num">仕訳帳 入金</th><th class="num">仕訳帳 出金</th><th class="num">仕訳帳NET</th><th class="num">差額</th></tr>
+        <tr><td>12月</td><td class="num negative">▲11,970,356</td><td class="num">109,079,598</td><td class="num">117,200,385</td><td class="num negative">▲8,120,787</td><td class="num negative">▲3,849,569</td></tr>
+        <tr><td>1月</td><td class="num negative">▲8,090,320</td><td class="num">143,897,194</td><td class="num">148,286,898</td><td class="num negative">▲4,389,704</td><td class="num negative">▲3,700,616</td></tr>
+        <tr><td>2月</td><td class="num negative">▲10,109,015</td><td class="num">156,320,066</td><td class="num">162,676,302</td><td class="num negative">▲6,356,236</td><td class="num negative">▲3,752,779</td></tr>
+      </table>
+      <div class="note">
+        <strong>分析:</strong> 毎月▲370万円前後の定常差異。非常に一定しており、以下が考えられる：
+        <br>① 小口現金への定期的な資金移動（BS現金は毎月+15~24万増加 → これでは説明できない）
+        <br>② 仕訳帳の普通預金に含まれない振替仕訳（相殺仕訳等）
+        <br>③ 複数伝票番号にまたがる仕訳の集計方法の差異
+        <br>→ <strong>定常差額の原因特定が必要。西先生に確認推奨。</strong>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <h2>🔍 整合性チェック③：PL売上高 vs 仕訳帳売上</h2>
+      <table>
+        <tr><th>月</th><th class="num">PL売上高（税抜）</th><th class="num">仕訳帳 売上高（税込）</th><th class="num">差額</th><th class="num">差額÷PL（税率）</th><th>判定</th></tr>
+        <tr><td>11月</td><td class="num">89,391,159</td><td class="num">98,330,260</td><td class="num">8,939,101</td><td class="num">10.0%</td><td><span class="badge badge-ok">✓ 一致</span></td></tr>
+        <tr><td>12月</td><td class="num">89,394,642</td><td class="num">98,334,098</td><td class="num">8,939,456</td><td class="num">10.0%</td><td><span class="badge badge-ok">✓ 一致</span></td></tr>
+        <tr><td>1月</td><td class="num">46,709,024</td><td class="num">51,379,915</td><td class="num">4,670,891</td><td class="num">10.0%</td><td><span class="badge badge-ok">✓ 一致</span></td></tr>
+        <tr><td>2月</td><td class="num">20,702,353</td><td class="num">22,772,577</td><td class="num">2,070,224</td><td class="num">10.0%</td><td><span class="badge badge-ok">✓ 一致</span></td></tr>
+      </table>
+      <div class="note">
+        <strong>結果:</strong> PL売上高（税抜）× 1.1 = 仕訳帳売上高（税込）で完全一致。PLと仕訳帳の売上データは整合している。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔍 整合性チェック④：入出金サマリ INTER/HUBRIDE分離</h2>
+      <table>
+        <tr><th>月</th><th colspan="3" style="text-align:center;">インターシフト</th><th colspan="3" style="text-align:center;">ハブライド</th><th class="num">合計NET</th></tr>
+        <tr><th></th><th class="num">出金</th><th class="num">入金</th><th class="num">NET</th><th class="num">出金</th><th class="num">入金</th><th class="num">NET</th><th></th></tr>
+        <tr>
+          <td>1月</td>
+          <td class="num">95,092,698</td><td class="num">88,838,465</td><td class="num negative">▲6,254,233</td>
+          <td class="num">9,251,713</td><td class="num">9,519,014</td><td class="num positive">+267,301</td>
+          <td class="num negative">▲5,986,932</td>
+        </tr>
+        <tr>
+          <td>2月</td>
+          <td class="num">75,974,731</td><td class="num">73,825,791</td><td class="num negative">▲2,148,940</td>
+          <td class="num">12,263,134</td><td class="num">14,307,081</td><td class="num positive">+2,043,947</td>
+          <td class="num negative">▲104,993</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>3月</td>
+          <td class="num">48,723,544</td><td class="num">73,940,633</td><td class="num positive">+25,217,089</td>
+          <td class="num">13,786,594</td><td class="num">11,457,830</td><td class="num negative">▲2,328,764</td>
+          <td class="num positive">+22,888,325</td>
+        </tr>
+      </table>
+      <div class="note">
+        <strong>分析:</strong> 1月・2月はINTER赤字をHUBRIDEが補填する構図（前回分析と一致）。
+        3月はINTER側に大口入金があり全体でプラス。HUBRIDE側は3月に出金＞入金（車両仕入先行）。
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: P&L -->
+  <div id="pl" class="tab-content">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>💰 損益計算書 月次推移</h2>
+      <table>
+        <tr><th>科目</th><th class="num">11月</th><th class="num">12月</th><th class="num">1月</th><th class="num">2月</th><th class="num">3月</th><th class="num">累計</th></tr>
+        <tr class="highlight-row"><td><strong>売上高</strong></td><td class="num">89,391,159</td><td class="num">89,394,642</td><td class="num">46,709,024</td><td class="num">20,702,353</td><td class="num">0</td><td class="num"><strong>246,197,178</strong></td></tr>
+        <tr><td>　売上値引・返品</td><td class="num negative">▲16,091</td><td class="num negative">▲212,782</td><td class="num negative">▲2,627,460</td><td class="num">0</td><td class="num">0</td><td class="num negative">▲2,856,333</td></tr>
+        <tr><td><strong>売上高合計</strong></td><td class="num">89,375,068</td><td class="num">89,181,860</td><td class="num">44,081,564</td><td class="num">20,702,353</td><td class="num">0</td><td class="num"><strong>243,340,845</strong></td></tr>
+        <tr><td>売上原価</td><td class="num">15,045,558</td><td class="num">11,360,539</td><td class="num">6,985,016</td><td class="num">11,872,570</td><td class="num">122,400</td><td class="num">45,386,083</td></tr>
+        <tr class="highlight-row"><td><strong>売上総利益</strong></td><td class="num">74,329,510</td><td class="num">77,821,321</td><td class="num">37,096,548</td><td class="num">8,829,783</td><td class="num negative">▲122,400</td><td class="num"><strong>197,954,762</strong></td></tr>
+        <tr><td>販管費合計</td><td class="num">76,568,584</td><td class="num">79,324,199</td><td class="num">52,377,903</td><td class="num">13,582,913</td><td class="num">870,527</td><td class="num">222,724,126</td></tr>
+        <tr class="highlight-row"><td><strong>営業利益</strong></td><td class="num negative">▲2,239,074</td><td class="num negative">▲1,502,878</td><td class="num negative">▲15,281,355</td><td class="num negative">▲4,753,130</td><td class="num negative">▲992,927</td><td class="num negative"><strong>▲24,769,364</strong></td></tr>
+        <tr><td>営業外収益</td><td class="num">676,645</td><td class="num">572,395</td><td class="num">975,409</td><td class="num">347,273</td><td class="num">16,909</td><td class="num">2,588,631</td></tr>
+        <tr><td>営業外費用</td><td class="num">0</td><td class="num">120,526</td><td class="num">71,392</td><td class="num">70,363</td><td class="num">0</td><td class="num">262,281</td></tr>
+        <tr class="highlight-row"><td><strong>経常利益</strong></td><td class="num negative">▲1,562,429</td><td class="num negative">▲1,051,009</td><td class="num negative">▲14,377,338</td><td class="num negative">▲4,476,220</td><td class="num negative">▲976,018</td><td class="num negative"><strong>▲22,443,014</strong></td></tr>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>📊 売上構成（補助科目別・累計）</h2>
+        <table>
+          <tr><th>補助科目</th><th class="num">金額</th><th class="num">構成比</th></tr>
+          <tr><td>AND Medical Group</td><td class="num">74,732,977</td><td class="num">30.4%</td></tr>
+          <tr><td>車両</td><td class="num">69,959,514</td><td class="num">28.4%</td></tr>
+          <tr><td>WEBマーケティング</td><td class="num">48,789,100</td><td class="num">19.8%</td></tr>
+          <tr><td>コンサル</td><td class="num">37,830,412</td><td class="num">15.4%</td></tr>
+          <tr><td>みつ葉グループ</td><td class="num">5,532,018</td><td class="num">2.2%</td></tr>
+          <tr><td>弁護士法人・響</td><td class="num">5,394,228</td><td class="num">2.2%</td></tr>
+          <tr><td>HUBRIDE</td><td class="num">2,800,722</td><td class="num">1.1%</td></tr>
+          <tr><td>その他</td><td class="num">1,158,207</td><td class="num">0.5%</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h2>📊 販管費TOP10（累計）</h2>
+        <table>
+          <tr><th>科目</th><th class="num">金額</th><th class="num">構成比</th></tr>
+          <tr><td>給料賃金</td><td class="num">72,692,511</td><td class="num">32.6%</td></tr>
+          <tr><td>外注費</td><td class="num">36,178,876</td><td class="num">16.2%</td></tr>
+          <tr><td>業務委託費</td><td class="num">27,478,721</td><td class="num">12.3%</td></tr>
+          <tr><td>広告宣伝費</td><td class="num">27,102,343</td><td class="num">12.2%</td></tr>
+          <tr><td>法定福利費</td><td class="num">11,945,174</td><td class="num">5.4%</td></tr>
+          <tr><td>旅費交通費</td><td class="num">6,082,186</td><td class="num">2.7%</td></tr>
+          <tr><td>車両費</td><td class="num">5,023,657</td><td class="num">2.3%</td></tr>
+          <tr><td>通信費</td><td class="num">4,951,843</td><td class="num">2.2%</td></tr>
+          <tr><td>支払手数料</td><td class="num">4,182,707</td><td class="num">1.9%</td></tr>
+          <tr><td>接待交際費</td><td class="num">3,868,885</td><td class="num">1.7%</td></tr>
+        </table>
+        <div class="note">
+          <strong>注目:</strong> 外注費に㈱イソガイ ¥1,397,200含む。キャリアビジョン ¥13,640,273（1月以降ゼロ）。
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ P&L 要注目ポイント</h2>
+      <div class="finding finding-alert">
+        <strong>1月の異常値:</strong> 売上高が半減（89M→47M）にも関わらず、販管費52.4Mは高水準を維持。営業損失▲15.3M。売上値引▲2.6Mも大きい。
+      </div>
+      <div class="finding finding-warn">
+        <strong>2月の売上急減:</strong> 売上高20.7M（前月比▲56%）。一方で売上原価11.9Mは1月より増加（車両仕入¥9.8M）。売上と原価のタイミングミスマッチ。
+      </div>
+      <div class="finding finding-warn">
+        <strong>3月は売上ゼロ:</strong> PL上3月の売上計上はゼロだが、サマリでは3月に¥85.4Mの入金あり。これは前月以前の売掛金回収であり、売上計上は翌月以降の可能性。
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: BS -->
+  <div id="bs" class="tab-content">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>🏦 貸借対照表 主要科目推移</h2>
+      <table>
+        <tr><th>科目</th><th class="num">11月末</th><th class="num">12月末</th><th class="num">1月末</th><th class="num">2月末</th><th>トレンド</th></tr>
+        <tr><td colspan="6" style="color:#60a5fa;font-weight:600;padding-top:12px;">【資産の部】</td></tr>
+        <tr><td>　現金</td><td class="num">7,907,839</td><td class="num">8,144,919</td><td class="num">8,301,949</td><td class="num">8,498,747</td><td>📈 微増</td></tr>
+        <tr class="highlight-row"><td>　<strong>普通預金</strong></td><td class="num">31,879,953</td><td class="num">19,909,597</td><td class="num">11,819,277</td><td class="num negative">1,710,262</td><td>📉 急減</td></tr>
+        <tr><td>　売掛金</td><td class="num">78,136,462</td><td class="num">94,603,108</td><td class="num">44,942,075</td><td class="num">6,349,905</td><td>📉 回収進行</td></tr>
+        <tr><td>　割賦売掛金</td><td class="num">43,611,860</td><td class="num">44,490,220</td><td class="num">33,908,000</td><td class="num">37,573,610</td><td>→ 横ばい</td></tr>
+        <tr><td>　立替金</td><td class="num">37,971,621</td><td class="num">38,326,815</td><td class="num">42,503,283</td><td class="num negative">59,497,437</td><td>📈 急増</td></tr>
+        <tr><td>　仮払金</td><td class="num">0</td><td class="num">16,420,486</td><td class="num">20,846,893</td><td class="num">20,759,676</td><td>📈 急増</td></tr>
+        <tr><td>　仮払消費税</td><td class="num">6,101,483</td><td class="num">12,353,853</td><td class="num">15,290,879</td><td class="num">17,754,963</td><td>📈 増加</td></tr>
+        <tr><td>　出資金</td><td class="num">44,500,000</td><td class="num">44,500,000</td><td class="num">44,500,000</td><td class="num">44,500,000</td><td>→ 不変</td></tr>
+        <tr style="border-top:2px solid #334155;"><td><strong>資産合計</strong></td><td class="num">269,298,342</td><td class="num">303,440,032</td><td class="num">249,840,172</td><td class="num">226,343,753</td><td>📉</td></tr>
+
+        <tr><td colspan="6" style="color:#f87171;font-weight:600;padding-top:12px;">【負債の部】</td></tr>
+        <tr><td>　買掛金</td><td class="num">30,904,984</td><td class="num">53,111,158</td><td class="num">22,491,402</td><td class="num negative">▲11,748,287</td><td>⚠️ マイナス</td></tr>
+        <tr class="highlight-row"><td>　<strong>短期借入金</strong></td><td class="num">61,500,000</td><td class="num">65,750,000</td><td class="num">66,750,000</td><td class="num">110,311,000</td><td>📈 急増</td></tr>
+        <tr><td>　未払金</td><td class="num">32,977,079</td><td class="num">36,935,715</td><td class="num">36,635,669</td><td class="num">9,070,492</td><td>📉 支払済</td></tr>
+        <tr><td>　長期借入金</td><td class="num">51,065,300</td><td class="num">50,350,200</td><td class="num">49,635,100</td><td class="num">48,920,000</td><td>📉 返済中</td></tr>
+        <tr style="border-top:2px solid #334155;"><td><strong>負債合計</strong></td><td class="num">234,125,390</td><td class="num">269,318,089</td><td class="num">230,095,567</td><td class="num">211,075,368</td><td></td></tr>
+
+        <tr><td colspan="6" style="color:#4ade80;font-weight:600;padding-top:12px;">【純資産の部】</td></tr>
+        <tr><td>　資本金</td><td class="num">20,000,000</td><td class="num">20,000,000</td><td class="num">20,000,000</td><td class="num">20,000,000</td><td>→ 不変</td></tr>
+        <tr class="highlight-row"><td>　<strong>繰越利益剰余金</strong></td><td class="num">15,172,952</td><td class="num">14,121,943</td><td class="num negative">▲255,395</td><td class="num negative">▲4,731,615</td><td>📉 債務超過接近</td></tr>
+        <tr style="border-top:2px solid #334155;"><td><strong>純資産合計</strong></td><td class="num">35,172,952</td><td class="num">34,121,943</td><td class="num">19,744,605</td><td class="num">15,268,385</td><td>📉</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ BS 要注目ポイント</h2>
+      <div class="finding finding-alert">
+        <strong>買掛金マイナス▲11.7M:</strong> 2月末の買掛金がマイナス。前払い超過 or 仕入戻しの未整理。異常値として西先生確認推奨。
+      </div>
+      <div class="finding finding-alert">
+        <strong>立替金急増（37.9M→59.5M）:</strong> ㈱ディーアイエー向け立替金が4.5M→51.0Mに急増。回収可能性の確認が必要。
+      </div>
+      <div class="finding finding-warn">
+        <strong>短期借入金+48.8M増:</strong> 4ヶ月で61.5M→110.3M。運転資金不足を借入で補填。長期借入金は▲715K/月で返済中。
+      </div>
+      <div class="finding finding-warn">
+        <strong>繰越利益剰余金 債務超過リスク:</strong> 1月末で▲255千円と赤字転落。2月末▲4.7M。このペースなら資本金20Mを食い尽くすまであと3-4ヶ月。
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: CASHFLOW -->
+  <div id="cashflow" class="tab-content">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>💧 資金繰り分析（入出金サマリベース）</h2>
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-value positive">29,985,419</div>
+          <div class="kpi-label">3月末残高（サマリ）</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-value">85,398,463</div>
+          <div class="kpi-label">3月入金合計</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-value">62,510,138</div>
+          <div class="kpi-label">3月出金合計</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-value positive">+22,888,325</div>
+          <div class="kpi-label">3月NET</div>
+        </div>
+      </div>
+
+      <table>
+        <tr><th>月</th><th class="num">先月末残高</th><th class="num">入金</th><th class="num">出金</th><th class="num">NET</th><th class="num">月末残高</th></tr>
+        <tr><td>1月</td><td class="num">13,189,019</td><td class="num">98,357,479</td><td class="num">104,344,411</td><td class="num negative">▲5,986,932</td><td class="num">7,202,087</td></tr>
+        <tr><td>2月</td><td class="num">7,202,087</td><td class="num">88,132,872</td><td class="num">88,237,865</td><td class="num negative">▲104,993</td><td class="num">7,097,094</td></tr>
+        <tr class="highlight-row"><td>3月</td><td class="num">7,097,094</td><td class="num">85,398,463</td><td class="num">62,510,138</td><td class="num positive">+22,888,325</td><td class="num positive">29,985,419</td></tr>
+      </table>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <h2>🏢 INTER vs HUBRIDE 資金フロー</h2>
+      <div class="flow-diagram">
+        <div class="flow-box" style="background:#1e3a5f;border:2px solid #3b82f6;">
+          <div style="font-size:0.75rem;color:#93c5fd;">インターシフト本体</div>
+          <div style="font-size:1.1rem;font-weight:700;">売上：コンサル・WEB等</div>
+          <div style="font-size:0.85rem;color:#fca5a5;margin-top:4px;">1~2月NET: ▲8.4M</div>
+          <div style="font-size:0.85rem;color:#6ee7b7;">3月NET: +25.2M</div>
+        </div>
+        <div class="flow-arrow">⟷</div>
+        <div class="flow-box" style="background:#064e3b;border:2px solid #10b981;">
+          <div style="font-size:0.75rem;color:#6ee7b7;">HUBRIDE事業部</div>
+          <div style="font-size:1.1rem;font-weight:700;">車両売買</div>
+          <div style="font-size:0.85rem;color:#6ee7b7;margin-top:4px;">1~2月NET: +2.3M</div>
+          <div style="font-size:0.85rem;color:#fca5a5;">3月NET: ▲2.3M</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box" style="background:#0f172a;border:2px solid #64748b;">
+          <div style="font-size:0.75rem;color:#94a3b8;">りそな銀行池袋支店</div>
+          <div style="font-size:1.1rem;font-weight:700;">共通口座</div>
+          <div style="font-size:0.85rem;color:#94a3b8;margin-top:4px;">3月末: ¥30.0M</div>
+        </div>
+      </div>
+      <div class="note">
+        <strong>構造的特徴:</strong> INTERとHUBRIDEは同一口座（りそな銀行池袋支店）で資金管理。
+        通常月はHUBRIDEの黒字がINTERの赤字を補填。3月はINTER側の大口入金で全体が回復。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📈 4月以降の資金見通し</h2>
+      <div class="finding finding-info">
+        <strong>3月末残高 ¥30.0M:</strong> 1~2月の危機的水準（¥7M前後）から大幅改善。ただし短期借入金¥110.3Mの返済圧力あり。
+      </div>
+      <div class="finding finding-warn">
+        <strong>4月見通し:</strong> 入出金サマリの「4月確定」シートおよび「2026年03月予測」の分析が必要。HUBRIDE車両売上の入金タイミングが鍵。
+      </div>
+      <div class="finding finding-warn">
+        <strong>構造的課題:</strong> 売上高が11~12月の¥89Mから1月¥47M→2月¥21Mと急減。季節性なのか事業構造の変化なのか要確認。
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: HUBRIDE -->
+  <div id="hubride" class="tab-content">
+    <div class="card" style="margin-bottom:20px;">
+      <h2>🚗 HUBRIDE部門 仕訳帳ベース分析</h2>
+      <table>
+        <tr><th>月</th><th class="num">借方金額（取引規模）</th><th class="num">件数</th><th class="num">貸方金額</th><th class="num">件数</th></tr>
+        <tr><td>11月</td><td class="num">160,350,547</td><td class="num">307</td><td class="num">147,184,927</td><td class="num">103</td></tr>
+        <tr><td>12月</td><td class="num">122,280,251</td><td class="num">364</td><td class="num">100,047,314</td><td class="num">97</td></tr>
+        <tr><td>1月</td><td class="num">91,516,706</td><td class="num">344</td><td class="num">91,545,340</td><td class="num">94</td></tr>
+        <tr><td>2月</td><td class="num">124,775,466</td><td class="num">292</td><td class="num">101,549,537</td><td class="num">93</td></tr>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>PL上のHUBRIDE関連科目</h2>
+        <table>
+          <tr><th>科目</th><th class="num">累計</th></tr>
+          <tr><td>売上高 - 車両</td><td class="num">69,959,514</td></tr>
+          <tr><td>売上高 - HUBRIDE</td><td class="num">2,800,722</td></tr>
+          <tr><td>仕入高 - 車両</td><td class="num">15,329,728</td></tr>
+          <tr class="highlight-row"><td><strong>車両粗利</strong></td><td class="num positive"><strong>54,629,786</strong></td></tr>
+        </table>
+        <div class="note">車両粗利率: 78.1%（売上70.0M - 仕入15.3M）</div>
+      </div>
+      <div class="card">
+        <h2>BS上の車両関連</h2>
+        <table>
+          <tr><th>科目</th><th class="num">2月末残高</th></tr>
+          <tr><td>商品（車両）</td><td class="num">3,662,010</td></tr>
+          <tr><td>割賦売掛金 - SBIオートサポート</td><td class="num">19,808,060</td></tr>
+          <tr><td>割賦売掛金 - カラフルライン</td><td class="num">14,720,000</td></tr>
+          <tr><td>割賦売掛金 - ライフティ</td><td class="num">2,945,000</td></tr>
+          <tr><td>割賦売掛金 - アプラス</td><td class="num">100,550</td></tr>
+          <tr class="highlight-row"><td><strong>割賦売掛金 合計</strong></td><td class="num"><strong>37,573,610</strong></td></tr>
+        </table>
+        <div class="note">割賦売掛金: SBI比率53%→カラフルライン39%にシフト中。分散化の兆候。</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔗 KINTONE入出金チェックシートとの突合</h2>
+      <div class="finding finding-ok">
+        <strong>前回分析結果（継続有効）:</strong> KINTONEの車両取引430件とサマリの車両関連入出金は全体として整合。
+        個別差異は入金タイミング（予測 vs 実績）と日付ズレで説明可能。
+      </div>
+      <div class="finding finding-info">
+        <strong>割賦売掛金の回収サイクル:</strong> SBIオートサポートからの入金は月次安定（¥19.8M→減少中）。
+        カラフルライン㈱が急増（3.9M→14.7M）しており、新たな割賦チャネルとして機能。
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;padding:30px;color:#475569;font-size:0.75rem;">
+  Generated by Claude Code for CFO磯貝 ｜ データ基準日: 2026年3月29日<br>
+  Sources: BS/PL月次推移CSV, 仕訳帳CSV, 入出金サマリXLSX, KINTONEチェックシートXLSM
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
