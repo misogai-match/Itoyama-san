@@ -980,17 +980,19 @@ function cellVal(n) {
 // ============================================================
 function buildKPI() {
   const s = DATA.summary;
-  // Mar end balance
-  const mar_inter_net = s.INTER["3月"].in - s.INTER["3月"].out;  // +25,217,089
-  const mar_hub_net   = s.HUBRIDE["3月"].in - s.HUBRIDE["3月"].out; // -2,328,764
-  const mar_end = DATA.balances["3月"] + mar_inter_net + mar_hub_net;
-  // 29,985,419
+  // 3月末残高: スプシの残高予測（31日時点）を使用
+  // 3月確定シートは月途中の実績のみ（月末支払い未反映）のため不正確
+  const mar_end = 3306882;  // 入出金サマリ 2026-03-29時点の3月末予測値
 
-  // 4月 forecast
-  const inter_nets = ["1月","2月","3月"].map(m => s.INTER[m].in - s.INTER[m].out);
-  const hub_nets   = ["1月","2月","3月"].map(m => s.HUBRIDE[m].in - s.HUBRIDE[m].out);
-  const inter_avg = inter_nets.reduce((a,b)=>a+b,0)/3;
-  const hub_avg   = hub_nets.reduce((a,b)=>a+b,0)/3;
+  // 4月 forecast: 3月予測シートのINTER/HUBRIDE純増減を使用
+  // 3月予測: INTER差引 ▲15,889,232 / HUBRIDE差引 +17,616,372
+  const mar_forecast_inter_net = DATA.mar_forecast.INTER.in - DATA.mar_forecast.INTER.out; // -15,889,232
+  const mar_forecast_hub_net = DATA.mar_forecast.HUBRIDE.in - DATA.mar_forecast.HUBRIDE.out; // +17,616,372
+  // 4月予測は直近実績月（1月・2月）の平均を使用（3月は未確定のため除外）
+  const inter_nets_12 = ["1月","2月"].map(m => s.INTER[m].in - s.INTER[m].out);
+  const hub_nets_12   = ["1月","2月"].map(m => s.HUBRIDE[m].in - s.HUBRIDE[m].out);
+  const inter_avg = inter_nets_12.reduce((a,b)=>a+b,0)/2;
+  const hub_avg   = hub_nets_12.reduce((a,b)=>a+b,0)/2;
   const apr_end = mar_end + inter_avg + hub_avg;
 
   // Cumulative totals
@@ -1003,9 +1005,9 @@ function buildKPI() {
   const cards = [
     {
       cls: "kpi-balance",
-      label: "3月末 銀行残高 (実績)",
+      label: "3月末 残高予測",
       value: fmt(mar_end),
-      sub: `期初残高 ¥7,097,094 + INTER純増 ${mar_inter_net >= 0 ? "+" : ""}${mar_inter_net.toLocaleString()} + HUBRIDE純増 ${mar_hub_net >= 0 ? "+" : ""}${mar_hub_net.toLocaleString()}`
+      sub: `入出金サマリ 残高予測（31日時点） ※3月確定前`
     },
     {
       cls: "kpi-forecast",
@@ -1359,25 +1361,26 @@ function buildDonutCharts() {
 // ============================================================
 function buildForecast() {
   const s = DATA.summary;
-  // INTER monthly nets
   const iNets = MONTHS.map(m => s.INTER[m].in - s.INTER[m].out);
   const hNets = MONTHS.map(m => s.HUBRIDE[m].in - s.HUBRIDE[m].out);
 
-  // Recent 3 months (1月,2月,3月 = index 2,3,4)
-  const iRecent = [iNets[2], iNets[3], iNets[4]];
-  const hRecent = [hNets[2], hNets[3], hNets[4]];
-  const iAvg = iRecent.reduce((a,b)=>a+b,0)/3;
-  const hAvg = hRecent.reduce((a,b)=>a+b,0)/3;
+  // 3月末残高: スプシの残高予測値を使用（3月確定は未完了のため）
+  const mar_end = 3306882;
 
-  const iOpt  = Math.max(...iRecent);
-  const iPes  = Math.min(...iRecent);
-  const hOpt  = Math.max(...hRecent);
-  const hPes  = Math.min(...hRecent);
+  // 3月予測シートの純増減
+  const mar_forecast_iNet = DATA.mar_forecast.INTER.in - DATA.mar_forecast.INTER.out;
+  const mar_forecast_hNet = DATA.mar_forecast.HUBRIDE.in - DATA.mar_forecast.HUBRIDE.out;
 
-  const mar_end = DATA.balances["3月"]
-    + (s.INTER["3月"].in - s.INTER["3月"].out)
-    + (s.HUBRIDE["3月"].in - s.HUBRIDE["3月"].out);
-  // = 29,985,419
+  // 4月予測: 1月・2月の確定実績を使用（3月は未確定）
+  const iRecent = [iNets[2], iNets[3]]; // 1月, 2月
+  const hRecent = [hNets[2], hNets[3]];
+  const iAvg = iRecent.reduce((a,b)=>a+b,0)/2;
+  const hAvg = hRecent.reduce((a,b)=>a+b,0)/2;
+
+  const iOpt = Math.max(...iRecent);
+  const iPes = Math.min(...iRecent);
+  const hOpt = Math.max(...hRecent);
+  const hPes = Math.min(...hRecent);
 
   const apr_base = mar_end + iAvg + hAvg;
   const apr_opt  = mar_end + iOpt + hOpt;
@@ -1385,11 +1388,11 @@ function buildForecast() {
 
   // INTER section
   document.getElementById("forecast-inter").innerHTML = `
-    <div class="forecast-row"><span class="forecast-label">1月 純増減</span><span class="forecast-value">${fmtSigned(iNets[2])}</span></div>
-    <div class="forecast-row"><span class="forecast-label">2月 純増減</span><span class="forecast-value">${fmtSigned(iNets[3])}</span></div>
-    <div class="forecast-row"><span class="forecast-label">3月 純増減</span><span class="forecast-value">${fmtSigned(iNets[4])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">1月 純増減 (確定)</span><span class="forecast-value">${fmtSigned(iNets[2])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">2月 純増減 (確定)</span><span class="forecast-value">${fmtSigned(iNets[3])}</span></div>
+    <div class="forecast-row" style="opacity:0.6"><span class="forecast-label">3月 純増減 (予測)</span><span class="forecast-value">${fmtSigned(mar_forecast_iNet)}</span></div>
     <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
-      <span class="forecast-label">直近3ヶ月平均</span>
+      <span class="forecast-label">1-2月平均 → 4月適用</span>
       <span class="forecast-value" style="color:#93c5fd">${fmtSigned(Math.round(iAvg))}</span>
     </div>
     <div class="range-bar">
@@ -1403,11 +1406,11 @@ function buildForecast() {
 
   // HUBRIDE section
   document.getElementById("forecast-hubride").innerHTML = `
-    <div class="forecast-row"><span class="forecast-label">1月 純増減</span><span class="forecast-value">${fmtSigned(hNets[2])}</span></div>
-    <div class="forecast-row"><span class="forecast-label">2月 純増減</span><span class="forecast-value">${fmtSigned(hNets[3])}</span></div>
-    <div class="forecast-row"><span class="forecast-label">3月 純増減</span><span class="forecast-value">${fmtSigned(hNets[4])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">1月 純増減 (確定)</span><span class="forecast-value">${fmtSigned(hNets[2])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">2月 純増減 (確定)</span><span class="forecast-value">${fmtSigned(hNets[3])}</span></div>
+    <div class="forecast-row" style="opacity:0.6"><span class="forecast-label">3月 純増減 (予測)</span><span class="forecast-value">${fmtSigned(mar_forecast_hNet)}</span></div>
     <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
-      <span class="forecast-label">直近3ヶ月平均</span>
+      <span class="forecast-label">1-2月平均 → 4月適用</span>
       <span class="forecast-value" style="color:#6ee7b7">${fmtSigned(Math.round(hAvg))}</span>
     </div>
     <div class="range-bar">
@@ -1421,9 +1424,9 @@ function buildForecast() {
 
   // Combined
   document.getElementById("forecast-combined").innerHTML = `
-    <div class="forecast-row"><span class="forecast-label">3月末残高 (実績)</span><span class="forecast-value" style="color:#fcd34d">${fmt(mar_end)}</span></div>
-    <div class="forecast-row"><span class="forecast-label">4月 INTER予測</span><span class="forecast-value">${fmtSigned(Math.round(iAvg))}</span></div>
-    <div class="forecast-row"><span class="forecast-label">4月 HUBRIDE予測</span><span class="forecast-value">${fmtSigned(Math.round(hAvg))}</span></div>
+    <div class="forecast-row"><span class="forecast-label">3月末残高 (スプシ予測)</span><span class="forecast-value" style="color:#fcd34d">${fmt(mar_end)}</span></div>
+    <div class="forecast-row"><span class="forecast-label">4月 INTER予測 (1-2月平均)</span><span class="forecast-value">${fmtSigned(Math.round(iAvg))}</span></div>
+    <div class="forecast-row"><span class="forecast-label">4月 HUBRIDE予測 (1-2月平均)</span><span class="forecast-value">${fmtSigned(Math.round(hAvg))}</span></div>
     <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
       <span class="forecast-label" style="font-weight:700">4月末 残高予測</span>
       <span class="forecast-value" style="color:#fcd34d;font-size:15px">${fmt(Math.round(apr_base))}</span>
@@ -1436,8 +1439,9 @@ function buildForecast() {
       </div>
     </div>
     <div style="margin-top:10px;font-size:11px;color:var(--text2);line-height:1.5">
-      ※ 直近3ヶ月の平均純増減を4月に適用した概算値。<br>
-      ※ 事業規模の変動が大きいため参考値として扱うこと。
+      ※ 3月末残高は入出金サマリの残高予測（31日時点）¥3,306,882を使用。<br>
+      ※ 4月予測は1月・2月の確定実績平均を適用（3月は未確定のため除外）。<br>
+      ※ 3月予測シート: INTER差引 ${fmtSigned(mar_forecast_iNet)} / HUBRIDE差引 ${fmtSigned(mar_forecast_hNet)}
     </div>
   `;
 }
