@@ -1483,19 +1483,30 @@ function sortTable(tableId, colIdx) {
 // COLLAPSIBLE
 // ============================================================
 
-// セクションの合計をtableのtotal-row最終セルから取得する
-function getSectionTotal(contentId) {
+// セクションの月別合計をtableのtotal-rowから取得する
+function getSectionMonthlyTotals(contentId) {
   const content = document.getElementById(contentId);
   if (!content) return null;
   const totalRow = content.querySelector("tr.total-row");
   if (!totalRow) return null;
   const cells = totalRow.querySelectorAll("td");
-  // 最終セルが合計値
-  const lastCell = cells[cells.length - 1];
-  if (!lastCell) return null;
-  const txt = lastCell.textContent.replace(/[¥,\s]/g, "").replace("—", "");
-  const n = parseFloat(txt);
-  return isNaN(n) ? null : n;
+  if (cells.length < 7) return null; // 取引先 + 5months + 合計
+  const months = ["11月","12月","1月","2月","3月"];
+  const result = [];
+  for (let i = 1; i <= 5; i++) {
+    const txt = cells[i].textContent.replace(/[¥,\s]/g, "").replace("—", "");
+    const n = parseFloat(txt);
+    if (!isNaN(n) && n > 0) {
+      result.push(months[i-1] + " ¥" + n.toLocaleString("ja-JP"));
+    }
+  }
+  // 合計
+  const totalTxt = cells[cells.length - 1].textContent.replace(/[¥,\s]/g, "").replace("—", "");
+  const total = parseFloat(totalTxt);
+  if (!isNaN(total) && total > 0) {
+    result.push("合計 ¥" + total.toLocaleString("ja-JP"));
+  }
+  return result.length > 0 ? result : null;
 }
 
 function toggleCollapsible(id) {
@@ -1515,10 +1526,10 @@ function toggleCollapsible(id) {
     const baseTitle = titleEl.dataset.baseTitle || titleEl.textContent.replace(/ — 合計.*$/, "").trim();
     titleEl.dataset.baseTitle = baseTitle;
     if (!willOpen) {
-      // 閉じた → 合計を表示
-      const total = getSectionTotal(id);
-      if (total !== null) {
-        titleEl.textContent = baseTitle + " — 合計 ¥" + total.toLocaleString("ja-JP");
+      // 閉じた → 月別合計を表示
+      const monthlyTotals = getSectionMonthlyTotals(id);
+      if (monthlyTotals) {
+        titleEl.innerHTML = baseTitle + '<br><span style="font-size:12px;font-weight:400;color:#94a3b8;margin-left:8px">' + monthlyTotals.join(' | ') + '</span>';
       } else {
         titleEl.textContent = baseTitle;
       }
