@@ -223,6 +223,11 @@
         <td>30,663,327</td><td>32,844,130</td><td>44,502,525</td><td>37,933,163</td><td>67,772,235</td>
         <td class="forecast-col">53,947,593</td>
       </tr>
+      <tr style="color:#94a3b8; font-size:0.8rem">
+        <td style="padding-left:24px">┗ 台数 / 平均単価</td>
+        <td>18台 / ¥1,834,269</td><td>24台 / ¥1,846,413</td><td>34台 / ¥1,336,638</td><td>29台 / ¥1,486,172</td><td>37台 / ¥1,477,980</td>
+        <td class="forecast-col">33台 / ¥1,449,927</td>
+      </tr>
       <tr>
         <td>その他入金</td>
         <td>998,779</td><td>10,961,014</td><td>3,349,414</td><td>6,051,617</td><td>1,325,048</td>
@@ -244,6 +249,11 @@
         <td>仕入（車両等）</td>
         <td>31,232,061</td><td>31,875,142</td><td>23,175,001</td><td>47,618,950</td><td>22,714,932</td>
         <td class="forecast-col">31,092,950</td>
+      </tr>
+      <tr style="color:#94a3b8; font-size:0.8rem">
+        <td style="padding-left:24px">┗ 台数 / 平均単価</td>
+        <td>32台 / ¥1,020,079</td><td>38台 / ¥778,891</td><td>29台 / ¥813,734</td><td>50台 / ¥950,627</td><td>32台 / ¥628,681</td>
+        <td class="forecast-col">36台 / ¥863,693</td>
       </tr>
       <tr>
         <td>その他出金</td>
@@ -267,6 +277,42 @@
       </tr>
     </tbody>
   </table>
+
+  <div style="margin-top:16px; padding:16px; background:#0f172a; border-radius:8px; border-left:3px solid #4ade80">
+    <h4 style="color:#4ade80; margin-bottom:8px; font-size:0.9rem">HUBRIDE 台数サマリ（KINTONEチェックシート）</h4>
+    <table style="font-size:0.85rem">
+      <thead>
+        <tr><th></th><th>11月</th><th>12月</th><th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>5月〜</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>出金（仕入）台数</td><td>32</td><td>38</td><td>29</td><td>50</td><td>32</td><td>2</td><td>—</td>
+        </tr>
+        <tr>
+          <td>入金（売上）台数</td><td>18</td><td>24</td><td>34</td><td>29</td><td>37</td><td>67</td><td>8</td>
+        </tr>
+        <tr style="font-weight:600">
+          <td>台数差（入−出）</td>
+          <td style="color:#ef4444">▲14</td><td style="color:#ef4444">▲14</td>
+          <td style="color:#22c55e">+5</td><td style="color:#ef4444">▲21</td>
+          <td style="color:#22c55e">+5</td><td style="color:#22c55e">+65</td><td>—</td>
+        </tr>
+        <tr>
+          <td>仕入 平均単価</td>
+          <td>¥1,020K</td><td>¥779K</td><td>¥814K</td><td>¥951K</td><td>¥629K</td><td>¥780K</td><td>—</td>
+        </tr>
+        <tr>
+          <td>売上 平均単価</td>
+          <td>¥1,834K</td><td>¥1,846K</td><td>¥1,337K</td><td>¥1,486K</td><td>¥1,478K</td><td>¥1,238K</td><td>¥1,196K</td>
+        </tr>
+        <tr style="font-weight:600; color:#fbbf24">
+          <td>粗利率（単価ベース）</td>
+          <td>80%</td><td>137%</td><td>64%</td><td>56%</td><td>135%</td><td>59%</td><td>—</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="color:#64748b; font-size:0.75rem; margin-top:8px">※ 4月出金2台は未確定分のみ。4月入金67台は3月以前仕入分の回収が大部分</p>
+  </div>
 </div>
 
 <!-- Charts -->
@@ -300,6 +346,18 @@
   <div class="chart-box">
     <h3>HUBRIDE 入金内訳（区分別）</h3>
     <canvas id="hubInChart"></canvas>
+  </div>
+</div>
+
+<!-- HUBRIDE 台数チャート -->
+<div class="chart-row">
+  <div class="chart-box">
+    <h3>HUBRIDE 月別台数（仕入 vs 売上）</h3>
+    <canvas id="vehicleCountChart"></canvas>
+  </div>
+  <div class="chart-box">
+    <h3>HUBRIDE 平均単価推移（仕入 vs 売上）</h3>
+    <canvas id="avgPriceChart"></canvas>
   </div>
 </div>
 
@@ -549,6 +607,74 @@ new Chart(document.getElementById('hubInChart'), {
     ]
   },
   options: { ...chartOpts, scales: { ...chartOpts.scales, x: { ...chartOpts.scales.x, stacked: true }, y: { ...chartOpts.scales.y, stacked: true } } }
+});
+
+// HUBRIDE 台数チャート
+const monthsHub = ['11月', '12月', '1月', '2月', '3月', '4月'];
+const countOpts = {
+  responsive: true,
+  plugins: {
+    legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+    tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y + '台' } }
+  },
+  scales: {
+    x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+    y: { ticks: { color: '#94a3b8', callback: v => v + '台' }, grid: { color: '#1e293b' } }
+  }
+};
+
+new Chart(document.getElementById('vehicleCountChart'), {
+  type: 'bar',
+  data: {
+    labels: monthsHub,
+    datasets: [
+      {
+        label: '仕入（出金）台数',
+        data: [32, 38, 29, 50, 32, 2],
+        backgroundColor: 'rgba(239,68,68,0.6)',
+        borderColor: '#ef4444', borderWidth: 1
+      },
+      {
+        label: '売上（入金）台数',
+        data: [18, 24, 34, 29, 37, 67],
+        backgroundColor: 'rgba(74,222,128,0.6)',
+        borderColor: '#4ade80', borderWidth: 1
+      }
+    ]
+  },
+  options: countOpts
+});
+
+// 平均単価チャート
+new Chart(document.getElementById('avgPriceChart'), {
+  type: 'line',
+  data: {
+    labels: monthsHub,
+    datasets: [
+      {
+        label: '仕入 平均単価',
+        data: [1020079, 778891, 813734, 950627, 628681, 780254],
+        borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)',
+        tension: 0.3, pointRadius: 5
+      },
+      {
+        label: '売上 平均単価',
+        data: [1834269, 1846413, 1336638, 1486172, 1477980, 1237859],
+        borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)',
+        tension: 0.3, pointRadius: 5
+      }
+    ]
+  },
+  options: {
+    ...chartOpts,
+    scales: {
+      ...chartOpts.scales,
+      y: {
+        ticks: { color: '#94a3b8', callback: v => '¥' + (v/10000).toFixed(0) + '万' },
+        grid: { color: '#1e293b' }
+      }
+    }
+  }
 });
 </script>
 </body>
