@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提案2：Chatwork タスク管理レポート自動化</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            line-height: 1.8;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        /* Slide */
+        .slide {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            page-break-inside: avoid;
+        }
+
+        /* Slide Number */
+        .slide-number {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        /* Cover */
+        .cover {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3d7ab5 100%);
+            color: white;
+            text-align: center;
+            padding: 48px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .cover::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: -40px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+        .cover-label {
+            font-size: 12px;
+            letter-spacing: 4px;
+            opacity: 0.6;
+            margin-bottom: 16px;
+        }
+        .cover h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .cover-sub {
+            font-size: 15px;
+            opacity: 0.8;
+            margin-bottom: 24px;
+        }
+        .cover-meta {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        /* Section Title */
+        .slide h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e3a5f;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #e8f0fe;
+        }
+        .slide h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d5a87;
+            margin: 16px 0 8px;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, #e8f0fe 0%, #f0f4ff 100%);
+            border-left: 4px solid #2d5a87;
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .highlight-box strong {
+            color: #1e3a5f;
+        }
+
+        /* Comparison Table */
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 16px 0;
+            font-size: 13px;
+        }
+        .compare-table th {
+            background: #1e3a5f;
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .compare-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+        .compare-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+        .compare-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .compare-table tr:last-child td:first-child {
+            border-radius: 0 0 0 8px;
+        }
+        .compare-table tr:last-child td:last-child {
+            border-radius: 0 0 8px 0;
+        }
+        .compare-table tr:nth-child(even) {
+            background: #fafbfc;
+        }
+
+        /* Flow */
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 16px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+        }
+        .flow-icon {
+            width: 44px;
+            height: 44px;
+            background: #e8f0fe;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .flow-arrow {
+            text-align: center;
+            color: #ccc;
+            font-size: 18px;
+            padding: 0 0 0 14px;
+        }
+        .flow-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 2px;
+        }
+        .flow-content p {
+            font-size: 12px;
+            color: #666;
+        }
+        .flow-time {
+            font-size: 11px;
+            color: #2d5a87;
+            font-weight: 600;
+            background: #e8f0fe;
+            padding: 1px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* Benefit Cards */
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .benefit-card {
+            background: #f8f9fb;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .benefit-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .benefit-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 4px;
+        }
+        .benefit-desc {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* Sample Box */
+        .sample-box {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin: 16px 0;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        .sample-box .comment {
+            color: #6a9955;
+        }
+        .sample-box .keyword {
+            color: #569cd6;
+        }
+        .sample-box .string {
+            color: #ce9178;
+        }
+
+        /* Phase Timeline */
+        .phase-container {
+            margin: 16px 0;
+        }
+        .phase-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .phase-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .phase-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: white;
+        }
+        .phase-dot.p1 { background: #38a169; }
+        .phase-dot.p2 { background: #2d5a87; }
+        .phase-dot.p3 { background: #805ad5; }
+        .phase-line {
+            width: 2px;
+            flex: 1;
+            background: #e0e0e0;
+            margin: 4px 0;
+        }
+        .phase-content {
+            flex: 1;
+            background: #f8f9fb;
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+        .phase-content h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .phase-content .period {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+        .phase-content ul {
+            font-size: 12px;
+            margin-left: 16px;
+            color: #555;
+        }
+
+        /* Cost Box */
+        .cost-box {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        .cost-title {
+            font-size: 12px;
+            color: #276749;
+            margin-bottom: 4px;
+        }
+        .cost-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #276749;
+        }
+        .cost-note {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Zero burden */
+        .zero-box {
+            background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+            color: white;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            margin: 16px 0;
+        }
+        .zero-box .zero-label {
+            font-size: 12px;
+            letter-spacing: 3px;
+            opacity: 0.6;
+            margin-bottom: 8px;
+        }
+        .zero-box .zero-value {
+            font-size: 36px;
+            font-weight: 800;
+        }
+        .zero-box .zero-desc {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        /* Link button */
+        .link-btn {
+            display: inline-block;
+            background: #2d5a87;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .link-btn:hover {
+            background: #1e3a5f;
+        }
+
+        /* List style */
+        .clean-list {
+            list-style: none;
+            margin: 12px 0;
+        }
+        .clean-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .clean-list li:last-child {
+            border-bottom: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 11px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Slide 1: Cover -->
+        <div class="slide cover">
+            <div class="cover-label">PROPOSAL 02</div>
+            <h1>Chatwork タスク管理<br>レポート自動化</h1>
+            <div class="cover-sub">鈴木さん管轄メンバーの稼働を<br>毎朝自動で可視化する仕組み</div>
+            <div class="cover-meta">2026年4月 ｜ 磯貝</div>
+        </div>
+
+        <!-- Slide 2: 課題 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 02</div>
+            <h2>現在の課題</h2>
+
+            <ul class="clean-list">
+                <li>
+                    <span>😰</span>
+                    <div><strong>メンバーの対応状況が見えない</strong><br>Chatworkの複数グループに情報が分散。誰が何を対応中か把握するのに時間がかかる</div>
+                </li>
+                <li>
+                    <span>⏰</span>
+                    <div><strong>期限超過の発見が遅れる</strong><br>タスクの抜け漏れに気づくのが後手になり、リカバリーコストが増大</div>
+                </li>
+                <li>
+                    <span>📱</span>
+                    <div><strong>確認作業に時間を取られる</strong><br>各グループを1つずつ確認する必要があり、管理業務に毎日30分以上消費</div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: 解決策 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 03</div>
+            <h2>解決策：毎朝の自動レポート</h2>
+
+            <div class="highlight-box">
+                Chatwork APIで<strong>全グループの会話を自動取得</strong>し、AIが解析。<br>
+                メンバーごとのタスク進捗・期限超過・要フォロー事項を<br>
+                <strong>毎朝8:00に鈴木さんへ自動配信</strong>します。
+            </div>
+
+            <div class="benefit-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤖</div>
+                    <div class="benefit-title">完全自動</div>
+                    <div class="benefit-desc">API連携で手作業ゼロ<br>毎朝勝手に届く</div>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">👥</div>
+                    <div class="benefit-title">メンバー別</div>
+                    <div class="benefit-desc">誰が何を対応中か<br>一目で把握</div>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🚨</div>
+                    <div class="benefit-title">アラート機能</div>
+                    <div class="benefit-desc">期限超過・未回答を<br>自動検知して通知</div>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📊</div>
+                    <div class="benefit-title">統計ダッシュボード</div>
+                    <div class="benefit-desc">タスク完了率・滞留を<br>数値で可視化</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: レポートサンプル -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 04</div>
+            <h2>レポートサンプル</h2>
+
+            <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+                実際のChatworkデータをもとに作成したサンプルです。毎朝このレポートが自動で届きます。
+            </p>
+
+            <a href="https://misogai-match.github.io/Itoyama-san/HUBRIDE/chatwork_daily_sample.html" class="link-btn" target="_blank">
+                📋 サンプルレポートを見る →
+            </a>
+
+            <h3 style="margin-top: 20px;">レポートの構成</h3>
+            <ul class="clean-list">
+                <li><span>📊</span><div><strong>統計サマリー</strong>：アクティブタスク数・完了数・期限超過・本日期限</div></li>
+                <li><span>⚠️</span><div><strong>要フォロー</strong>：期限超過のタスクをピックアップ（最重要）</div></li>
+                <li><span>👤</span><div><strong>メンバー別タスク</strong>：各メンバーの対応状況をステータス付きで一覧</div></li>
+                <li><span>💬</span><div><strong>アクティビティ</strong>：前日のChatwork主要やり取りのタイムライン</div></li>
+                <li><span>📋</span><div><strong>本日の注目ポイント</strong>：鈴木さんが今日フォローすべきことを3点に集約</div></li>
+            </ul>
+        </div>
+
+        <!-- Slide 5: 仕組み -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 05</div>
+            <h2>仕組み（自動化フロー）</h2>
+
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-icon">💬</div>
+                    <div class="flow-content">
+                        <h4>① Chatwork API でメッセージ取得</h4>
+                        <p>対象グループの前日分メッセージを自動収集</p>
+                        <span class="flow-time">毎朝 7:30 自動実行</span>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step">
+                    <div class="flow-icon">🤖</div>
+                    <div class="flow-content">
+                        <h4>② AI 解析</h4>
+                        <p>会話からタスク・依頼・未回答・期限を自動抽出。メンバー別に整理</p>
+                        <span class="flow-time">処理時間 約2分</span>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step">
+                    <div class="flow-icon">📊</div>
+                    <div class="flow-content">
+                        <h4>③ レポート生成</h4>
+                        <p>統計・アラート・メンバー別タスク・注目ポイントを自動構成</p>
+                        <span class="flow-time">HTML + テキスト版を同時生成</span>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step">
+                    <div class="flow-icon">📨</div>
+                    <div class="flow-content">
+                        <h4>④ 自動配信</h4>
+                        <p>Chatwork APIで鈴木さんへ直接投稿。HTMLレポートのURLも添付</p>
+                        <span class="flow-time">毎朝 8:00 配信</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: LINE版との比較 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 06</div>
+            <h2>提案1（LINE版）との比較</h2>
+
+            <table class="compare-table">
+                <tr>
+                    <th></th>
+                    <th>提案1：LINE版<br><span style="font-weight:400;font-size:11px;">糸山さん向け</span></th>
+                    <th>提案2：Chatwork版<br><span style="font-weight:400;font-size:11px;">鈴木さん向け</span></th>
+                </tr>
+                <tr>
+                    <td><strong>対象</strong></td>
+                    <td>糸山さん本人</td>
+                    <td>鈴木さん管轄メンバー</td>
+                </tr>
+                <tr>
+                    <td><strong>目的</strong></td>
+                    <td>経営全体の可視化</td>
+                    <td>部下のタスク管理</td>
+                </tr>
+                <tr>
+                    <td><strong>データ取得</strong></td>
+                    <td>手動エクスポート<br>（毎朝PC版LINE）</td>
+                    <td>API自動取得<br>（完全自動）</td>
+                </tr>
+                <tr>
+                    <td><strong>配信先</strong></td>
+                    <td>LINE</td>
+                    <td>Chatwork</td>
+                </tr>
+                <tr>
+                    <td><strong>手作業</strong></td>
+                    <td>磯貝が毎朝対応<br>→段階的に自動化</td>
+                    <td>初期設定のみ<br>→即日自動化</td>
+                </tr>
+                <tr>
+                    <td><strong>レポート内容</strong></td>
+                    <td>スケジュール・ToDo<br>フォロー事項</td>
+                    <td>メンバー別タスク進捗<br>期限管理・アラート</td>
+                </tr>
+            </table>
+
+            <div class="highlight-box">
+                2つの提案は<strong>対象も目的も異なる</strong>ため、併用が最適です。<br>
+                糸山さん → 経営全体を俯瞰 ／ 鈴木さん → チーム管理を効率化
+            </div>
+        </div>
+
+        <!-- Slide 7: 対象グループ -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 07</div>
+            <h2>対象Chatworkグループ</h2>
+
+            <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+                鈴木さん管轄で、タスク管理に関連するグループを対象にします。
+            </p>
+
+            <table class="compare-table">
+                <tr>
+                    <th>グループ名</th>
+                    <th>主な内容</th>
+                    <th>主要メンバー</th>
+                </tr>
+                <tr>
+                    <td>HUBRIDE×INTERSHIFT【請求管理】</td>
+                    <td>請求・契約管理</td>
+                    <td>小野寺・城・小川</td>
+                </tr>
+                <tr>
+                    <td>HUBRIDE：経費申請・現金…</td>
+                    <td>経費精算</td>
+                    <td>全メンバー</td>
+                </tr>
+                <tr>
+                    <td>HUBRIDE：CORE×AC</td>
+                    <td>CORE事業連携</td>
+                    <td>城・小川</td>
+                </tr>
+                <tr>
+                    <td>DualEdge×プラザシップ</td>
+                    <td>関連事業</td>
+                    <td>要確認</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align:center; color:#888; font-size:12px;">※ グループの追加・変更は随時対応可能</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 8: 鈴木さんの負担 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 08</div>
+            <h2>鈴木さんの負担</h2>
+
+            <div class="zero-box">
+                <div class="zero-label">DAILY WORKLOAD</div>
+                <div class="zero-value">ゼロ</div>
+                <div class="zero-desc">毎朝レポートを読むだけ。新しい作業は一切ありません。</div>
+            </div>
+
+            <h3>初期設定で必要なこと（1回のみ）</h3>
+            <ul class="clean-list">
+                <li><span>🔑</span><div><strong>ChatworkのAPIトークン発行</strong><br>管理者権限で発行 → 磯貝に共有（所要時間5分）</div></li>
+                <li><span>📋</span><div><strong>対象グループの確認</strong><br>レポート対象にするグループを選定（所要時間10分）</div></li>
+                <li><span>👥</span><div><strong>メンバーリストの確認</strong><br>管轄メンバーの一覧を共有（所要時間5分）</div></li>
+            </ul>
+
+            <div class="highlight-box">
+                初期設定は<strong>合計20分程度</strong>。以降はすべて磯貝側で運用します。
+            </div>
+        </div>
+
+        <!-- Slide 9: 導入ステップ -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 09</div>
+            <h2>導入ステップ</h2>
+
+            <div class="phase-container">
+                <div class="phase-item">
+                    <div class="phase-marker">
+                        <div class="phase-dot p1">1</div>
+                        <div class="phase-line"></div>
+                    </div>
+                    <div class="phase-content">
+                        <h4 style="color: #38a169;">初期構築（1週間）</h4>
+                        <div class="period">4月第1週</div>
+                        <ul>
+                            <li>APIトークン取得・接続テスト</li>
+                            <li>対象グループ・メンバーの設定</li>
+                            <li>サンプルレポート生成・フォーマット調整</li>
+                            <li>鈴木さんに試験配信 → フィードバック</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="phase-item">
+                    <div class="phase-marker">
+                        <div class="phase-dot p2">2</div>
+                        <div class="phase-line"></div>
+                    </div>
+                    <div class="phase-content">
+                        <h4 style="color: #2d5a87;">運用開始（2週間）</h4>
+                        <div class="period">4月第2〜3週</div>
+                        <ul>
+                            <li>毎朝8:00の自動配信スタート</li>
+                            <li>レポート精度のチューニング</li>
+                            <li>タスク検知ルールの改善</li>
+                            <li>ウィークリーサマリーの追加</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="phase-item">
+                    <div class="phase-marker">
+                        <div class="phase-dot p3">3</div>
+                    </div>
+                    <div class="phase-content">
+                        <h4 style="color: #805ad5;">拡張（月次）</h4>
+                        <div class="period">5月〜</div>
+                        <ul>
+                            <li>他の役員・マネージャーへの横展開</li>
+                            <li>Googleカレンダー連携（会議予定の反映）</li>
+                            <li>タスク完了率・レスポンスタイムの月次レポート</li>
+                            <li>Chatworkタスク機能との連動</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: コスト -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 10</div>
+            <h2>コスト</h2>
+
+            <div class="cost-box">
+                <div class="cost-title">追加コスト</div>
+                <div class="cost-value">¥0</div>
+                <div class="cost-note">Chatwork API（無料）＋ 既存のAI環境で運用</div>
+            </div>
+
+            <ul class="clean-list">
+                <li><span>✅</span><div><strong>Chatwork API</strong>：ビジネスプラン以上で利用可能（追加費用なし）</div></li>
+                <li><span>✅</span><div><strong>AI処理</strong>：磯貝のClaude環境で実行（追加費用なし）</div></li>
+                <li><span>✅</span><div><strong>配信</strong>：Chatwork APIで直接投稿（追加費用なし）</div></li>
+                <li><span>✅</span><div><strong>運用</strong>：磯貝が管理（追加の人件費なし）</div></li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>削減効果</strong>：鈴木さんの毎日のChatwork確認作業 30分 × 月20日 = <strong>月10時間の削減</strong>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>提案2：Chatwork タスク管理レポート自動化 ｜ 磯貝 ｜ 2026年4月</p>
+        </div>
+
+    </div>
+</body>
+</html>
