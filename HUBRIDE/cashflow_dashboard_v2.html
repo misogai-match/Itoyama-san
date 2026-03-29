@@ -1456,19 +1456,28 @@ function buildDetailTable(headId, bodyId, data, colorClass) {
   const bodyEl = document.getElementById(bodyId);
   const tblId = headId.replace("head-", "tbl-");
 
-  headEl.innerHTML = cols.map((c,i) =>
-    `<th onclick="sortTable('${tblId}',${i})">${c}</th>`
-  ).join("");
-
-  // Calculate column totals
+  // Calculate column totals first
   const colTotals = {};
   MONTHS.forEach(m => { colTotals[m] = 0; });
   colTotals["合計"] = 0;
-
-  let rows = data.map(row => {
+  data.forEach(row => {
     MONTHS.forEach(m => { colTotals[m] += row[m] || 0; });
     colTotals["合計"] += row.total || 0;
+  });
 
+  // Header row + summary row in thead
+  const headerRow = cols.map((c,i) =>
+    `<th onclick="sortTable('${tblId}',${i})">${c}</th>`
+  ).join("");
+  const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
+    <td style="color:#94a3b8;font-weight:400">月計</td>
+    ${MONTHS.map(m => `<td>${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("")}
+    <td>${fmt(colTotals["合計"])}</td>
+  </tr>`;
+  headEl.innerHTML = headerRow;
+  headEl.insertAdjacentHTML("afterend", summaryRow);
+
+  let rows = data.map(row => {
     const cells = MONTHS.map(m => cellVal(row[m] || 0)).join("");
     return `<tr>
       <td class="${colorClass || ''}" style="font-weight:500">${row.vendor}</td>
@@ -1477,7 +1486,7 @@ function buildDetailTable(headId, bodyId, data, colorClass) {
     </tr>`;
   }).join("");
 
-  // Total row
+  // Total row at bottom
   const totalCells = MONTHS.map(m => `<td style="font-weight:700">${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("");
   rows += `<tr class="total-row">
     <td>合計</td>
@@ -1496,21 +1505,29 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
   const headEl = document.getElementById(headId);
   const bodyEl = document.getElementById(bodyId);
 
-  headEl.innerHTML = cols.map((c, i) =>
-    `<th style="cursor:default">${c}</th>`
-  ).join("");
-
-  // Grand total accumulators
+  // Calculate grand totals first
   const grandTotals = {};
   MONTHS.forEach(m => { grandTotals[m] = 0; });
   grandTotals["合計"] = 0;
+  groupedData.forEach(group => {
+    MONTHS.forEach(m => { grandTotals[m] += group.subtotal[m] || 0; });
+    grandTotals["合計"] += group.subtotal.total || 0;
+  });
+
+  const headerRow = cols.map((c, i) =>
+    `<th style="cursor:default">${c}</th>`
+  ).join("");
+  const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
+    <td style="color:#94a3b8;font-weight:400">月計</td>
+    ${MONTHS.map(m => `<td>${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`).join("")}
+    <td>${fmt(grandTotals["合計"])}</td>
+  </tr>`;
+  headEl.innerHTML = headerRow;
+  headEl.insertAdjacentHTML("afterend", summaryRow);
 
   let rows = "";
 
   groupedData.forEach(group => {
-    // Accumulate grand totals
-    MONTHS.forEach(m => { grandTotals[m] += group.subtotal[m] || 0; });
-    grandTotals["合計"] += group.subtotal.total || 0;
 
     // Category header row
     const catMonthlyCells = MONTHS.map(m =>
