@@ -645,14 +645,16 @@ const DATA = {
       "12月": {"in": 61424885, "out": 58545818},
       "1月": {"in": 88838465, "out": 95092698},
       "2月": {"in": 73825791, "out": 75974731},
-      "3月": {"in": 73940633, "out": 48723544}
+      "3月": {"in": 73940633, "out": 48723544},
+      "4月予": {"in": 81332128, "out": 85533715}
     },
     "HUBRIDE": {
       "11月": {"in": 31677131, "out": 40848551},
       "12月": {"in": 43805144, "out": 58654567},
       "1月": {"in": 9519014, "out": 9251713},
       "2月": {"in": 14307081, "out": 12263134},
-      "3月": {"in": 11457830, "out": 13786594}
+      "3月": {"in": 11457830, "out": 13786594},
+      "4月予": {"in": 82936564, "out": 3636947}
     }
   },
   "balances": {"1月": 13189019, "2月": 7202087, "3月": 7097094},
@@ -1176,7 +1178,7 @@ function consolidateVendors(data) {
 // ============================================================
 // UTILITY FUNCTIONS
 // ============================================================
-const MONTHS = ["11月","12月","1月","2月","3月"];
+const MONTHS = ["11月","12月","1月","2月","3月","4月予"];
 
 function fmt(n) {
   if (n === 0 || n === null || n === undefined) return "—";
@@ -1259,12 +1261,10 @@ function buildMonthlyChart() {
   const s = DATA.summary;
 
   const af = DATA.apr_forecast;
-  const MONTHS_APR = [...MONTHS, "4月予"];
-
-  const interIn   = MONTHS.map(m => s.INTER[m].in / 1e6).concat([af.inter.in / 1e6]);
-  const interOut  = MONTHS.map(m => -s.INTER[m].out / 1e6).concat([-af.inter.out / 1e6]);
-  const hubrideIn  = MONTHS.map(m => s.HUBRIDE[m].in / 1e6).concat([af.hubride.sales_in / 1e6]);
-  const hubrideOut = MONTHS.map(m => -s.HUBRIDE[m].out / 1e6).concat([-(af.hubride.purchase_out + af.hubride.other_out) / 1e6]);
+  const interIn   = MONTHS.map(m => s.INTER[m].in / 1e6);
+  const interOut  = MONTHS.map(m => -s.INTER[m].out / 1e6);
+  const hubrideIn  = MONTHS.map(m => s.HUBRIDE[m].in / 1e6);
+  const hubrideOut = MONTHS.map(m => -s.HUBRIDE[m].out / 1e6);
 
   // Balance line
   const balLine = [null, null,
@@ -1278,7 +1278,7 @@ function buildMonthlyChart() {
   new Chart(ctx, {
     type: "bar",
     data: {
-      labels: MONTHS_APR,
+      labels: MONTHS,
       datasets: [
         {
           label: "INTER 入金",
@@ -1346,14 +1346,14 @@ function buildMonthlyChart() {
   });
 
   // NET chart
-  const interNet   = MONTHS.map(m => (s.INTER[m].in - s.INTER[m].out) / 1e6).concat([af.inter.net / 1e6]);
-  const hubrideNet = MONTHS.map(m => (s.HUBRIDE[m].in - s.HUBRIDE[m].out) / 1e6).concat([af.hubride.net / 1e6]);
+  const interNet   = MONTHS.map(m => (s.INTER[m].in - s.INTER[m].out) / 1e6);
+  const hubrideNet = MONTHS.map(m => (s.HUBRIDE[m].in - s.HUBRIDE[m].out) / 1e6);
 
   const ctx2 = document.getElementById("netChart").getContext("2d");
   new Chart(ctx2, {
     type: "bar",
     data: {
-      labels: MONTHS_APR,
+      labels: MONTHS,
       datasets: [
         {
           label: "INTER 純増減",
@@ -1424,27 +1424,9 @@ function buildComparisonTable() {
     </tr>`;
   });
 
-  // 4月予測行 (背景色を変えて区別)
-  const af = DATA.apr_forecast;
-  const afi = af.inter, afh = af.hubride;
-  const afii = afi.in || (81332128), afio = afi.out || (85533715);
-  const afhi = afh.sales_in, afho = afh.purchase_out + afh.other_out;
-  const afiNet = af.inter.net, afhNet = af.hubride.net;
-  const afTotal = afiNet + afhNet;
-  html += `<tr style="background:rgba(245,158,11,0.15);border-top:2px solid #f59e0b">
-    <td style="font-weight:600;color:#f59e0b">4月予 📊</td>
-    <td class="inter-col">${fmt(afii)}</td>
-    <td class="inter-col">${fmt(afio)}</td>
-    <td data-val="${afiNet}">${fmtSigned(afiNet)}</td>
-    <td class="hubride-col">${fmt(afhi)}</td>
-    <td class="hubride-col">${fmt(afho)}</td>
-    <td data-val="${afhNet}">${fmtSigned(afhNet)}</td>
-    <td data-val="${afTotal}">${fmtSigned(afTotal)}</td>
-  </tr>`;
-
   const iNet = totals.ii - totals.io, hNet = totals.hi - totals.ho;
   html += `<tr class="total-row">
-    <td>合計(実績)</td>
+    <td>合計</td>
     <td class="inter-col">${fmt(totals.ii)}</td>
     <td class="inter-col">${fmt(totals.io)}</td>
     <td>${fmtSigned(iNet)}</td>
@@ -1461,7 +1443,7 @@ function buildComparisonTable() {
 // DETAIL TABLES
 // ============================================================
 function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
-  const cols = ["取引先", ...MONTHS, "合計"];
+  const cols = ["取引先", ...MONTHS];
   const headEl = document.getElementById(headId);
   const bodyEl = document.getElementById(bodyId);
   const tblId = headId.replace("head-", "tbl-");
@@ -1469,13 +1451,10 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
   // Calculate column totals first
   const colTotals = {};
   MONTHS.forEach(m => { colTotals[m] = 0; });
-  colTotals["合計"] = 0;
   data.forEach(row => {
     MONTHS.forEach(m => { colTotals[m] += row[m] || 0; });
-    colTotals["合計"] += row.total || 0;
   });
 
-  // Header row + summary row in thead
   const headerRow = cols.map((c,i) =>
     `<th onclick="sortTable('${tblId}',${i})">${c}</th>`
   ).join("");
@@ -1483,18 +1462,15 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
   // 台数行 (vehicleCounts がある場合)
   let vehicleRow = "";
   if (vehicleCounts) {
-    const totalCount = MONTHS.reduce((a, m) => a + (vehicleCounts[m] || 0), 0);
     vehicleRow = `<tr style="background:#1a2744;font-size:12px;color:#a78bfa">
       <td style="font-weight:400">台数</td>
       ${MONTHS.map(m => `<td>${vehicleCounts[m] ? vehicleCounts[m] + "台" : "—"}</td>`).join("")}
-      <td style="font-weight:600">${totalCount}台</td>
     </tr>`;
   }
 
   const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
     <td style="color:#94a3b8;font-weight:400">月計</td>
     ${MONTHS.map(m => `<td>${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("")}
-    <td>${fmt(colTotals["合計"])}</td>
   </tr>`;
   headEl.innerHTML = headerRow;
   headEl.insertAdjacentHTML("afterend", summaryRow + vehicleRow);
@@ -1504,17 +1480,8 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
     return `<tr>
       <td class="${colorClass || ''}" style="font-weight:500">${row.vendor}</td>
       ${cells}
-      <td style="font-weight:600">${fmt(row.total)}</td>
     </tr>`;
   }).join("");
-
-  // Total row at bottom
-  const totalCells = MONTHS.map(m => `<td style="font-weight:700">${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("");
-  rows += `<tr class="total-row">
-    <td>合計</td>
-    ${totalCells}
-    <td style="font-weight:700">${fmt(colTotals["合計"])}</td>
-  </tr>`;
 
   bodyEl.innerHTML = rows;
 }
@@ -1523,17 +1490,15 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
 // GROUPED TABLE (勘定科目 → 取引先 → 小計)
 // ============================================================
 function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
-  const cols = ["取引先 / 勘定科目", ...MONTHS, "合計"];
+  const cols = ["取引先 / 勘定科目", ...MONTHS];
   const headEl = document.getElementById(headId);
   const bodyEl = document.getElementById(bodyId);
 
   // Calculate grand totals first
   const grandTotals = {};
   MONTHS.forEach(m => { grandTotals[m] = 0; });
-  grandTotals["合計"] = 0;
   groupedData.forEach(group => {
     MONTHS.forEach(m => { grandTotals[m] += group.subtotal[m] || 0; });
-    grandTotals["合計"] += group.subtotal.total || 0;
   });
 
   const headerRow = cols.map((c, i) =>
@@ -1542,7 +1507,6 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
   const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
     <td style="color:#94a3b8;font-weight:400">月計</td>
     ${MONTHS.map(m => `<td>${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`).join("")}
-    <td>${fmt(grandTotals["合計"])}</td>
   </tr>`;
   headEl.innerHTML = headerRow;
   headEl.insertAdjacentHTML("afterend", summaryRow);
@@ -1560,7 +1524,6 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
     rows += `<tr style="background:#1a2744">
       <td style="font-weight:700;color:#6ee7b7;padding-left:14px">■ ${group.category}</td>
       ${catMonthlyCells}
-      <td style="font-weight:700;color:#6ee7b7">${fmt(group.subtotal.total)}</td>
     </tr>`;
 
     // Vendor detail rows
@@ -1569,7 +1532,6 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
       rows += `<tr>
         <td class="${colorClass || ''}" style="font-weight:500;padding-left:38px">${v.vendor}</td>
         ${vendorCells}
-        <td style="font-weight:600">${fmt(v.total)}</td>
       </tr>`;
     });
 
@@ -1583,7 +1545,6 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
       rows += `<tr style="background:#162033">
         <td style="font-weight:600;font-size:12px;color:var(--text2);padding-left:38px">小計</td>
         ${subMonthlyCells}
-        <td style="font-weight:600;font-size:12px">${fmt(group.subtotal.total)}</td>
       </tr>`;
     }
   });
@@ -1595,7 +1556,6 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
   rows += `<tr class="total-row">
     <td>合計</td>
     ${grandMonthlyCells}
-    <td style="font-weight:700">${fmt(grandTotals["合計"])}</td>
   </tr>`;
 
   bodyEl.innerHTML = rows;
