@@ -530,7 +530,7 @@
 
     <div class="collapsible-wrap" id="wrap-hub-purchase">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-purchase')">
-        <h3>仕入 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月32台 / 12月38台 / 1月29台 / 2月50台 / 3月32台</span></h3>
+        <h3>仕入 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月32台 / 12月38台 / 1月29台 / 2月50台 / 3月32台 / 4月予41台</span></h3>
         <span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-hub-purchase"></div>
@@ -539,6 +539,12 @@
           <thead><tr id="head-hub-purchase"></tr></thead>
           <tbody id="body-hub-purchase"></tbody>
         </table>
+        <div style="margin-top:12px;padding:12px 16px;background:#2d1f0e;border:2px solid #f59e0b;border-radius:8px;font-size:13px;color:#fcd34d;">
+          <strong>⚠ 4月予 仕入について</strong><br>
+          <span style="color:#e2e8f0">KINTONE登録済みの4月出金は2台 ¥1,561,719のみ。<br>
+          ダッシュボードでは<strong>直近2ヶ月平均（2月50台+3月32台→41台 ¥8,682,196）</strong>を採用。<br>
+          ※ 予測ロジックは鈴木常務と相談の上、確定予定。</span>
+        </div>
       </div>
     </div>
 
@@ -654,7 +660,7 @@ const DATA = {
       "1月": {"in": 9519014, "out": 9251713},
       "2月": {"in": 14307081, "out": 12263134},
       "3月": {"in": 11457830, "out": 13786594},
-      "4月予": {"in": 82936564, "out": 3636947}
+      "4月予": {"in": 83044300, "out": 10757424}
     }
   },
   "balances": {"1月": 13189019, "2月": 7202087, "3月": 7097094},
@@ -1062,13 +1068,13 @@ const DATA = {
   },
   "vehicle_counts": {
     "sales":    {"11月": 18, "12月": 24, "1月": 34, "2月": 29, "3月": 37, "4月予": 67},
-    "purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32, "4月予": 2}
+    "purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32, "4月予": 41}
   },
   "apr_forecast": {
     "mar_end": 3306882,
     "inter": {"in": 81332128, "out": 85533715, "net": -4201587, "note": "1月-2月平均"},
-    "hubride": {"sales_in": 82936564, "sales_count": 67, "purchase_out": 1561719, "purchase_count": 2, "other_out": 2075228, "net": 79299617, "note": "KINTONE 67台 + 経費1-2月平均"},
-    "apr_end": 78404912
+    "hubride": {"sales_in": 82936564, "sales_count": 67, "purchase_out": 8682196, "purchase_count": 41, "other_out": 2075228, "other_in": 107736, "net": 72286876, "note": "売上: KINTONE 67台 / 仕入: 直近2ヶ月平均41台"},
+    "apr_end": 71392171
   }
 };
 
@@ -1207,7 +1213,7 @@ function buildKPI() {
   const s = DATA.summary;
   const af = DATA.apr_forecast;
   const mar_end = af.mar_end;   // ¥3,306,882
-  const apr_end = af.apr_end;   // ¥78,404,912
+  const apr_end = af.apr_end;   // ¥71,392,171
 
   // Cumulative totals
   let total_in = 0, total_out = 0;
@@ -1442,7 +1448,7 @@ function buildComparisonTable() {
 // ============================================================
 // DETAIL TABLES
 // ============================================================
-function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
+function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts, aprTotal) {
   const cols = ["取引先", ...MONTHS];
   const headEl = document.getElementById(headId);
   const bodyEl = document.getElementById(bodyId);
@@ -1454,6 +1460,8 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
   data.forEach(row => {
     MONTHS.forEach(m => { colTotals[m] += row[m] || 0; });
   });
+  // 4月予の月計を上書き（vendor-levelデータがないため）
+  if (aprTotal !== undefined) { colTotals["4月予"] = aprTotal; }
 
   const headerRow = cols.map((c,i) =>
     `<th onclick="sortTable('${tblId}',${i})">${c}</th>`
@@ -1489,7 +1497,7 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts) {
 // ============================================================
 // GROUPED TABLE (勘定科目 → 取引先 → 小計)
 // ============================================================
-function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
+function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
   const cols = ["取引先 / 勘定科目", ...MONTHS];
   const headEl = document.getElementById(headId);
   const bodyEl = document.getElementById(bodyId);
@@ -1500,6 +1508,7 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass) {
   groupedData.forEach(group => {
     MONTHS.forEach(m => { grandTotals[m] += group.subtotal[m] || 0; });
   });
+  if (aprTotal !== undefined) { grandTotals["4月予"] = aprTotal; }
 
   const headerRow = cols.map((c, i) =>
     `<th style="cursor:default">${c}</th>`
@@ -1842,18 +1851,19 @@ document.addEventListener("DOMContentLoaded", () => {
   buildMonthlyChart();
   buildComparisonTable();
 
-  // INTER detail tables (名寄せ適用)
-  buildDetailTable("head-inter-sales",  "body-inter-sales",  consolidateVendors(DATA.inter_sales),  "inter-col");
-  buildDetailTable("head-inter-borrow", "body-inter-borrow", consolidateVendors(DATA.inter_borrow), "inter-col");
-  buildDetailTable("head-inter-lend",   "body-inter-lend",   consolidateVendors(DATA.inter_lend),   "inter-col");
-  buildDetailTable("head-inter-other",  "body-inter-other",  consolidateVendors(DATA.inter_other_out), "inter-col");
-  buildDetailTable("head-inter-salary", "body-inter-salary", consolidateVendors(DATA.inter_salary), "inter-col");
+  // INTER detail tables (名寄せ適用 + 4月予カテゴリ別合計)
+  const APR = DATA.apr_forecast;
+  buildDetailTable("head-inter-sales",  "body-inter-sales",  consolidateVendors(DATA.inter_sales),  "inter-col", null, 43319838);
+  buildDetailTable("head-inter-borrow", "body-inter-borrow", consolidateVendors(DATA.inter_borrow), "inter-col", null, 32500000);
+  buildDetailTable("head-inter-lend",   "body-inter-lend",   consolidateVendors(DATA.inter_lend),   "inter-col", null, 18035650);
+  buildDetailTable("head-inter-other",  "body-inter-other",  consolidateVendors(DATA.inter_other_out), "inter-col", null, 42833071);
+  buildDetailTable("head-inter-salary", "body-inter-salary", consolidateVendors(DATA.inter_salary), "inter-col", null, 24664994);
 
-  // HUBRIDE detail tables (名寄せ適用 + 台数表示)
-  buildDetailTable("head-hub-sales",    "body-hub-sales",    consolidateVendors(DATA.hubride_sales),     "hubride-col", DATA.vehicle_counts.sales);
-  buildDetailTable("head-hub-purchase", "body-hub-purchase", consolidateVendors(DATA.hubride_purchase),  "hubride-col", DATA.vehicle_counts.purchase);
-  buildGroupedTable("head-hub-other-out","body-hub-other-out", DATA.hubride_other_grouped, "hubride-col");
-  buildDetailTable("head-hub-other-in", "body-hub-other-in", consolidateVendors(DATA.hubride_other_in),  "hubride-col");
+  // HUBRIDE detail tables (売上・仕入はKINTONE, 他は1月-2月平均)
+  buildDetailTable("head-hub-sales",    "body-hub-sales",    consolidateVendors(DATA.hubride_sales),     "hubride-col", DATA.vehicle_counts.sales, APR.hubride.sales_in);
+  buildDetailTable("head-hub-purchase", "body-hub-purchase", consolidateVendors(DATA.hubride_purchase),  "hubride-col", DATA.vehicle_counts.purchase, APR.hubride.purchase_out);
+  buildGroupedTable("head-hub-other-out","body-hub-other-out", DATA.hubride_other_grouped, "hubride-col", 2075228);
+  buildDetailTable("head-hub-other-in", "body-hub-other-in", consolidateVendors(DATA.hubride_other_in),  "hubride-col", null, APR.hubride.other_in);
 
   // Update all summary bars
   ["inter-sales","inter-borrow","inter-lend","inter-other","inter-salary",
