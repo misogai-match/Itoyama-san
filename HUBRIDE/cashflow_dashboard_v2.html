@@ -184,7 +184,9 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   table {
     width: 100%;
@@ -259,7 +261,9 @@
     border: 1px solid var(--border);
     border-top: none;
     border-radius: 0 0 8px 8px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     margin-bottom: 12px;
   }
   .collapsible-content.open { display: block; }
