@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatwork日次レポート サンプル</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 28px 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .header-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .header-date {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .header-meta {
+            margin-top: 12px;
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .summary-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summary-title .icon {
+            font-size: 16px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .stat-box {
+            background: #f8f9fb;
+            border-radius: 10px;
+            padding: 14px 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1e3a5f;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .stat-box.alert {
+            background: #fff5f5;
+        }
+        .stat-box.alert .stat-number {
+            color: #e53e3e;
+        }
+        .stat-box.good {
+            background: #f0fff4;
+        }
+        .stat-box.good .stat-number {
+            color: #38a169;
+        }
+
+        /* Member Section */
+        .member-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            border-left: 4px solid #2d5a87;
+        }
+        .member-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .member-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .member-role {
+            font-size: 11px;
+            color: #888;
+        }
+        .status-badge {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .status-badge.active {
+            background: #e6fffa;
+            color: #319795;
+        }
+        .status-badge.warning {
+            background: #fffbeb;
+            color: #d69e2e;
+        }
+        .status-badge.overdue {
+            background: #fff5f5;
+            color: #e53e3e;
+        }
+
+        /* Task List */
+        .task-list {
+            list-style: none;
+        }
+        .task-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-status {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+        .task-status.done {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        .task-status.progress {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+        .task-status.pending {
+            background: #fefcbf;
+            color: #975a16;
+        }
+        .task-status.overdue {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        .task-content {
+            flex: 1;
+        }
+        .task-title {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .task-detail {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .task-source {
+            font-size: 10px;
+            color: #aaa;
+            background: #f7f7f7;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        /* Activity Timeline */
+        .activity-section {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .activity-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-time {
+            font-size: 11px;
+            color: #aaa;
+            font-family: monospace;
+        }
+        .activity-room {
+            font-size: 10px;
+            color: white;
+            background: #2d5a87;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+        }
+        .activity-text {
+            margin-top: 4px;
+            color: #444;
+        }
+        .activity-person {
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+
+        /* Alert Box */
+        .alert-box {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .alert-box .alert-title {
+            font-weight: 700;
+            color: #c53030;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+        .alert-box ul {
+            margin-left: 16px;
+            color: #742a2a;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: #aaa;
+        }
+        .footer a {
+            color: #2d5a87;
+            text-decoration: none;
+        }
+
+        /* Chatwork Badge */
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #e53e3e;
+            background: #fff5f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-label">Daily Task Report</div>
+            <h1>HUBRIDE メンバー稼働レポート</h1>
+            <div class="header-date">2026年3月29日（土）8:00 配信</div>
+            <div class="header-meta">
+                <span>📊 対象: 鈴木さん管轄メンバー</span>
+                <span>💬 ソース: Chatwork 6グループ</span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-number">12</div>
+                <div class="stat-label">アクティブ<br>タスク</div>
+            </div>
+            <div class="stat-box good">
+                <div class="stat-number">5</div>
+                <div class="stat-label">昨日<br>完了</div>
+            </div>
+            <div class="stat-box alert">
+                <div class="stat-number">2</div>
+                <div class="stat-label">期限<br>超過</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">3</div>
+                <div class="stat-label">本日<br>期限</div>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert-box">
+            <div class="alert-title">⚠️ 要フォロー（期限超過）</div>
+            <ul>
+                <li><strong>小川さん</strong>：SBIオートサポート精算書の提出（期限: 3/26）</li>
+                <li><strong>城さん</strong>：契約マスタへの入出金管理移行確認（期限: 3/27）</li>
+            </ul>
+        </div>
+
+        <!-- Member: 小野寺 -->
+        <div class="member-card">
+            <div class="member-header">
+                <div>
+                    <div class="member-name">小野寺 啓悟</div>
+                    <div class="member-role">株式会社インターシフト</div>
+                </div>
+                <span class="status-badge active">順調</span>
+            </div>
+            <ul class="task-list">
+                <li class="task-item">
+                    <span class="task-status done">✓</span>
+                    <div class="task-content">
+                        <div class="task-title">キントーン管理体制変更の共有</div>
+                        <div class="task-detail">契約マスタ新規作成・顧客マスタから移行 <span class="task-source">請求管理</span></div>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <span class="task-status done">✓</span>
+                    <div class="task-content">
+                        <div class="task-title">カラフルライン様 GPS発送対応</div>
+                        <div class="task-detail">追跡番号: 1996-6327-8010 → 小川さんへ依頼済 <span class="task-source">請求管理</span></div>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <span class="task-status progress">→</span>
+                    <div class="task-content">
+                        <div class="task-title">プラグイン整備</div>
+                        <div class="task-detail">本日中に完了予定 <span class="task-source">請求管理</span></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Member: 城 -->
+        <div class="member-card" style="border-left-color: #d69e2e;">
+            <div class="member-header">
+                <div>
+                    <div class="member-name">城 悠馬</div>
+                    <div class="member-role">HUBRIDE</div>
+                </div>
+                <span class="status-badge warning">要確認</span>
+            </div>
+            <ul class="task-list">
+                <li class="task-item">
+                    <span class="task-status overdue">!</span>
+                    <div class="task-content">
+                        <div class="task-title">入出金管理の契約マスタ移行確認</div>
+                        <div class="task-detail">小野寺さんより依頼あり（3/28）・未回答 <span class="task-source">請求管理</span></div>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <span class="task-status progress">→</span>
+                    <div class="task-content">
+                        <div class="task-title">契約解除関連 損害実費請求書</div>
+                        <div class="task-detail">Googleドライブに格納済み・鈴木さん確認待ち <span class="task-source">請求管理</span></div>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <span class="task-status pending">△</span>
+                    <div class="task-content">
+                        <div class="task-title">HUBRIDE×CORE×AC 経費精算</div>
+                        <div class="task-detail">3月分未提出 <span class="task-source">経費申請</span></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Member: 小川 -->
+        <div class="member-card" style="border-left-color: #e53e3e;">
+            <div class="member-header">
+                <div>
+                    <div class="member-name">小川 心</div>
+                    <div class="member-role">HUBRIDE</div>
+                </div>
+                <span class="status-badge overdue">要フォロー</span>
+            </div>
+            <ul class="task-list">
+                <li class="task-item">
+                    <span class="task-status overdue">!</span>
+                    <div class="task-content">
+                        <div class="task-title">SBIオートサポート精算書の提出</div>
+                        <div class="task-detail">期限3/26超過・未対応 <span class="task-source">経費申請</span></div>
+                    </div>
+                </li>
+                <li class="task-item">
+                    <span class="task-status pending">△</span>
+                    <div class="task-content">
+                        <div class="task-title">カラフルライン様 GPS受取対応</div>
+                        <div class="task-detail">小野寺さんより依頼（3/28）・未回答 <span class="task-source">請求管理</span></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="activity-section">
+            <div class="summary-title">
+                <span class="icon">💬</span>
+                昨日のChatwork主要アクティビティ
+            </div>
+            <div class="activity-item">
+                <span class="activity-time">15:39</span>
+                <span class="activity-room">請求管理</span>
+                <div class="activity-text">
+                    <span class="activity-person">小野寺</span> → 城・小川：キントーン管理体制変更の通知。契約マスタ新設、入出金管理の移行依頼
+                </div>
+            </div>
+            <div class="activity-item">
+                <span class="activity-time">16:36</span>
+                <span class="activity-room">請求管理</span>
+                <div class="activity-text">
+                    <span class="activity-person">小野寺</span> → 小川：カラフルライン様よりGPS到着予定。受取対応依頼
+                </div>
+            </div>
+            <div class="activity-item">
+                <span class="activity-time">17:12</span>
+                <span class="activity-room">経費申請</span>
+                <div class="activity-text">
+                    <span class="activity-person">城</span>：DualEdge×プラザシップ 3月経費申請を提出
+                </div>
+            </div>
+        </div>
+
+        <!-- Tomorrow's Focus -->
+        <div class="summary-card">
+            <div class="summary-title">
+                <span class="icon">📋</span>
+                本日の注目ポイント
+            </div>
+            <ul style="list-style: none; font-size: 13px;">
+                <li style="padding: 6px 0; border-bottom: 1px solid #f0f0f0;">
+                    🔴 <strong>小川さん</strong>のSBI精算書が3日超過 → 直接リマインド推奨
+                </li>
+                <li style="padding: 6px 0; border-bottom: 1px solid #f0f0f0;">
+                    🟡 <strong>城さん</strong>の入出金管理移行確認 → 小野寺さんが待っている状態
+                </li>
+                <li style="padding: 6px 0;">
+                    🟢 <strong>小野寺さん</strong>のプラグイン整備が本日完了予定 → 進捗確認
+                </li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Generated by AI × Chatwork API</p>
+            <p style="margin-top: 4px;">データソース: HUBRIDE×INTERSHIFT【請求管理】/ 経費申請 / CORE×AC 他</p>
+            <p style="margin-top: 4px;">対象期間: 2026/3/28 00:00 〜 23:59</p>
+        </div>
+
+    </div>
+</body>
+</html>
