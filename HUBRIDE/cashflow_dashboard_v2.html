@@ -266,6 +266,14 @@
   .collapsible-wrap { margin-bottom: 12px; }
   .collapsible-wrap .collapsible-header { border-radius: 8px 8px 0 0; }
   .collapsible-wrap.open .collapsible-header { border-radius: 8px 8px 0 0; }
+  .summary-bar {
+    background: rgba(30, 41, 59, 0.8);
+    padding: 6px 16px;
+    font-size: 12px;
+    color: #94a3b8;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
 
   /* CATEGORY LABEL */
   .cat-label {
@@ -350,10 +358,11 @@
     body { background: #fff; color: #000; font-size: 12px; }
     .header { background: #f0f4f8; border-bottom: 2px solid #ddd; }
     .header h1, .header .subtitle { color: #000; }
-    .kpi-card, .chart-card, .table-wrap, .forecast-card, .collapsible-header, .collapsible-content {
+    .kpi-card, .chart-card, .table-wrap, .forecast-card, .collapsible-header, .collapsible-content, .summary-bar {
       background: #fff;
       border: 1px solid #ddd;
     }
+    .summary-bar { color: #666; }
     th { background: #f5f5f5; color: #333; }
     td { color: #000; }
     .btn-print { display: none; }
@@ -435,6 +444,7 @@
         <h3>売上 (取引先別)</h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-inter-sales"></div>
       <div class="collapsible-content" id="inter-sales">
         <table id="tbl-inter-sales">
           <thead><tr id="head-inter-sales"></tr></thead>
@@ -448,6 +458,7 @@
         <h3>借入・回収 (取引先別)</h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-inter-borrow"></div>
       <div class="collapsible-content" id="inter-borrow">
         <table id="tbl-inter-borrow">
           <thead><tr id="head-inter-borrow"></tr></thead>
@@ -461,6 +472,7 @@
         <h3>貸付・返済 (取引先別)</h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-inter-lend"></div>
       <div class="collapsible-content" id="inter-lend">
         <table id="tbl-inter-lend">
           <thead><tr id="head-inter-lend"></tr></thead>
@@ -474,6 +486,7 @@
         <h3>その他出金 (取引先別)</h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-inter-other"></div>
       <div class="collapsible-content" id="inter-other">
         <table id="tbl-inter-other">
           <thead><tr id="head-inter-other"></tr></thead>
@@ -487,6 +500,7 @@
         <h3>給与関連 (取引先別)</h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-inter-salary"></div>
       <div class="collapsible-content" id="inter-salary">
         <table id="tbl-inter-salary">
           <thead><tr id="head-inter-salary"></tr></thead>
@@ -502,9 +516,10 @@
 
     <div class="collapsible-wrap" id="wrap-hub-sales">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-sales')">
-        <h3>売上 (取引先別)</h3>
+        <h3>売上 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月18台 / 12月24台 / 1月34台 / 2月29台 / 3月37台 / 4月67台</span></h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-hub-sales"></div>
       <div class="collapsible-content" id="hub-sales">
         <table id="tbl-hub-sales">
           <thead><tr id="head-hub-sales"></tr></thead>
@@ -515,9 +530,10 @@
 
     <div class="collapsible-wrap" id="wrap-hub-purchase">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-purchase')">
-        <h3>仕入 (取引先別)</h3>
+        <h3>仕入 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月32台 / 12月38台 / 1月29台 / 2月50台 / 3月32台</span></h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-hub-purchase"></div>
       <div class="collapsible-content" id="hub-purchase">
         <table id="tbl-hub-purchase">
           <thead><tr id="head-hub-purchase"></tr></thead>
@@ -531,6 +547,7 @@
         <h3>その他出金 (勘定科目・取引先別)</h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-hub-other-out"></div>
       <div class="collapsible-content" id="hub-other-out">
         <table id="tbl-hub-other-out">
           <thead><tr id="head-hub-other-out"></tr></thead>
@@ -544,6 +561,7 @@
         <h3>その他入金 (取引先別)</h3>
         <span class="toggle-icon">▼</span>
       </div>
+      <div class="summary-bar" id="summary-hub-other-in"></div>
       <div class="collapsible-content" id="hub-other-in">
         <table id="tbl-hub-other-in">
           <thead><tr id="head-hub-other-in"></tr></thead>
@@ -1179,16 +1197,24 @@ function buildKPI() {
   // 3月確定シートは月途中の実績のみ（月末支払い未反映）のため不正確
   const mar_end = 3306882;  // 入出金サマリ 2026-03-29時点の3月末予測値
 
-  // 4月 forecast: 3月予測シートのINTER/HUBRIDE純増減を使用
-  // 3月予測: INTER差引 ▲15,889,232 / HUBRIDE差引 +17,616,372
-  const mar_forecast_inter_net = DATA.mar_forecast.INTER.in - DATA.mar_forecast.INTER.out; // -15,889,232
-  const mar_forecast_hub_net = DATA.mar_forecast.HUBRIDE.in - DATA.mar_forecast.HUBRIDE.out; // +17,616,372
-  // 4月予測は直近実績月（1月・2月）の平均を使用（3月は未確定のため除外）
+  // 4月予測: KINTONEデータ + INTER 1-2月平均
+  // HUBRIDE 4月: KINTONE 67台 ¥82,936,564入金, 仕入2台 ¥1,561,719
+  const hub_apr_sales = 82936564;    // KINTONE 67台 入金予定
+  const hub_apr_purchase = 1561719;  // KINTONE 2台 仕入予定
+  // HUBRIDE その他経費: 1-2月平均で推定
+  const hub_other_out_12 = ["1月","2月"].map(m => {
+    let total = 0;
+    DATA.hubride_other_grouped.forEach(g => { total += g.subtotal[m] || 0; });
+    return total;
+  });
+  const hub_other_out_avg = hub_other_out_12.reduce((a,b)=>a+b,0)/2;
+  const hub_apr_net = hub_apr_sales - hub_apr_purchase - hub_other_out_avg;
+
+  // INTER 4月: 1-2月平均
   const inter_nets_12 = ["1月","2月"].map(m => s.INTER[m].in - s.INTER[m].out);
-  const hub_nets_12   = ["1月","2月"].map(m => s.HUBRIDE[m].in - s.HUBRIDE[m].out);
-  const inter_avg = inter_nets_12.reduce((a,b)=>a+b,0)/2;
-  const hub_avg   = hub_nets_12.reduce((a,b)=>a+b,0)/2;
-  const apr_end = mar_end + inter_avg + hub_avg;
+  const inter_avg = inter_nets_12.reduce((a,b)=>a+b,0)/2;  // ▲4,201,587
+
+  const apr_end = mar_end + inter_avg + hub_apr_net;
 
   // Cumulative totals
   let total_in = 0, total_out = 0;
@@ -1207,9 +1233,9 @@ function buildKPI() {
     {
       cls: "kpi-forecast",
       label: "4月末 残高予測",
-      value: fmt(apr_end),
-      sub: `直近3ヶ月平均: INTER ${fmtSigned(Math.round(inter_avg))} / HUBRIDE ${fmtSigned(Math.round(hub_avg))}`,
-      badge: "概算"
+      value: fmt(Math.round(apr_end)),
+      sub: `HUBRIDE: KINTONE 67台 入金¥82.9M - 仕入¥1.6M - 経費¥${(hub_other_out_avg/1e6).toFixed(1)}M / INTER: 1-2月平均 ${fmtSigned(Math.round(inter_avg))}`,
+      badge: "KINTONE連動"
     },
     {
       cls: "kpi-income",
@@ -1640,20 +1666,27 @@ function buildForecast() {
   const mar_forecast_iNet = DATA.mar_forecast.INTER.in - DATA.mar_forecast.INTER.out;
   const mar_forecast_hNet = DATA.mar_forecast.HUBRIDE.in - DATA.mar_forecast.HUBRIDE.out;
 
-  // 4月予測: 1月・2月の確定実績を使用（3月は未確定）
+  // INTER 4月: 1月・2月の確定実績平均
   const iRecent = [iNets[2], iNets[3]]; // 1月, 2月
-  const hRecent = [hNets[2], hNets[3]];
   const iAvg = iRecent.reduce((a,b)=>a+b,0)/2;
-  const hAvg = hRecent.reduce((a,b)=>a+b,0)/2;
-
   const iOpt = Math.max(...iRecent);
   const iPes = Math.min(...iRecent);
-  const hOpt = Math.max(...hRecent);
-  const hPes = Math.min(...hRecent);
 
-  const apr_base = mar_end + iAvg + hAvg;
-  const apr_opt  = mar_end + iOpt + hOpt;
-  const apr_pes  = mar_end + iPes + hPes;
+  // HUBRIDE 4月: KINTONEデータ + その他経費平均
+  const hub_apr_sales = 82936564;    // KINTONE 67台
+  const hub_apr_purchase = 1561719;  // KINTONE 2台
+  const hub_other_out_12 = ["1月","2月"].map(m => {
+    let total = 0;
+    DATA.hubride_other_grouped.forEach(g => { total += g.subtotal[m] || 0; });
+    return total;
+  });
+  const hub_other_avg = hub_other_out_12.reduce((a,b)=>a+b,0)/2;
+  const hub_apr_net = hub_apr_sales - hub_apr_purchase - hub_other_avg;
+
+  // レンジ: HUBRIDE は KINTONE確定なので変動小, INTER は1-2月レンジ
+  const apr_base = mar_end + iAvg + hub_apr_net;
+  const apr_opt  = mar_end + iOpt + hub_apr_net;
+  const apr_pes  = mar_end + iPes + hub_apr_net;
 
   // INTER section
   document.getElementById("forecast-inter").innerHTML = `
@@ -1673,44 +1706,43 @@ function buildForecast() {
     </div>
   `;
 
-  // HUBRIDE section
+  // HUBRIDE section - KINTONEデータ使用
   document.getElementById("forecast-hubride").innerHTML = `
     <div class="forecast-row"><span class="forecast-label">1月 純増減 (確定)</span><span class="forecast-value">${fmtSigned(hNets[2])}</span></div>
     <div class="forecast-row"><span class="forecast-label">2月 純増減 (確定)</span><span class="forecast-value">${fmtSigned(hNets[3])}</span></div>
     <div class="forecast-row" style="opacity:0.6"><span class="forecast-label">3月 純増減 (予測)</span><span class="forecast-value">${fmtSigned(mar_forecast_hNet)}</span></div>
-    <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
-      <span class="forecast-label">1-2月平均 → 4月適用</span>
-      <span class="forecast-value" style="color:#6ee7b7">${fmtSigned(Math.round(hAvg))}</span>
+    <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px;background:rgba(16,185,129,0.1);border-radius:4px;padding:8px">
+      <span class="forecast-label" style="font-weight:600;color:#6ee7b7">4月 KINTONE確定</span>
+      <span class="forecast-value" style="color:#6ee7b7">${fmtSigned(Math.round(hub_apr_net))}</span>
     </div>
-    <div class="range-bar">
-      <div class="range-label">レンジ (4月予測)</div>
-      <div class="range-values">
-        <span class="range-pessimistic">悲観: ${fmtSigned(hPes)}</span>
-        <span class="range-optimistic">楽観: ${fmtSigned(hOpt)}</span>
-      </div>
+    <div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.5">
+      入金: ¥${hub_apr_sales.toLocaleString()} (67台)<br>
+      仕入: ¥${hub_apr_purchase.toLocaleString()} (2台)<br>
+      経費: ¥${Math.round(hub_other_avg).toLocaleString()} (1-2月平均)
     </div>
   `;
 
   // Combined
   document.getElementById("forecast-combined").innerHTML = `
     <div class="forecast-row"><span class="forecast-label">3月末残高 (スプシ予測)</span><span class="forecast-value" style="color:#fcd34d">${fmt(mar_end)}</span></div>
-    <div class="forecast-row"><span class="forecast-label">4月 INTER予測 (1-2月平均)</span><span class="forecast-value">${fmtSigned(Math.round(iAvg))}</span></div>
-    <div class="forecast-row"><span class="forecast-label">4月 HUBRIDE予測 (1-2月平均)</span><span class="forecast-value">${fmtSigned(Math.round(hAvg))}</span></div>
+    <div class="forecast-row"><span class="forecast-label">4月 INTER (1-2月平均)</span><span class="forecast-value">${fmtSigned(Math.round(iAvg))}</span></div>
+    <div class="forecast-row"><span class="forecast-label">4月 HUBRIDE (KINTONE)</span><span class="forecast-value">${fmtSigned(Math.round(hub_apr_net))}</span></div>
     <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
       <span class="forecast-label" style="font-weight:700">4月末 残高予測</span>
       <span class="forecast-value" style="color:#fcd34d;font-size:15px">${fmt(Math.round(apr_base))}</span>
     </div>
     <div class="range-bar">
-      <div class="range-label">信頼レンジ</div>
+      <div class="range-label">信頼レンジ (INTERのみ変動)</div>
       <div class="range-values">
         <span class="range-pessimistic">悲観: ${fmt(Math.round(apr_pes))}</span>
         <span class="range-optimistic">楽観: ${fmt(Math.round(apr_opt))}</span>
       </div>
     </div>
     <div style="margin-top:10px;font-size:11px;color:var(--text2);line-height:1.5">
-      ※ 3月末残高は入出金サマリの残高予測（31日時点）¥3,306,882を使用。<br>
-      ※ 4月予測は1月・2月の確定実績平均を適用（3月は未確定のため除外）。<br>
-      ※ 3月予測シート: INTER差引 ${fmtSigned(mar_forecast_iNet)} / HUBRIDE差引 ${fmtSigned(mar_forecast_hNet)}
+      ※ 3月末残高: 入出金サマリ予測 ¥3,306,882<br>
+      ※ HUBRIDE 4月: KINTONE 67台入金 ¥82,936,564 - 仕入2台 ¥1,561,719 - 経費 ¥${Math.round(hub_other_avg).toLocaleString()}<br>
+      ※ INTER 4月: 1-2月確定実績平均 ${fmtSigned(Math.round(iAvg))}<br>
+      ※ 3月予測シート: INTER ${fmtSigned(mar_forecast_iNet)} / HUBRIDE ${fmtSigned(mar_forecast_hNet)}
     </div>
   `;
 }
@@ -1756,30 +1788,53 @@ function sortTable(tableId, colIdx) {
 // COLLAPSIBLE
 // ============================================================
 
-// セクションの月別合計をtableのtotal-rowから取得する
-function getSectionMonthlyTotals(contentId) {
-  const content = document.getElementById(contentId);
-  if (!content) return null;
+// KINTONE vehicle count data
+const KINTONE_VEHICLES = {
+  "hub-sales":    {"11月": 18, "12月": 24, "1月": 34, "2月": 29, "3月": 37, "4月": 67},
+  "hub-purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32}
+};
+
+// セクションの月別合計をtableのtotal-rowから取得し、summary-barを更新する
+function updateSummaryBar(sectionId) {
+  const content = document.getElementById(sectionId);
+  const bar = document.getElementById("summary-" + sectionId);
+  if (!content || !bar) return;
   const totalRow = content.querySelector("tr.total-row");
-  if (!totalRow) return null;
+  if (!totalRow) return;
   const cells = totalRow.querySelectorAll("td");
-  if (cells.length < 7) return null; // 取引先 + 5months + 合計
+  if (cells.length < 7) return;
+
   const months = ["11月","12月","1月","2月","3月"];
-  const result = [];
+  const vehicleData = KINTONE_VEHICLES[sectionId] || null;
+  const parts = [];
+  let grandTotal = 0;
+  let grandVehicles = 0;
+
   for (let i = 1; i <= 5; i++) {
     const txt = cells[i].textContent.replace(/[¥,\s]/g, "").replace("—", "");
     const n = parseFloat(txt);
     if (!isNaN(n) && n > 0) {
-      result.push(months[i-1] + " ¥" + n.toLocaleString("ja-JP"));
+      const mVal = (n / 1e6).toFixed(1);
+      let part = months[i-1] + " ¥" + mVal + "M";
+      if (vehicleData && vehicleData[months[i-1]]) {
+        part += " (" + vehicleData[months[i-1]] + "台)";
+        grandVehicles += vehicleData[months[i-1]];
+      }
+      parts.push(part);
+      grandTotal += n;
     }
   }
+
   // 合計
-  const totalTxt = cells[cells.length - 1].textContent.replace(/[¥,\s]/g, "").replace("—", "");
-  const total = parseFloat(totalTxt);
-  if (!isNaN(total) && total > 0) {
-    result.push("合計 ¥" + total.toLocaleString("ja-JP"));
+  if (grandTotal > 0) {
+    let totalPart = "合計 ¥" + (grandTotal / 1e6).toFixed(1) + "M";
+    if (vehicleData && grandVehicles > 0) {
+      totalPart += " (" + grandVehicles + "台)";
+    }
+    parts.push(totalPart);
   }
-  return result.length > 0 ? result : null;
+
+  bar.innerHTML = parts.length > 0 ? parts.join(" | ") : "";
 }
 
 function toggleCollapsible(id) {
@@ -1791,26 +1846,6 @@ function toggleCollapsible(id) {
   const willOpen = !isOpen;
   content.classList.toggle("open", willOpen);
   if (header) header.classList.toggle("open", willOpen);
-
-  // collapsedになった場合: ヘッダーに合計を表示
-  if (header) {
-    const titleEl = header.querySelector("h3");
-    if (!titleEl) return;
-    const baseTitle = titleEl.dataset.baseTitle || titleEl.textContent.replace(/ — 合計.*$/, "").trim();
-    titleEl.dataset.baseTitle = baseTitle;
-    if (!willOpen) {
-      // 閉じた → 月別合計を表示
-      const monthlyTotals = getSectionMonthlyTotals(id);
-      if (monthlyTotals) {
-        titleEl.innerHTML = baseTitle + '<br><span style="font-size:12px;font-weight:400;color:#94a3b8;margin-left:8px">' + monthlyTotals.join(' | ') + '</span>';
-      } else {
-        titleEl.textContent = baseTitle;
-      }
-    } else {
-      // 開いた → ベース名のみ
-      titleEl.textContent = baseTitle;
-    }
-  }
 }
 
 // Open all by default on load
@@ -1839,6 +1874,10 @@ document.addEventListener("DOMContentLoaded", () => {
   buildDetailTable("head-hub-purchase", "body-hub-purchase", consolidateVendors(DATA.hubride_purchase),  "hubride-col");
   buildGroupedTable("head-hub-other-out","body-hub-other-out", DATA.hubride_other_grouped, "hubride-col");
   buildDetailTable("head-hub-other-in", "body-hub-other-in", consolidateVendors(DATA.hubride_other_in),  "hubride-col");
+
+  // Update all summary bars
+  ["inter-sales","inter-borrow","inter-lend","inter-other","inter-salary",
+   "hub-sales","hub-purchase","hub-other-out","hub-other-in"].forEach(updateSummaryBar);
 
   buildDonutCharts();
   buildForecast();
