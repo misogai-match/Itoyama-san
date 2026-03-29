@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatwork業務サポート：城さん・心ちゃん向け</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            line-height: 1.8;
+        }
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+        .slide {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .slide-number {
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+
+        /* Cover */
+        .cover {
+            background: linear-gradient(135deg, #6b46c1 0%, #805ad5 50%, #9f7aea 100%);
+            color: white;
+            text-align: center;
+            padding: 48px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .cover-label {
+            font-size: 12px;
+            letter-spacing: 4px;
+            opacity: 0.6;
+            margin-bottom: 16px;
+        }
+        .cover h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .cover-sub {
+            font-size: 15px;
+            opacity: 0.8;
+            margin-bottom: 24px;
+        }
+        .cover-meta {
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .slide h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #6b46c1;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #f3e8ff;
+        }
+        .slide h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #805ad5;
+            margin: 16px 0 8px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
+            border-left: 4px solid #805ad5;
+            border-radius: 0 10px 10px 0;
+            padding: 16px 20px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .highlight-box strong {
+            color: #6b46c1;
+        }
+
+        /* Pain Points */
+        .pain-card {
+            background: #fff5f5;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            border-left: 4px solid #fc8181;
+        }
+        .pain-card .pain-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #c53030;
+            margin-bottom: 4px;
+        }
+        .pain-card .pain-desc {
+            font-size: 12px;
+            color: #742a2a;
+        }
+
+        /* Solution Cards */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .solution-card {
+            background: #faf5ff;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #e9d8fd;
+        }
+        .solution-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .solution-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b46c1;
+            margin-bottom: 4px;
+        }
+        .solution-desc {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* Before/After */
+        .ba-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: center;
+            margin: 16px 0;
+        }
+        .ba-box {
+            border-radius: 12px;
+            padding: 18px 16px;
+        }
+        .ba-before {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+        }
+        .ba-after {
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+        }
+        .ba-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .ba-before .ba-label { color: #c53030; }
+        .ba-after .ba-label { color: #276749; }
+        .ba-arrow {
+            font-size: 24px;
+            color: #805ad5;
+        }
+        .ba-item {
+            font-size: 12px;
+            padding: 4px 0;
+            color: #555;
+        }
+
+        /* Sample Report Mini */
+        .mini-report {
+            background: #fafbfc;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin: 16px 0;
+        }
+        .mini-report-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b46c1;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9d8fd;
+        }
+        .mini-task {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        .mini-task:last-child { border-bottom: none; }
+        .mini-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .mini-badge.urgent { background: #fed7d7; color: #c53030; }
+        .mini-badge.today { background: #fefcbf; color: #975a16; }
+        .mini-badge.progress { background: #bee3f8; color: #2b6cb0; }
+        .mini-badge.done { background: #c6f6d5; color: #276749; }
+        .mini-from {
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        /* Flow */
+        .flow-container {
+            margin: 16px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 12px 0;
+        }
+        .flow-icon {
+            width: 40px;
+            height: 40px;
+            background: #f3e8ff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .flow-arrow {
+            text-align: center;
+            color: #ccc;
+            font-size: 16px;
+            padding: 0 0 0 14px;
+        }
+        .flow-content h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #6b46c1;
+        }
+        .flow-content p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Clean List */
+        .clean-list {
+            list-style: none;
+            margin: 12px 0;
+        }
+        .clean-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .clean-list li:last-child { border-bottom: none; }
+
+        /* Zero Box */
+        .zero-box {
+            background: linear-gradient(135deg, #6b46c1, #805ad5);
+            color: white;
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+            margin: 16px 0;
+        }
+        .zero-box .zero-label {
+            font-size: 12px;
+            letter-spacing: 3px;
+            opacity: 0.6;
+            margin-bottom: 8px;
+        }
+        .zero-box .zero-value {
+            font-size: 36px;
+            font-weight: 800;
+        }
+        .zero-box .zero-desc {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 16px 0;
+            font-size: 13px;
+        }
+        .compare-table th {
+            background: #6b46c1;
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .compare-table th:first-child { border-radius: 8px 0 0 0; }
+        .compare-table th:last-child { border-radius: 0 8px 0 0; }
+        .compare-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .compare-table tr:nth-child(even) { background: #fafbfc; }
+        .compare-table tr:last-child td:first-child { border-radius: 0 0 0 8px; }
+        .compare-table tr:last-child td:last-child { border-radius: 0 0 8px 0; }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 11px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Slide 1: Cover -->
+        <div class="slide cover">
+            <div class="cover-label">SUPPORT PROPOSAL</div>
+            <h1>毎朝のタスク整理<br>自動サポート</h1>
+            <div class="cover-sub">城さん・心ちゃんの業務負担を<br>AIで軽くする仕組み</div>
+            <div class="cover-meta">2026年4月 ｜ 磯貝</div>
+        </div>
+
+        <!-- Slide 2: 今こうなっていませんか？ -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 02</div>
+            <h2>今、こうなっていませんか？</h2>
+
+            <div class="pain-card">
+                <div class="pain-title">😣 朝イチでChatwork開くと大量のメッセージ</div>
+                <div class="pain-desc">複数グループの未読を1つずつ確認。誰から何を頼まれたか整理するだけで時間が過ぎる</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-title">😰 「あれ対応した？」が怖い</div>
+                <div class="pain-desc">依頼が埋もれて対応漏れに気づくのが遅れる。確認されて初めて思い出すことも</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-title">📝 自分でタスク管理するのが手間</div>
+                <div class="pain-desc">Chatworkのメッセージを見て、メモして、期限を確認して…の繰り返し。管理作業が本業を圧迫</div>
+            </div>
+            <div class="pain-card">
+                <div class="pain-title">🤷 HUBRIDEメンバーの対応状況がわからない</div>
+                <div class="pain-desc">他のメンバーが対応済みか未対応か、Chatworkを遡らないとわからない</div>
+            </div>
+        </div>
+
+        <!-- Slide 3: こうなります -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 03</div>
+            <h2>こうなります</h2>
+
+            <div class="ba-container">
+                <div class="ba-box ba-before">
+                    <div class="ba-label">BEFORE</div>
+                    <div class="ba-item">😰 朝イチで全グループ確認</div>
+                    <div class="ba-item">📝 依頼を手動でメモ</div>
+                    <div class="ba-item">🔍 期限を自分で把握</div>
+                    <div class="ba-item">❓ 他メンバーの状況不明</div>
+                    <div class="ba-item" style="font-weight:700; color:#c53030; margin-top:8px;">毎朝30分以上</div>
+                </div>
+                <div class="ba-arrow">→</div>
+                <div class="ba-box ba-after">
+                    <div class="ba-label">AFTER</div>
+                    <div class="ba-item">☕ レポートを読むだけ</div>
+                    <div class="ba-item">📋 タスク自動リスト化</div>
+                    <div class="ba-item">🚨 期限アラート自動通知</div>
+                    <div class="ba-item">👥 メンバー状況も一覧</div>
+                    <div class="ba-item" style="font-weight:700; color:#276749; margin-top:8px;">毎朝3分で把握</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: 毎朝届くレポートのイメージ -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 04</div>
+            <h2>毎朝届くレポートのイメージ</h2>
+
+            <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+                毎朝8:00にChatworkで届きます。自分宛のタスクが優先度付きで整理されています。
+            </p>
+
+            <!-- 城さん版 -->
+            <div class="mini-report">
+                <div class="mini-report-header">📋 城さん 今日のタスク（3/29）</div>
+                <div class="mini-task">
+                    <span class="mini-badge urgent">期限超過</span>
+                    <div>
+                        <strong>入出金管理の契約マスタ移行確認</strong>
+                        <div class="mini-from">← 小野寺さん（3/28 請求管理）・未回答</div>
+                    </div>
+                </div>
+                <div class="mini-task">
+                    <span class="mini-badge today">今日期限</span>
+                    <div>
+                        <strong>契約解除関連 損害実費請求書 → 鈴木さん確認依頼</strong>
+                        <div class="mini-from">Googleドライブ格納済み</div>
+                    </div>
+                </div>
+                <div class="mini-task">
+                    <span class="mini-badge progress">対応中</span>
+                    <div>
+                        <strong>DualEdge×プラザシップ 3月経費提出</strong>
+                        <div class="mini-from">経費申請グループ</div>
+                    </div>
+                </div>
+                <div class="mini-task">
+                    <span class="mini-badge done">完了</span>
+                    <div>
+                        <strong>HUBRIDE×CORE×AC 2月精算</strong>
+                        <div class="mini-from">3/27 完了済み ✓</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 心ちゃん版 -->
+            <div class="mini-report" style="margin-top: 12px;">
+                <div class="mini-report-header">📋 心ちゃん 今日のタスク（3/29）</div>
+                <div class="mini-task">
+                    <span class="mini-badge urgent">期限超過</span>
+                    <div>
+                        <strong>SBIオートサポート精算書の提出</strong>
+                        <div class="mini-from">期限3/26 → 3日超過</div>
+                    </div>
+                </div>
+                <div class="mini-task">
+                    <span class="mini-badge today">今日対応</span>
+                    <div>
+                        <strong>カラフルライン様 GPS受取対応</strong>
+                        <div class="mini-from">← 小野寺さん（3/28 請求管理）・追跡番号あり</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 16px;">
+                <strong>ポイント</strong>：自分宛のタスクだけが抽出されるので、全グループを確認する必要がありません。
+                期限超過は一番上に表示されるので、見逃しゼロ。
+            </div>
+        </div>
+
+        <!-- Slide 5: 機能一覧 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 05</div>
+            <h2>できること</h2>
+
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <div class="solution-icon">📨</div>
+                    <div class="solution-title">自動タスク抽出</div>
+                    <div class="solution-desc">Chatworkの会話から<br>自分宛の依頼を自動検知</div>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">🚨</div>
+                    <div class="solution-title">期限アラート</div>
+                    <div class="solution-desc">期限超過・本日期限を<br>優先表示で見逃し防止</div>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">👥</div>
+                    <div class="solution-title">メンバー対応状況</div>
+                    <div class="solution-desc">他メンバーが対応済みか<br>一目で確認できる</div>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">✅</div>
+                    <div class="solution-title">完了トラッキング</div>
+                    <div class="solution-desc">対応済みタスクも記録<br>「やった・やってない」が明確</div>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">📊</div>
+                    <div class="solution-title">週次サマリー</div>
+                    <div class="solution-desc">1週間の対応件数・<br>完了率を自動集計</div>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">🔔</div>
+                    <div class="solution-title">未回答リマインド</div>
+                    <div class="solution-desc">依頼されて24時間<br>未回答のものを通知</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: 仕組み -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 06</div>
+            <h2>仕組み</h2>
+
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-icon">💬</div>
+                    <div class="flow-content">
+                        <h4>① Chatworkから自動取得</h4>
+                        <p>対象グループの前日メッセージをAPI経由で収集（自動・毎朝7:30）</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step">
+                    <div class="flow-icon">🤖</div>
+                    <div class="flow-content">
+                        <h4>② AIがタスクを自動仕分け</h4>
+                        <p>「誰が」「誰に」「何を」「いつまでに」を解析。城さん宛・心ちゃん宛に自動分類</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step">
+                    <div class="flow-icon">📋</div>
+                    <div class="flow-content">
+                        <h4>③ 優先度付きタスクリスト生成</h4>
+                        <p>期限超過 → 今日期限 → 対応中 → 完了の順に自動整理</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-step">
+                    <div class="flow-icon">📨</div>
+                    <div class="flow-content">
+                        <h4>④ Chatworkに自動配信</h4>
+                        <p>毎朝8:00にそれぞれのDMへ配信。朝一で確認するだけ</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                全自動です。城さん・心ちゃんが<strong>何か操作する必要は一切ありません</strong>。
+            </div>
+        </div>
+
+        <!-- Slide 7: 他メンバーの管理 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 07</div>
+            <h2>HUBRIDEメンバーの管理サポート</h2>
+
+            <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+                経理として他メンバーへの依頼・確認が多い2人のために、メンバー対応状況も自動追跡します。
+            </p>
+
+            <div class="mini-report">
+                <div class="mini-report-header">👥 メンバー対応状況（城さん視点）</div>
+                <div class="mini-task">
+                    <span class="mini-badge urgent">未回答</span>
+                    <div>
+                        <strong>佐藤さん</strong>：3月経費申請の領収書提出
+                        <div class="mini-from">3/25 依頼 → 4日未回答</div>
+                    </div>
+                </div>
+                <div class="mini-task">
+                    <span class="mini-badge progress">対応中</span>
+                    <div>
+                        <strong>田中さん</strong>：交通費精算の修正
+                        <div class="mini-from">3/28 修正依頼済み</div>
+                    </div>
+                </div>
+                <div class="mini-task">
+                    <span class="mini-badge done">完了</span>
+                    <div>
+                        <strong>山田さん</strong>：2月立替精算
+                        <div class="mini-from">3/27 提出済み ✓</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                「あの人に依頼したけど、返事来てたっけ？」を<strong>自動でトラッキング</strong>。<br>
+                催促のタイミングも一目でわかります。
+            </div>
+        </div>
+
+        <!-- Slide 8: 2人の負担 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 08</div>
+            <h2>城さん・心ちゃんの負担</h2>
+
+            <div class="zero-box">
+                <div class="zero-label">新しい作業</div>
+                <div class="zero-value">ゼロ</div>
+                <div class="zero-desc">今まで通りChatworkを使うだけ。<br>毎朝レポートが届くようになるだけです。</div>
+            </div>
+
+            <h3>効果</h3>
+            <table class="compare-table">
+                <tr>
+                    <th>項目</th>
+                    <th>Before</th>
+                    <th>After</th>
+                </tr>
+                <tr>
+                    <td>朝の確認作業</td>
+                    <td>30分以上</td>
+                    <td><strong>3分</strong></td>
+                </tr>
+                <tr>
+                    <td>タスクの見落とし</td>
+                    <td>たまにある</td>
+                    <td><strong>ゼロ</strong></td>
+                </tr>
+                <tr>
+                    <td>メンバーへの催促</td>
+                    <td>手動で確認</td>
+                    <td><strong>自動通知</strong></td>
+                </tr>
+                <tr>
+                    <td>期限管理</td>
+                    <td>自分で記憶</td>
+                    <td><strong>自動アラート</strong></td>
+                </tr>
+                <tr>
+                    <td>「対応した？」の確認</td>
+                    <td>Chatwork遡る</td>
+                    <td><strong>一覧で即確認</strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 9: はじめ方 -->
+        <div class="slide">
+            <div class="slide-number">SLIDE 09</div>
+            <h2>はじめ方</h2>
+
+            <ul class="clean-list">
+                <li>
+                    <span>1️⃣</span>
+                    <div>
+                        <strong>教えてほしいこと（5分）</strong><br>
+                        レポートに含めたいChatworkグループ名と、管理対象のメンバー名
+                    </div>
+                </li>
+                <li>
+                    <span>2️⃣</span>
+                    <div>
+                        <strong>磯貝が設定（1〜2日）</strong><br>
+                        Chatwork連携・AI解析・レポート生成の仕組みを構築
+                    </div>
+                </li>
+                <li>
+                    <span>3️⃣</span>
+                    <div>
+                        <strong>テスト配信（1週間）</strong><br>
+                        実際のデータでレポートを試験配信。「ここをこうしてほしい」のフィードバック
+                    </div>
+                </li>
+                <li>
+                    <span>4️⃣</span>
+                    <div>
+                        <strong>本運用スタート</strong><br>
+                        フィードバックを反映して毎朝の自動配信を開始
+                    </div>
+                </li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>城さん・心ちゃんにやってもらうのは①だけ</strong>。あとは全部こちらで対応します。
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Chatwork業務サポート提案 ｜ 磯貝 ｜ 2026年4月</p>
+        </div>
+
+    </div>
+</body>
+</html>
