@@ -492,6 +492,11 @@
           <thead><tr id="head-inter-other"></tr></thead>
           <tbody id="body-inter-other"></tbody>
         </table>
+        <div style="margin-top:12px;padding:12px 16px;background:#2d1f0e;border:1px solid #f59e0b;border-radius:8px;font-size:13px;color:#fcd34d;">
+          <strong>⚠ 4月予 その他出金について</strong><br>
+          <span style="color:#e2e8f0">1月-2月平均から<strong>麻布税務署 ¥19,923,100（一時的税金支払）</strong>と<strong>クロノス ¥30,165,000</strong>を除外して算出。<br>
+          除外後: 1月 ¥17,878,242 / 2月 ¥17,699,800 → 平均 ¥17,789,021</span>
+        </div>
       </div>
     </div>
 
@@ -525,6 +530,13 @@
           <thead><tr id="head-hub-sales"></tr></thead>
           <tbody id="body-hub-sales"></tbody>
         </table>
+        <div style="margin-top:12px;padding:12px 16px;background:#0e2d1f;border:2px solid #f59e0b;border-radius:8px;font-size:13px;color:#fcd34d;">
+          <strong>⚠ 4月予 売上について</strong><br>
+          <span style="color:#e2e8f0">KINTONE上の入金予定額は67台 ¥82,936,564。<br>
+          ただし直近3ヶ月の実績台単価（1月¥278K / 2月¥489K / 3月¥310K = 平均¥359K）と乖離が大きいため、<br>
+          <strong>67台 × 平均台単価 ¥358,653 = ¥24,029,751 を採用。</strong><br>
+          ※ KINTONEの入金予定額は要確認（鈴木常務と相談予定）。</span>
+        </div>
       </div>
     </div>
 
@@ -652,7 +664,7 @@ const DATA = {
       "1月": {"in": 88838465, "out": 95092698},
       "2月": {"in": 73825791, "out": 75974731},
       "3月": {"in": 73940633, "out": 48723544},
-      "4月予": {"in": 81332128, "out": 85533715}
+      "4月予": {"in": 81332128, "out": 60489665}
     },
     "HUBRIDE": {
       "11月": {"in": 31677131, "out": 40848551},
@@ -660,7 +672,7 @@ const DATA = {
       "1月": {"in": 9519014, "out": 9251713},
       "2月": {"in": 14307081, "out": 12263134},
       "3月": {"in": 11457830, "out": 13786594},
-      "4月予": {"in": 83044300, "out": 10757424}
+      "4月予": {"in": 24137487, "out": 10757424}
     }
   },
   "balances": {"1月": 13189019, "2月": 7202087, "3月": 7097094},
@@ -1072,9 +1084,9 @@ const DATA = {
   },
   "apr_forecast": {
     "mar_end": 3306882,
-    "inter": {"in": 81332128, "out": 85533715, "net": -4201587, "note": "1月-2月平均"},
-    "hubride": {"sales_in": 82936564, "sales_count": 67, "purchase_out": 8682196, "purchase_count": 41, "other_out": 2075228, "other_in": 107736, "net": 72286876, "note": "売上: KINTONE 67台 / 仕入: 直近2ヶ月平均41台"},
-    "apr_end": 71392171
+    "inter": {"in": 81332128, "out": 60489665, "net": 20842463, "note": "1月-2月平均（その他出金は麻布税務署・クロノス除外）"},
+    "hubride": {"sales_in": 24029751, "sales_count": 67, "purchase_out": 8682196, "purchase_count": 41, "other_out": 2075228, "other_in": 107736, "net": 13380063, "note": "売上: 67台×直近3ヶ月平均台単価¥358,653 / 仕入: 直近2ヶ月平均41台"},
+    "apr_end": 37529408
   }
 };
 
@@ -1856,11 +1868,11 @@ document.addEventListener("DOMContentLoaded", () => {
   buildDetailTable("head-inter-sales",  "body-inter-sales",  consolidateVendors(DATA.inter_sales),  "inter-col", null, 43319838);
   buildDetailTable("head-inter-borrow", "body-inter-borrow", consolidateVendors(DATA.inter_borrow), "inter-col", null, 32500000);
   buildDetailTable("head-inter-lend",   "body-inter-lend",   consolidateVendors(DATA.inter_lend),   "inter-col", null, 18035650);
-  buildDetailTable("head-inter-other",  "body-inter-other",  consolidateVendors(DATA.inter_other_out), "inter-col", null, 42833071);
+  buildDetailTable("head-inter-other",  "body-inter-other",  consolidateVendors(DATA.inter_other_out), "inter-col", null, 17789021);
   buildDetailTable("head-inter-salary", "body-inter-salary", consolidateVendors(DATA.inter_salary), "inter-col", null, 24664994);
 
   // HUBRIDE detail tables (売上・仕入はKINTONE, 他は1月-2月平均)
-  buildDetailTable("head-hub-sales",    "body-hub-sales",    consolidateVendors(DATA.hubride_sales),     "hubride-col", DATA.vehicle_counts.sales, APR.hubride.sales_in);
+  buildDetailTable("head-hub-sales",    "body-hub-sales",    consolidateVendors(DATA.hubride_sales),     "hubride-col", DATA.vehicle_counts.sales, 24029751);
   buildDetailTable("head-hub-purchase", "body-hub-purchase", consolidateVendors(DATA.hubride_purchase),  "hubride-col", DATA.vehicle_counts.purchase, APR.hubride.purchase_out);
   buildGroupedTable("head-hub-other-out","body-hub-other-out", DATA.hubride_other_grouped, "hubride-col", 2075228);
   buildDetailTable("head-hub-other-in", "body-hub-other-in", consolidateVendors(DATA.hubride_other_in),  "hubride-col", null, APR.hubride.other_in);
