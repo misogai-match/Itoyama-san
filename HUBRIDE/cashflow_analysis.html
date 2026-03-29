@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>資金管理ダッシュボード - インターシフト / HUBRIDE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+        .header-sub {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .header-date {
+            font-size: 12px;
+            color: #38bdf8;
+            margin-top: 8px;
+        }
+
+        /* KPI Row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .kpi-label {
+            font-size: 11px;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+        .kpi-value.positive { color: #4ade80; }
+        .kpi-value.negative { color: #f87171; }
+        .kpi-value.neutral { color: #38bdf8; }
+        .kpi-sub {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Section */
+        .section {
+            background: #1e293b;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid #334155;
+        }
+        .section h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #334155;
+        }
+        .section h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #94a3b8;
+            margin: 16px 0 8px;
+        }
+
+        /* Company Split */
+        .company-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .company-card {
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid #334155;
+        }
+        .company-name {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid;
+        }
+        .company-name.inter { color: #38bdf8; border-color: #38bdf8; }
+        .company-name.hubride { color: #a78bfa; border-color: #a78bfa; }
+
+        /* Bar Chart CSS */
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .bar-label {
+            width: 80px;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+        .bar-container {
+            flex: 1;
+            height: 20px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        .bar-fill.out { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .bar-fill.in { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .bar-fill.inter-out { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+        .bar-fill.hubride-out { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+        .bar-value {
+            width: 100px;
+            text-align: right;
+            font-family: monospace;
+            color: #cbd5e1;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin-top: 12px;
+        }
+        .timeline-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 1fr 1fr;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid #1e293b;
+            font-size: 12px;
+            align-items: center;
+        }
+        .timeline-row.header {
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 1px solid #475569;
+        }
+        .timeline-date { color: #94a3b8; font-family: monospace; }
+        .timeline-out { color: #f87171; text-align: right; font-family: monospace; }
+        .timeline-in { color: #4ade80; text-align: right; font-family: monospace; }
+        .timeline-balance { text-align: right; font-family: monospace; font-weight: 700; }
+        .timeline-balance.danger { color: #f87171; }
+        .timeline-balance.warning { color: #fbbf24; }
+        .timeline-balance.safe { color: #4ade80; }
+        .timeline-row.forecast { opacity: 0.7; border-left: 2px solid #fbbf24; padding-left: 6px; }
+
+        /* Category Table */
+        .cat-table {
+            width: 100%;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .cat-table td {
+            padding: 4px 8px;
+        }
+        .cat-table td:first-child {
+            color: #94a3b8;
+        }
+        .cat-table td:nth-child(2),
+        .cat-table td:nth-child(3) {
+            text-align: right;
+            font-family: monospace;
+        }
+        .cat-table tr {
+            border-bottom: 1px solid #1e293b;
+        }
+
+        /* Alert */
+        .alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+        .alert-title {
+            color: #f87171;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        /* Forecast Box */
+        .forecast-box {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        /* Waterfall */
+        .waterfall {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 120px;
+            margin: 16px 0;
+            padding: 0 10px;
+        }
+        .wf-bar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .wf-block {
+            width: 100%;
+            border-radius: 3px 3px 0 0;
+            min-height: 2px;
+        }
+        .wf-label {
+            font-size: 9px;
+            color: #64748b;
+            margin-top: 4px;
+            text-align: center;
+        }
+        .wf-value {
+            font-size: 9px;
+            color: #cbd5e1;
+            margin-bottom: 2px;
+            font-family: monospace;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="header">
+            <h1>💰 資金管理ダッシュボード</h1>
+            <div class="header-sub">株式会社インターシフト ＋ HUBRIDE 連結</div>
+            <div class="header-date">2026年3月度 | データ更新: 3/29</div>
+        </div>
+
+        <!-- KPI -->
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">現在残高（3/27実績）</div>
+                <div class="kpi-value neutral">¥9.1M</div>
+                <div class="kpi-sub">¥9,095,136</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">3月末 予測残高</div>
+                <div class="kpi-value negative">¥3.3M</div>
+                <div class="kpi-sub">¥3,306,882（⚠️タイト）</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">4月末 予測残高</div>
+                <div class="kpi-value positive">¥61.5M</div>
+                <div class="kpi-sub">¥61,532,937（概算）</div>
+            </div>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert">
+            <div class="alert-title">⚠️ 3月末リスク</div>
+            3/31に出金 ¥79.9M が集中（ProNetix ¥3.4M、THEO TEC ¥3.4M、toBE Tech ¥3.7M 等）。
+            入金が50%遅延した場合、残高はほぼゼロに。入金の確実性の確認が必要。
+        </div>
+
+        <!-- 会社別 3月サマリ -->
+        <div class="section">
+            <h2>📊 3月 会社別 入出金サマリ</h2>
+            <div class="company-grid">
+                <div class="company-card">
+                    <div class="company-name inter">INTERSHIFT</div>
+                    <table class="cat-table">
+                        <tr><td colspan="2" style="color:#4ade80; font-weight:700;">入金 ¥106,215,881</td></tr>
+                        <tr><td>借入･回収</td><td style="color:#4ade80;">¥55,050,000</td></tr>
+                        <tr><td>売上</td><td style="color:#4ade80;">¥35,491,391</td></tr>
+                        <tr><td>その他入金</td><td style="color:#4ade80;">¥15,674,490</td></tr>
+                        <tr><td colspan="2" style="color:#f87171; font-weight:700; padding-top:12px;">出金 ¥122,105,113</td></tr>
+                        <tr><td>その他出金</td><td style="color:#f87171;">¥67,747,420</td></tr>
+                        <tr><td>貸付･返済</td><td style="color:#f87171;">¥35,000,000</td></tr>
+                        <tr><td>給与関連</td><td style="color:#f87171;">¥19,357,693</td></tr>
+                        <tr><td colspan="2" style="font-weight:700; padding-top:12px; color:#f87171;">ネット ▲¥15,889,232</td></tr>
+                    </table>
+                </div>
+                <div class="company-card">
+                    <div class="company-name hubride">HUBRIDE</div>
+                    <table class="cat-table">
+                        <tr><td colspan="2" style="color:#4ade80; font-weight:700;">入金 ¥69,097,283</td></tr>
+                        <tr><td>売上</td><td style="color:#4ade80;">¥67,772,235</td></tr>
+                        <tr><td>その他入金</td><td style="color:#4ade80;">¥1,325,048</td></tr>
+                        <tr><td colspan="2" style="color:#f87171; font-weight:700; padding-top:12px;">出金 ¥51,611,431</td></tr>
+                        <tr><td>その他出金</td><td style="color:#f87171;">¥28,896,499</td></tr>
+                        <tr><td>仕入</td><td style="color:#f87171;">¥22,714,932</td></tr>
+                        <tr><td colspan="2" style="font-weight:700; padding-top:12px; color:#4ade80;">ネット +¥17,485,852</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="forecast-box" style="margin-top:16px;">
+                <strong style="color:#38bdf8;">構造的ポイント</strong>
+                <ul style="font-size:12px; margin-top:8px; margin-left:16px; color:#94a3b8;">
+                    <li><strong style="color:#38bdf8;">INTER</strong>はマイナス ▲¥15.9M：貸付・給与・固定費が大きい。借入で補填する構造</li>
+                    <li><strong style="color:#a78bfa;">HUBRIDE</strong>はプラス +¥17.5M：車両売上が仕入を上回るキャッシュカウ</li>
+                    <li>連結ではHUBRIDEの黒字がINTERの赤字を埋める形</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 日別残高推移 -->
+        <div class="section">
+            <h2>📈 3月 日別残高推移</h2>
+            <div class="timeline">
+                <div class="timeline-row header">
+                    <span>日付</span>
+                    <span style="text-align:right;">出金</span>
+                    <span style="text-align:right;">入金</span>
+                    <span style="text-align:right;">残高</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/01</span>
+                    <span class="timeline-out">-</span>
+                    <span class="timeline-in">10,000,000</span>
+                    <span class="timeline-balance safe">11,710,262</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/02</span>
+                    <span class="timeline-out">24,203,709</span>
+                    <span class="timeline-in">15,069,590</span>
+                    <span class="timeline-balance warning">2,576,143</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/03</span>
+                    <span class="timeline-out">2,124,116</span>
+                    <span class="timeline-in">967,594</span>
+                    <span class="timeline-balance danger">1,419,621</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/04</span>
+                    <span class="timeline-out">8,063,912</span>
+                    <span class="timeline-in">10,000,000</span>
+                    <span class="timeline-balance warning">3,355,709</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/09</span>
+                    <span class="timeline-out">606,300</span>
+                    <span class="timeline-in">7,123,258</span>
+                    <span class="timeline-balance safe">10,638,262</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/10</span>
+                    <span class="timeline-out">15,708,289</span>
+                    <span class="timeline-in">11,198,999</span>
+                    <span class="timeline-balance warning">6,128,972</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/13</span>
+                    <span class="timeline-out">5,604,784</span>
+                    <span class="timeline-in">1,872,755</span>
+                    <span class="timeline-balance safe">7,657,781</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/20</span>
+                    <span class="timeline-out">-</span>
+                    <span class="timeline-in">3,070,828</span>
+                    <span class="timeline-balance safe">7,711,898</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/23</span>
+                    <span class="timeline-out">3,501,354</span>
+                    <span class="timeline-in">8,586,339</span>
+                    <span class="timeline-balance safe">12,796,883</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/25</span>
+                    <span class="timeline-out">117,718</span>
+                    <span class="timeline-in">5,954,608</span>
+                    <span class="timeline-balance safe">19,377,293</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/26</span>
+                    <span class="timeline-out">2,004,018</span>
+                    <span class="timeline-in">4,489,952</span>
+                    <span class="timeline-balance safe">21,863,227</span>
+                </div>
+                <div class="timeline-row">
+                    <span class="timeline-date">03/27</span>
+                    <span class="timeline-out">12,859,386</span>
+                    <span class="timeline-in">91,295</span>
+                    <span class="timeline-balance safe">9,095,136</span>
+                </div>
+                <div class="timeline-row forecast">
+                    <span class="timeline-date">03/30</span>
+                    <span class="timeline-out">3,907,612</span>
+                    <span class="timeline-in">40,958,659</span>
+                    <span class="timeline-balance safe">46,146,183</span>
+                </div>
+                <div class="timeline-row forecast">
+                    <span class="timeline-date">03/31</span>
+                    <span class="timeline-out">79,895,549</span>
+                    <span class="timeline-in">37,056,248</span>
+                    <span class="timeline-balance warning">3,306,882</span>
+                </div>
+            </div>
+            <div style="font-size:10px; color:#64748b; margin-top:8px;">
+                🟡 黄色の行 = 予測値 ｜
+                <span style="color:#4ade80;">■</span> 安全 ｜
+                <span style="color:#fbbf24;">■</span> 注意 ｜
+                <span style="color:#f87171;">■</span> 危険
+            </div>
+        </div>
+
+        <!-- 4月見通し -->
+        <div class="section">
+            <h2>🔮 4月 キャッシュフロー見通し</h2>
+
+            <div class="company-grid">
+                <div class="company-card">
+                    <div class="company-name inter">INTERSHIFT 4月推定</div>
+                    <table class="cat-table">
+                        <tr><td>売上</td><td style="color:#4ade80;">要確認</td></tr>
+                        <tr><td>借入</td><td style="color:#4ade80;">要確認</td></tr>
+                        <tr><td>給与関連</td><td style="color:#f87171;">≈¥19,400,000</td></tr>
+                        <tr><td>りそな返済</td><td style="color:#f87171;">≈¥800,000</td></tr>
+                        <tr><td>ProNetix等</td><td style="color:#f87171;">≈¥10,560,000</td></tr>
+                        <tr><td>その他</td><td style="color:#f87171;">≈¥3,000,000</td></tr>
+                    </table>
+                </div>
+                <div class="company-card">
+                    <div class="company-name hubride">HUBRIDE 4月推定</div>
+                    <table class="cat-table">
+                        <tr><td>売上入金</td><td style="color:#4ade80;">¥82,936,564</td></tr>
+                        <tr><td style="font-size:10px; color:#64748b;">（KINTONE 67件）</td><td></td></tr>
+                        <tr><td>仕入出金</td><td style="color:#f87171;">¥1,560,509</td></tr>
+                        <tr><td style="font-size:10px; color:#64748b;">（KINTONE 2件）</td><td></td></tr>
+                        <tr><td>運用費用</td><td style="color:#f87171;">≈¥2,090,000</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h3>週別入金予測（HUBRIDE車両売上）</h3>
+            <div class="bar-row">
+                <span class="bar-label">4/1-10</span>
+                <div class="bar-container">
+                    <div class="bar-fill in" style="width: 48%;"></div>
+                </div>
+                <span class="bar-value">¥40,145,384</span>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">4/11-20</span>
+                <div class="bar-container">
+                    <div class="bar-fill in" style="width: 29%;"></div>
+                </div>
+                <span class="bar-value">¥24,031,522</span>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">4/21-30</span>
+                <div class="bar-container">
+                    <div class="bar-fill in" style="width: 23%;"></div>
+                </div>
+                <span class="bar-value">¥18,759,658</span>
+            </div>
+
+            <div class="alert" style="background: rgba(250,204,21,0.1); border-color: rgba(250,204,21,0.3);">
+                <div class="alert-title" style="color:#fbbf24;">📝 4月予測の注意事項</div>
+                <ul style="font-size:12px; margin-left:16px; color:#94a3b8;">
+                    <li>INTER側の売上・借入が未反映 → 実際の残高はこれより増える可能性</li>
+                    <li>HUBRIDE入金は KINTONEの67件を基にした確度の高い数値</li>
+                    <li>INTER固定費は3月実績からの推定値</li>
+                    <li>4月予測シートが作成されれば、より精緻な予測が可能</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- KINTONE突合 -->
+        <div class="section">
+            <h2>🔍 KINTONE × サマリ 突合結果</h2>
+            <table class="cat-table" style="width:100%;">
+                <tr style="border-bottom:1px solid #475569;">
+                    <td style="font-weight:700;">項目</td>
+                    <td style="font-weight:700; text-align:right;">サマリ</td>
+                    <td style="font-weight:700; text-align:right;">KINTONE</td>
+                    <td style="font-weight:700; text-align:right;">差額</td>
+                    <td style="font-weight:700; text-align:center;">判定</td>
+                </tr>
+                <tr>
+                    <td>3月 出金（仕入）</td>
+                    <td style="text-align:right; color:#f87171;">¥22.7M</td>
+                    <td style="text-align:right; color:#f87171;">¥18.5M</td>
+                    <td style="text-align:right;">¥4.3M</td>
+                    <td style="text-align:center;">⚠️</td>
+                </tr>
+                <tr>
+                    <td style="font-size:10px; color:#64748b;" colspan="5">→ 差額は3/30-31の未実績分（予測）</td>
+                </tr>
+                <tr>
+                    <td>3月 入金（売上）</td>
+                    <td style="text-align:right; color:#4ade80;">¥67.8M</td>
+                    <td style="text-align:right; color:#4ade80;">¥52.0M</td>
+                    <td style="text-align:right;">¥15.7M</td>
+                    <td style="text-align:center;">⚠️</td>
+                </tr>
+                <tr>
+                    <td style="font-size:10px; color:#64748b;" colspan="5">→ 差額は3/30-31の未実績分（予測）</td>
+                </tr>
+                <tr style="border-top:1px solid #475569;">
+                    <td>確定日の一致率</td>
+                    <td style="text-align:right; color:#4ade80;" colspan="2">出金3日/入金10日 完全一致</td>
+                    <td></td>
+                    <td style="text-align:center;">✅</td>
+                </tr>
+            </table>
+            <div style="font-size:11px; color:#64748b; margin-top:12px;">
+                ※ 実績確定済みの日付では概ね一致。差額は「予測未実績分」と「計上日ズレ」が主因。
+            </div>
+        </div>
+
+        <!-- 未完了タスク -->
+        <div class="section">
+            <h2>📋 未完了の入出金（要フォロー）</h2>
+            <h3>出金 未完了（5件 / ¥3.2M）</h3>
+            <table class="cat-table" style="width:100%;">
+                <tr><td>山田順子</td><td style="color:#f87171;">¥420,363</td><td>3/31</td><td style="color:#fbbf24;">請求書発行済み</td></tr>
+                <tr><td>高橋誠一</td><td style="color:#f87171;">¥1,163,719</td><td>4/1</td><td style="color:#fbbf24;">請求書発行済み</td></tr>
+                <tr><td>西宮孝志</td><td style="color:#f87171;">¥781,496</td><td>3/30</td><td style="color:#fbbf24;">請求書発行済み</td></tr>
+                <tr><td>山本達也</td><td style="color:#f87171;">¥396,790</td><td>4/3</td><td style="color:#f87171;">AA精算書待ち</td></tr>
+                <tr><td>和泉健治</td><td style="color:#f87171;">¥458,476</td><td>3/30</td><td style="color:#f87171;">AA精算書待ち</td></tr>
+            </table>
+
+            <h3>入金 未完了（79件 / ¥97.7M）</h3>
+            <div style="font-size:12px; color:#94a3b8;">
+                <div style="margin: 4px 0;">請求書発行待ち：55件 ｜ 立替入金待ち：21件 ｜ その他：3件</div>
+                <div style="margin: 4px 0; color:#fbbf24;">⚠️ 鎌倉大：入金予定日相違の判定あり → 要確認</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Generated by AI | データソース: 入出金サマリ-インター + KINTONE入出金チェックシート<br>
+            分析日: 2026/3/29
+        </div>
+    </div>
+</body>
+</html>
