@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インターシフト 資金管理ダッシュボード</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', 'Hiragino Sans', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.6; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.8rem; margin-bottom: 8px; color: #f1f5f9; }
+  .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 24px; }
+  .update-badge { display: inline-block; background: #1e3a5f; color: #60a5fa; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; margin-left: 12px; }
+
+  /* KPI Cards */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .kpi-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+  .kpi-card.danger { border-color: #ef4444; background: linear-gradient(135deg, #1e293b 60%, #3b1111); }
+  .kpi-card.warning { border-color: #f59e0b; background: linear-gradient(135deg, #1e293b 60%, #3b2f0f); }
+  .kpi-card.success { border-color: #22c55e; background: linear-gradient(135deg, #1e293b 60%, #0f3b1e); }
+  .kpi-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
+  .kpi-value { font-size: 1.6rem; font-weight: 700; }
+  .kpi-value.negative { color: #ef4444; }
+  .kpi-value.positive { color: #22c55e; }
+  .kpi-sub { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+
+  /* Section */
+  .section { background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #334155; }
+  .section h2 { font-size: 1.2rem; color: #f1f5f9; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section h3 { font-size: 1rem; color: #cbd5e1; margin: 16px 0 8px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+  .badge-inter { background: #1e3a5f; color: #60a5fa; }
+  .badge-hub { background: #1e3f2f; color: #4ade80; }
+  .badge-forecast { background: #3b2f0f; color: #fbbf24; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #0f172a; color: #94a3b8; font-weight: 600; text-align: right; padding: 10px 12px; border-bottom: 2px solid #334155; }
+  th:first-child { text-align: left; }
+  td { padding: 8px 12px; text-align: right; border-bottom: 1px solid #1e293b; }
+  td:first-child { text-align: left; color: #cbd5e1; }
+  tr:hover { background: #253349; }
+  .row-total { font-weight: 700; border-top: 2px solid #475569; background: #0f172a; }
+  .row-net { font-weight: 700; }
+  .row-net.negative td { color: #ef4444; }
+  .row-net.positive td { color: #22c55e; }
+  .forecast-col { background: rgba(251, 191, 36, 0.05); }
+
+  /* Charts */
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .chart-box { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+  .chart-box h3 { font-size: 1rem; color: #f1f5f9; margin-bottom: 12px; }
+  canvas { max-height: 320px; }
+
+  /* Validation */
+  .validation { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .val-item { background: #0f172a; border-radius: 8px; padding: 12px; }
+  .val-label { font-size: 0.75rem; color: #64748b; }
+  .val-match { color: #22c55e; font-weight: 600; }
+  .val-diff { color: #f59e0b; font-weight: 600; }
+
+  /* Notes */
+  .notes { background: #0f172a; border-radius: 8px; padding: 16px; margin-top: 16px; border-left: 3px solid #f59e0b; }
+  .notes h4 { color: #fbbf24; margin-bottom: 8px; font-size: 0.9rem; }
+  .notes ul { padding-left: 20px; color: #94a3b8; font-size: 0.85rem; }
+  .notes li { margin-bottom: 4px; }
+
+  @media (max-width: 768px) {
+    .chart-row { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    table { font-size: 0.75rem; }
+    th, td { padding: 6px 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>インターシフト 資金管理ダッシュボード <span class="update-badge">2026/03/29 更新</span></h1>
+<p class="subtitle">今期（2025年11月〜）入出金推移 ｜ INTER × HUBRIDE 分離分析 ｜ 4月予測付き</p>
+
+<!-- KPI Cards -->
+<div class="kpi-row">
+  <div class="kpi-card warning">
+    <div class="kpi-label">3月29日 現残高</div>
+    <div class="kpi-value positive">¥9,095,136</div>
+    <div class="kpi-sub">りそな銀行池袋支店</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">3月末 予測残高</div>
+    <div class="kpi-value" style="color:#fbbf24">¥3,306,882</div>
+    <div class="kpi-sub">残取引の出入金次第で変動</div>
+  </div>
+  <div class="kpi-card danger">
+    <div class="kpi-label">4月末 予測残高</div>
+    <div class="kpi-value negative">▲¥612,866</div>
+    <div class="kpi-sub">直近3ヶ月加重平均ベース</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">今期累計 経常利益</div>
+    <div class="kpi-value negative">▲¥22,443,014</div>
+    <div class="kpi-sub">PL 11月〜2月確定</div>
+  </div>
+</div>
+
+<!-- 月別入出金サマリ -->
+<div class="section">
+  <h2>月別 入出金サマリ（INTER + HUBRIDE 合算）</h2>
+  <table>
+    <thead>
+      <tr>
+        <th></th><th>11月</th><th>12月</th><th>1月</th><th>2月</th><th>3月</th><th class="forecast-col">4月(予測)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>月初残高</td>
+        <td>17,870,415</td><td>31,879,953</td><td>19,909,597</td><td>11,819,277</td><td>1,710,262</td>
+        <td class="forecast-col">3,306,882</td>
+      </tr>
+      <tr>
+        <td>入金合計</td>
+        <td>164,620,496</td><td>105,230,029</td><td>140,196,578</td><td>152,567,287</td><td>175,313,164</td>
+        <td class="forecast-col">161,878,441</td>
+      </tr>
+      <tr>
+        <td>出金合計</td>
+        <td>150,610,958</td><td>117,200,385</td><td>148,286,898</td><td>162,676,302</td><td>173,716,544</td>
+        <td class="forecast-col">165,798,189</td>
+      </tr>
+      <tr class="row-net positive">
+        <td>差引（入−出）</td>
+        <td>+14,009,538</td><td style="color:#ef4444">▲11,970,356</td><td style="color:#ef4444">▲8,090,320</td>
+        <td style="color:#ef4444">▲10,109,015</td><td>+1,596,620</td>
+        <td class="forecast-col" style="color:#ef4444">▲3,919,748</td>
+      </tr>
+      <tr class="row-total">
+        <td>月末残高</td>
+        <td>31,879,953</td><td>19,909,597</td><td>11,819,277</td><td>1,710,262</td><td>3,306,882</td>
+        <td class="forecast-col" style="color:#ef4444">▲612,866</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- INTER 詳細 -->
+<div class="section">
+  <h2><span class="badge badge-inter">INTER</span> インターシフト本体 入出金推移</h2>
+  <table>
+    <thead>
+      <tr><th></th><th>11月</th><th>12月</th><th>1月</th><th>2月</th><th>3月</th><th class="forecast-col">4月(予測)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="7" style="color:#60a5fa; font-weight:600; background:#0f172a">【入金】</td></tr>
+      <tr>
+        <td>売上</td>
+        <td>60,005,677</td><td>56,663,525</td><td>71,202,869</td><td>44,647,014</td><td>35,491,391</td>
+        <td class="forecast-col">44,495,178</td>
+      </tr>
+      <tr>
+        <td>借入・回収</td>
+        <td>72,887,488</td><td>4,750,000</td><td>21,000,000</td><td>62,561,000</td><td>55,050,000</td>
+        <td class="forecast-col">51,878,667</td>
+      </tr>
+      <tr>
+        <td>その他入金</td>
+        <td>50,200</td><td>11,360</td><td>141,770</td><td>1,374,493</td><td>15,674,490</td>
+        <td class="forecast-col">8,319,038</td>
+      </tr>
+      <tr class="row-total">
+        <td>入金計</td>
+        <td>132,943,365</td><td>61,424,885</td><td>92,344,639</td><td>108,582,507</td><td>106,215,881</td>
+        <td class="forecast-col">104,692,883</td>
+      </tr>
+
+      <tr><td colspan="7" style="color:#f87171; font-weight:600; background:#0f172a">【出金】</td></tr>
+      <tr>
+        <td>その他出金</td>
+        <td>49,691,360</td><td>30,902,040</td><td>64,984,298</td><td>40,113,012</td><td>67,747,420</td>
+        <td class="forecast-col">58,075,430</td>
+      </tr>
+      <tr>
+        <td>給与関連</td>
+        <td>19,571,047</td><td>26,338,152</td><td>22,188,288</td><td>27,137,549</td><td>19,357,693</td>
+        <td class="forecast-col">22,422,744</td>
+      </tr>
+      <tr>
+        <td>貸付・返済</td>
+        <td>40,500,000</td><td>1,305,626</td><td>13,420,026</td><td>24,400,000</td><td>35,000,000</td>
+        <td class="forecast-col">27,870,004</td>
+      </tr>
+      <tr class="row-total">
+        <td>出金計</td>
+        <td>109,762,407</td><td>58,545,818</td><td>100,592,612</td><td>91,650,561</td><td>122,105,113</td>
+        <td class="forecast-col">108,368,179</td>
+      </tr>
+
+      <tr class="row-net">
+        <td>差引</td>
+        <td style="color:#22c55e">+23,180,958</td>
+        <td style="color:#22c55e">+2,879,067</td>
+        <td style="color:#ef4444">▲8,247,973</td>
+        <td style="color:#22c55e">+16,931,946</td>
+        <td style="color:#ef4444">▲15,889,232</td>
+        <td class="forecast-col" style="color:#ef4444">▲3,675,296</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- HUBRIDE 詳細 -->
+<div class="section">
+  <h2><span class="badge badge-hub">HUBRIDE</span> ハブライド事業 入出金推移</h2>
+  <table>
+    <thead>
+      <tr><th></th><th>11月</th><th>12月</th><th>1月</th><th>2月</th><th>3月</th><th class="forecast-col">4月(予測)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="7" style="color:#4ade80; font-weight:600; background:#0f172a">【入金】</td></tr>
+      <tr>
+        <td>売上</td>
+        <td>30,663,327</td><td>32,844,130</td><td>44,502,525</td><td>37,933,163</td><td>67,772,235</td>
+        <td class="forecast-col">53,947,593</td>
+      </tr>
+      <tr>
+        <td>その他入金</td>
+        <td>998,779</td><td>10,961,014</td><td>3,349,414</td><td>6,051,617</td><td>1,325,048</td>
+        <td class="forecast-col">3,237,965</td>
+      </tr>
+      <tr>
+        <td>借入・回収</td>
+        <td>15,025</td><td>—</td><td>—</td><td>—</td><td>—</td>
+        <td class="forecast-col">—</td>
+      </tr>
+      <tr class="row-total">
+        <td>入金計</td>
+        <td>31,677,131</td><td>43,805,144</td><td>47,851,939</td><td>43,984,780</td><td>69,097,283</td>
+        <td class="forecast-col">57,185,558</td>
+      </tr>
+
+      <tr><td colspan="7" style="color:#f87171; font-weight:600; background:#0f172a">【出金】</td></tr>
+      <tr>
+        <td>仕入（車両等）</td>
+        <td>31,232,061</td><td>31,875,142</td><td>23,175,001</td><td>47,618,950</td><td>22,714,932</td>
+        <td class="forecast-col">31,092,950</td>
+      </tr>
+      <tr>
+        <td>その他出金</td>
+        <td>9,616,490</td><td>26,779,425</td><td>24,519,285</td><td>23,406,791</td><td>28,896,499</td>
+        <td class="forecast-col">26,337,061</td>
+      </tr>
+      <tr class="row-total">
+        <td>出金計</td>
+        <td>40,848,551</td><td>58,654,567</td><td>47,694,286</td><td>71,025,741</td><td>51,611,431</td>
+        <td class="forecast-col">57,430,010</td>
+      </tr>
+
+      <tr class="row-net">
+        <td>差引</td>
+        <td style="color:#ef4444">▲9,171,420</td>
+        <td style="color:#ef4444">▲14,849,423</td>
+        <td style="color:#22c55e">+157,653</td>
+        <td style="color:#ef4444">▲27,040,961</td>
+        <td style="color:#22c55e">+17,485,852</td>
+        <td class="forecast-col" style="color:#ef4444">▲244,452</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Charts -->
+<div class="chart-row">
+  <div class="chart-box">
+    <h3>月末残高推移</h3>
+    <canvas id="balanceChart"></canvas>
+  </div>
+  <div class="chart-box">
+    <h3>INTER vs HUBRIDE 月別差引（入金−出金）</h3>
+    <canvas id="netChart"></canvas>
+  </div>
+</div>
+
+<div class="chart-row">
+  <div class="chart-box">
+    <h3>INTER 出金内訳（区分別）</h3>
+    <canvas id="interOutChart"></canvas>
+  </div>
+  <div class="chart-box">
+    <h3>HUBRIDE 出金内訳（区分別）</h3>
+    <canvas id="hubOutChart"></canvas>
+  </div>
+</div>
+
+<div class="chart-row">
+  <div class="chart-box">
+    <h3>INTER 入金内訳（区分別）</h3>
+    <canvas id="interInChart"></canvas>
+  </div>
+  <div class="chart-box">
+    <h3>HUBRIDE 入金内訳（区分別）</h3>
+    <canvas id="hubInChart"></canvas>
+  </div>
+</div>
+
+<!-- BS整合 -->
+<div class="section">
+  <h2>BS普通預金残高との整合確認</h2>
+  <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:12px">入出金サマリの月末残高 vs 会計ソフト（BS）の普通預金残高</p>
+  <div class="validation">
+    <div class="val-item">
+      <div class="val-label">11月末</div>
+      <div>サマリ: ¥31,879,953</div>
+      <div>BS: ¥31,879,953</div>
+      <div class="val-match">一致 ✓</div>
+    </div>
+    <div class="val-item">
+      <div class="val-label">12月末</div>
+      <div>サマリ: ¥19,909,597</div>
+      <div>BS: ¥19,909,597</div>
+      <div class="val-match">一致 ✓</div>
+    </div>
+    <div class="val-item">
+      <div class="val-label">1月末</div>
+      <div>サマリ: ¥11,819,277</div>
+      <div>BS: ¥11,819,277</div>
+      <div class="val-match">一致 ✓</div>
+    </div>
+    <div class="val-item">
+      <div class="val-label">2月末</div>
+      <div>サマリ: ¥1,710,262</div>
+      <div>BS: ¥1,710,262</div>
+      <div class="val-match">一致 ✓</div>
+    </div>
+  </div>
+</div>
+
+<!-- 分析ノート -->
+<div class="section">
+  <h2>分析サマリ・リスクポイント</h2>
+  <div class="notes">
+    <h4>資金繰りリスク</h4>
+    <ul>
+      <li><strong>4月末マイナス予測:</strong> 直近3ヶ月加重平均ベースで▲61万。借入タイミング次第で回避可能だが、資金ショートリスクあり</li>
+      <li><strong>3月末残高330万:</strong> 今期最低水準。入金遅延があれば即座に資金不足に陥る</li>
+      <li><strong>構造的赤字:</strong> 今期経常利益▲2,244万。売上は減少トレンド（11月8,900万→2月2,070万）</li>
+    </ul>
+  </div>
+  <div class="notes" style="border-left-color: #60a5fa; margin-top: 12px;">
+    <h4>INTER vs HUBRIDE 構造</h4>
+    <ul>
+      <li><strong>INTER:</strong> 借入・回収が毎月の入金の大部分を占める（売上だけでは出金を賄えない構造）</li>
+      <li><strong>HUBRIDE:</strong> 売上入金が安定（月3,000〜6,800万）。仕入出金との差引は概ねトントン</li>
+      <li><strong>INTER貸付・返済:</strong> 月1,300万〜4,050万の出金。グループ間資金移動の規模が大きい</li>
+      <li><strong>INTER給与関連:</strong> 月1,900〜2,700万で安定的な固定費</li>
+    </ul>
+  </div>
+  <div class="notes" style="border-left-color: #22c55e; margin-top: 12px;">
+    <h4>4月予測の前提・留意点</h4>
+    <ul>
+      <li>直近3ヶ月（1〜3月）の加重平均で算出（3月=ウェイト3, 2月=2, 1月=1）</li>
+      <li>3月は3/29時点のデータ。月末の残取引で変動する</li>
+      <li>借入・新規融資は過去パターンから推計しているが、実際の借入予定に置き換えるべき</li>
+      <li>HUBRIDE仕入は月ごとの変動が大きい（2,300万〜4,760万）。車両仕入計画に依存</li>
+    </ul>
+  </div>
+</div>
+
+<p style="text-align:center; color:#475569; font-size:0.75rem; margin-top:20px; padding-bottom:20px">
+  データソース: 入出金サマリ-インター_20260329.xlsx / BS月次推移_20260329 / PL月次推移_20260329<br>
+  Generated by Claude Code | 2026-03-29
+</p>
+
+</div>
+
+<script>
+const months = ['11月', '12月', '1月', '2月', '3月', '4月(予測)'];
+const chartOpts = {
+  responsive: true,
+  plugins: {
+    legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+    tooltip: {
+      callbacks: {
+        label: ctx => {
+          const v = ctx.parsed.y || ctx.parsed;
+          return ctx.dataset.label + ': ¥' + Math.round(v).toLocaleString();
+        }
+      }
+    }
+  },
+  scales: {
+    x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+    y: {
+      ticks: {
+        color: '#94a3b8',
+        callback: v => '¥' + (v/10000).toLocaleString() + '万'
+      },
+      grid: { color: '#1e293b' }
+    }
+  }
+};
+
+// 月末残高推移
+new Chart(document.getElementById('balanceChart'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [{
+      label: '月末残高',
+      data: [31879953, 19909597, 11819277, 1710262, 3306882, -612866],
+      borderColor: '#f59e0b',
+      backgroundColor: 'rgba(245,158,11,0.1)',
+      fill: true, tension: 0.3, pointRadius: 6,
+      pointBackgroundColor: [
+        '#f59e0b','#f59e0b','#f59e0b','#ef4444','#f59e0b','#ef4444'
+      ],
+      segment: {
+        borderDash: ctx => ctx.p1DataIndex === 5 ? [6, 3] : undefined
+      }
+    }]
+  },
+  options: {
+    ...chartOpts,
+    plugins: {
+      ...chartOpts.plugins,
+      annotation: {}
+    }
+  }
+});
+
+// INTER vs HUBRIDE 差引
+new Chart(document.getElementById('netChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: 'INTER',
+        data: [23180958, 2879067, -8247973, 16931946, -15889232, -3675296],
+        backgroundColor: months.map((_, i) => {
+          const v = [23180958, 2879067, -8247973, 16931946, -15889232, -3675296][i];
+          return v >= 0 ? 'rgba(96,165,250,0.7)' : 'rgba(96,165,250,0.3)';
+        }),
+        borderColor: '#60a5fa', borderWidth: 1
+      },
+      {
+        label: 'HUBRIDE',
+        data: [-9171420, -14849423, 157653, -27040961, 17485852, -244452],
+        backgroundColor: months.map((_, i) => {
+          const v = [-9171420, -14849423, 157653, -27040961, 17485852, -244452][i];
+          return v >= 0 ? 'rgba(74,222,128,0.7)' : 'rgba(74,222,128,0.3)';
+        }),
+        borderColor: '#4ade80', borderWidth: 1
+      }
+    ]
+  },
+  options: chartOpts
+});
+
+// INTER出金 stacked bar
+new Chart(document.getElementById('interOutChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: 'その他出金',
+        data: [49691360, 30902040, 64984298, 40113012, 67747420, 58075430],
+        backgroundColor: 'rgba(239,68,68,0.6)'
+      },
+      {
+        label: '給与関連',
+        data: [19571047, 26338152, 22188288, 27137549, 19357693, 22422744],
+        backgroundColor: 'rgba(251,191,36,0.6)'
+      },
+      {
+        label: '貸付・返済',
+        data: [40500000, 1305626, 13420026, 24400000, 35000000, 27870004],
+        backgroundColor: 'rgba(139,92,246,0.6)'
+      }
+    ]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, x: { ...chartOpts.scales.x, stacked: true }, y: { ...chartOpts.scales.y, stacked: true } } }
+});
+
+// HUBRIDE出金 stacked bar
+new Chart(document.getElementById('hubOutChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: '仕入（車両等）',
+        data: [31232061, 31875142, 23175001, 47618950, 22714932, 31092950],
+        backgroundColor: 'rgba(74,222,128,0.6)'
+      },
+      {
+        label: 'その他出金',
+        data: [9616490, 26779425, 24519285, 23406791, 28896499, 26337061],
+        backgroundColor: 'rgba(96,165,250,0.6)'
+      }
+    ]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, x: { ...chartOpts.scales.x, stacked: true }, y: { ...chartOpts.scales.y, stacked: true } } }
+});
+
+// INTER入金 stacked bar
+new Chart(document.getElementById('interInChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: '売上',
+        data: [60005677, 56663525, 71202869, 44647014, 35491391, 44495178],
+        backgroundColor: 'rgba(96,165,250,0.7)'
+      },
+      {
+        label: '借入・回収',
+        data: [72887488, 4750000, 21000000, 62561000, 55050000, 51878667],
+        backgroundColor: 'rgba(139,92,246,0.7)'
+      },
+      {
+        label: 'その他入金',
+        data: [50200, 11360, 141770, 1374493, 15674490, 8319038],
+        backgroundColor: 'rgba(251,191,36,0.5)'
+      }
+    ]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, x: { ...chartOpts.scales.x, stacked: true }, y: { ...chartOpts.scales.y, stacked: true } } }
+});
+
+// HUBRIDE入金 stacked bar
+new Chart(document.getElementById('hubInChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: '売上',
+        data: [30663327, 32844130, 44502525, 37933163, 67772235, 53947593],
+        backgroundColor: 'rgba(74,222,128,0.7)'
+      },
+      {
+        label: 'その他入金',
+        data: [998779, 10961014, 3349414, 6051617, 1325048, 3237965],
+        backgroundColor: 'rgba(251,191,36,0.5)'
+      }
+    ]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, x: { ...chartOpts.scales.x, stacked: true }, y: { ...chartOpts.scales.y, stacked: true } } }
+});
+</script>
+</body>
+</html>
