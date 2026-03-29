@@ -848,6 +848,109 @@ const DATA = {
 };
 
 // ============================================================
+// VENDOR NAME MAPPING (半角カナ → 正式名称)
+// ============================================================
+const NAME_MAP = {
+  // INTER 売上
+  "ｲﾂﾊﾟﾝｼﾔﾀﾞﾝﾎｳｼﾞﾝ ｱﾝﾄﾞﾒﾃﾞｲｶﾙｸﾞﾙ-ﾌﾟ": "AND Medical Group",
+  "ﾍﾞﾝｺﾞｼﾎｳｼﾞﾝﾕｱｴ-ｽ": "ユアース法律事務所",
+  "ﾍﾞﾝ)ﾕｱｴ-ｽ,ｹｲﾋｸﾞﾁ": "ユアース法律事務所(経費口)",
+  "ｼﾎｳ)ﾐﾂﾊﾞｸﾞﾙ-ﾌﾟ": "みつ葉",
+  "ｱﾄﾘｴﾌﾛ-ﾙ(ｶ": "アトリエフロール",
+  "ｷﾕ-ﾌﾞ(ｶ": "キューブ",
+  "NUWORKS(ｶ": "NUWORKS",
+  "ﾄｳｼﾖｳﾎﾞｳｴｷ (ｶ": "東晶貿易",
+  "ﾄｳｼﾖｳﾎﾞｳｴｷ(ｶ": "東晶貿易",
+  "ｶ)ﾗﾂﾌﾟﾏ-ｹﾃｲﾝｸﾞ": "WrapMarketing",
+  "ｶ)ﾘﾝｸ": "Link",
+  "ｶ)ﾋﾞﾕ-ﾈ": "ビューネ",
+  "ﾄｳ-ﾋﾞ-ﾃﾂｸ": "TB-TECH",
+  "ﾆｼﾆﾎﾝｹｱｻ-ﾋﾞｽ(ｶ": "西日本ケアサービス",
+  // INTER 借入・回収
+  "ｶ)ｸﾛﾉｽ": "クロノス",
+  "ｺﾞﾕｳｼ": "合同会社(テラソル系)",
+  "ｱｻﾞﾌﾞ": "麻布(税務署還付)",
+  "ｶﾜｸﾞﾁ ｲｸﾏ": "川口郁磨",
+  "ｲﾉｾ ﾐﾋﾛ": "猪瀬美尋",
+  "ｶ)ﾘﾝｸ": "Link",
+  // INTER 貸付・返済
+  "IB ｶ)ｸﾛﾉｽ": "クロノス",
+  "IB ｶ)ﾗﾂﾌﾟﾏ-ｹﾃｲﾝｸﾞ": "WrapMarketing",
+  "ﾍﾝｻｲ": "りそな返済",
+  "ｶｼﾘｿｸ": "りそな返済利息",
+  // INTER その他出金
+  "IB ｶ)ｷﾔﾘｱﾋﾞｼﾞﾖﾝ": "キャリアビジョン",
+  "PE ｱｻﾞﾌﾞｾﾞｲﾑｼﾖ": "麻布税務署",
+  "IB ｶ)ｱﾂﾌﾟｻｲﾀﾞ-": "UPSIDER",
+  "ｱﾒﾂｸｽ": "AMEX",
+  "IB ｶ)ﾄﾘｶﾞ- ﾌｵ-ｽ": "TRIGGER FORCE",
+  "IB ｶ)ﾄﾘｶﾞ- ﾌｫ-ｽ": "TRIGGER FORCE",
+  "IB ｶ)ｷﾞﾌﾞﾌｱ-ｽﾄ": "ギブファースト",
+  "IB ｶ)ｴﾎﾟｽｶ-ﾄﾞ": "エポスカード",
+  "ｴﾎﾟｽｶ-ﾄﾞ": "エポスカード",
+  "IB ｶ)ﾘｱﾙｹﾞｲﾄ": "リアルゲイト",
+  "IB ｶ)ﾐﾈﾂﾄ": "ミネット",
+  "IB ｼﾎｳ)ﾐﾂﾊﾞｸﾞﾙ-ﾌﾟ": "みつ葉グループ",
+  "IB ｶ) ﾏｲﾅﾋﾞ": "マイナビ",
+  "IB ﾏﾈ-ﾌｫﾜ-ﾄﾞｹﾂｻｲ(": "マネーフォワード",
+  "IB ﾏﾈ-ﾌｵﾜ-ﾄﾞｹﾂｻｲ(": "マネーフォワード",
+  "IB ｶ)ﾄﾗﾝｻﾞｸﾄ": "トランザクト",
+  "IB ｻﾐﾂﾄｲﾝﾀ-ﾅｼﾖﾅﾙ": "サミットインターナショナル",
+  "IB ﾗｸﾃﾝﾓﾊﾞｲﾙ(ｶ": "楽天モバイル",
+  "ｼﾞﾕｳﾐﾝｾﾞｲ": "住民税",
+  "ｼﾔｶｲﾎｹﾝﾘﾖｳ": "社会保険料",
+  "IB ｶ)ｾﾞｽﾄ": "ZEST",
+  "IB ｶ) ﾃﾞｲ-ﾜｲｴﾑ": "DYM",
+  "IB ｶ) ｱｸﾃｲｱｽ": "アクティアス",
+  "IB ｲ)ﾕｳﾕｳ": "悠々",
+  "IB ｱ-ﾙｴｽｴﾑｼｵﾄﾞﾒﾊﾟ": "RSM汐留パートナーズ",
+  "IB ｱ-ﾙ ｴ- ｱｾﾂﾄ ﾏﾈ": "RAアセットマネジメント",
+  "PE ﾁﾎｳｾﾞｲｷﾖｳﾄﾞｳ": "地方税共同",
+  "PE ﾛｳﾄﾞｳﾎｹﾝﾘﾖｳﾄ": "労働保険料",
+  "SMBC(ｱﾂﾄﾊﾟ-ｷ": "アットパーキング",
+  "SMBC(ｶ)ﾈﾂﾄﾌﾟ": "ネットプロ",
+  "SMBC(ﾔﾁﾝ(ｾ-ﾌ": "家賃(セーフティ)",
+  "IB ｹｲﾃﾞｨ-ｴﾂｸｽﾚｼﾞﾃ": "KDXレジデンス",
+  "IB ﾊﾟ-ｿﾙｷﾔﾘｱ (ｶ": "パーソルキャリア",
+  "IB ﾊﾟ-ｿﾙｷﾔﾘｱ(ｶ": "パーソルキャリア",
+  "IB ｴﾂｸｽｻ-ﾊﾞ-(ｶ": "Xserver",
+  "IB ｻｲﾎﾞｳｽﾞ (ｶ": "サイボウズ",
+  "IB ﾕ)ﾖｼﾀﾞﾔｼﾖｳﾃﾝ": "吉田屋商店",
+  "IB ｶ)NEXT FUTURES": "NEXT FUTURES",
+  "IB ｼﾔ)ｼ-ﾃﾞｨ-ﾒﾃﾞｲｶ": "CDMedical",
+  "IB ｼﾔ)ﾁｾｲｶｲ": "治生会",
+  "ｱｻﾞﾌﾞ": "麻布税務署",
+  // HUBRIDE 売上
+  "ﾕ)ｼ-ﾃｲ-ﾌﾟﾗﾝﾅ-": "シーティープランナー",
+  "ｶ)ﾃﾞｲ-ｱｲｴ-": "DIA",
+  // HUBRIDE 仕入
+  "IB ﾕ)ｼ-ﾃｲ-ﾌﾟﾗﾝﾅ-": "シーティープランナー",
+  "IB ｶ)ﾃﾞｲ-ｱｲｴ-": "DIA",
+  // HUBRIDE その他出金
+  "IB ﾊﾟﾌｫ-ﾏﾝｽﾃｸﾉﾛｼﾞ": "Performance Technologies",
+  "IB ﾊﾟﾌｵ-ﾏﾝｽﾃｸﾉﾛｼﾞ": "Performance Technologies",
+  "IB ｶﾌﾞｼｷｶﾞｲｼﾔ ﾁﾕｳ": "中小企業のチカラ",
+  "IB ｵｷﾞﾉ ｱｵｲ": "荻野あおい",
+  "IB ﾅｶﾊﾗ ｶｲﾄ": "中原海斗",
+  "IB ﾀﾞｲﾄｳｹﾝﾀｸﾊﾟ-ﾄﾅ": "大東建託パートナーズ"
+};
+
+// 名寄せ: カナ名を正式名にマップし、同一取引先を合算する
+function consolidateVendors(data) {
+  const map = {};
+  data.forEach(row => {
+    const canonical = NAME_MAP[row.vendor] || row.vendor;
+    if (map[canonical]) {
+      MONTHS.forEach(m => { map[canonical][m] = (map[canonical][m] || 0) + (row[m] || 0); });
+      map[canonical].total += row.total || 0;
+    } else {
+      map[canonical] = Object.assign({}, row, { vendor: canonical });
+    }
+  });
+  return Object.values(map).sort((a, b) => b.total - a.total);
+}
+
+// ============================================================
 // UTILITY FUNCTIONS
 // ============================================================
 const MONTHS = ["11月","12月","1月","2月","3月"];
@@ -1379,14 +1482,51 @@ function sortTable(tableId, colIdx) {
 // ============================================================
 // COLLAPSIBLE
 // ============================================================
+
+// セクションの合計をtableのtotal-row最終セルから取得する
+function getSectionTotal(contentId) {
+  const content = document.getElementById(contentId);
+  if (!content) return null;
+  const totalRow = content.querySelector("tr.total-row");
+  if (!totalRow) return null;
+  const cells = totalRow.querySelectorAll("td");
+  // 最終セルが合計値
+  const lastCell = cells[cells.length - 1];
+  if (!lastCell) return null;
+  const txt = lastCell.textContent.replace(/[¥,\s]/g, "").replace("—", "");
+  const n = parseFloat(txt);
+  return isNaN(n) ? null : n;
+}
+
 function toggleCollapsible(id) {
   const content = document.getElementById(id);
   const wrap = document.getElementById("wrap-" + id);
   const header = wrap ? wrap.querySelector(".collapsible-header") : null;
   if (!content) return;
   const isOpen = content.classList.contains("open");
-  content.classList.toggle("open", !isOpen);
-  if (header) header.classList.toggle("open", !isOpen);
+  const willOpen = !isOpen;
+  content.classList.toggle("open", willOpen);
+  if (header) header.classList.toggle("open", willOpen);
+
+  // collapsedになった場合: ヘッダーに合計を表示
+  if (header) {
+    const titleEl = header.querySelector("h3");
+    if (!titleEl) return;
+    const baseTitle = titleEl.dataset.baseTitle || titleEl.textContent.replace(/ — 合計.*$/, "").trim();
+    titleEl.dataset.baseTitle = baseTitle;
+    if (!willOpen) {
+      // 閉じた → 合計を表示
+      const total = getSectionTotal(id);
+      if (total !== null) {
+        titleEl.textContent = baseTitle + " — 合計 ¥" + total.toLocaleString("ja-JP");
+      } else {
+        titleEl.textContent = baseTitle;
+      }
+    } else {
+      // 開いた → ベース名のみ
+      titleEl.textContent = baseTitle;
+    }
+  }
 }
 
 // Open all by default on load
@@ -1403,18 +1543,18 @@ document.addEventListener("DOMContentLoaded", () => {
   buildMonthlyChart();
   buildComparisonTable();
 
-  // INTER detail tables
-  buildDetailTable("head-inter-sales",  "body-inter-sales",  DATA.inter_sales,  "inter-col");
-  buildDetailTable("head-inter-borrow", "body-inter-borrow", DATA.inter_borrow, "inter-col");
-  buildDetailTable("head-inter-lend",   "body-inter-lend",   DATA.inter_lend,   "inter-col");
-  buildDetailTable("head-inter-other",  "body-inter-other",  DATA.inter_other_out, "inter-col");
-  buildDetailTable("head-inter-salary", "body-inter-salary", DATA.inter_salary, "inter-col");
+  // INTER detail tables (名寄せ適用)
+  buildDetailTable("head-inter-sales",  "body-inter-sales",  consolidateVendors(DATA.inter_sales),  "inter-col");
+  buildDetailTable("head-inter-borrow", "body-inter-borrow", consolidateVendors(DATA.inter_borrow), "inter-col");
+  buildDetailTable("head-inter-lend",   "body-inter-lend",   consolidateVendors(DATA.inter_lend),   "inter-col");
+  buildDetailTable("head-inter-other",  "body-inter-other",  consolidateVendors(DATA.inter_other_out), "inter-col");
+  buildDetailTable("head-inter-salary", "body-inter-salary", consolidateVendors(DATA.inter_salary), "inter-col");
 
-  // HUBRIDE detail tables
-  buildDetailTable("head-hub-sales",    "body-hub-sales",    DATA.hubride_sales,     "hubride-col");
-  buildDetailTable("head-hub-purchase", "body-hub-purchase", DATA.hubride_purchase,  "hubride-col");
-  buildDetailTable("head-hub-other-out","body-hub-other-out",DATA.hubride_other_out, "hubride-col");
-  buildDetailTable("head-hub-other-in", "body-hub-other-in", DATA.hubride_other_in,  "hubride-col");
+  // HUBRIDE detail tables (名寄せ適用)
+  buildDetailTable("head-hub-sales",    "body-hub-sales",    consolidateVendors(DATA.hubride_sales),     "hubride-col");
+  buildDetailTable("head-hub-purchase", "body-hub-purchase", consolidateVendors(DATA.hubride_purchase),  "hubride-col");
+  buildDetailTable("head-hub-other-out","body-hub-other-out",consolidateVendors(DATA.hubride_other_out), "hubride-col");
+  buildDetailTable("head-hub-other-in", "body-hub-other-in", consolidateVendors(DATA.hubride_other_in),  "hubride-col");
 
   buildDonutCharts();
   buildForecast();
