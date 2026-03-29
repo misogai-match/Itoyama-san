@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インターシフト 資金管理ダッシュボード v2</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263347;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --inter: #3b82f6;
+    --hubride: #10b981;
+    --income: #22c55e;
+    --expense: #ef4444;
+    --yellow: #f59e0b;
+    --purple: #a855f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+  .header-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .badge-inter {
+    background: rgba(59,130,246,0.2);
+    border: 1px solid var(--inter);
+    color: var(--inter);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-hubride {
+    background: rgba(16,185,129,0.2);
+    border: 1px solid var(--hubride);
+    color: var(--hubride);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .btn-print {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .btn-print:hover { background: var(--border); }
+
+  /* MAIN LAYOUT */
+  .main { padding: 24px 32px; max-width: 1600px; margin: 0 auto; }
+
+  /* SECTION */
+  .section { margin-bottom: 32px; }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .dot-inter { width: 10px; height: 10px; border-radius: 50%; background: var(--inter); display: inline-block; }
+  .section-title .dot-hubride { width: 10px; height: 10px; border-radius: 50%; background: var(--hubride); display: inline-block; }
+  .section-title .dot-both {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--inter) 50%, var(--hubride) 50%);
+    display: inline-block;
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi-card.kpi-balance::before { background: var(--inter); }
+  .kpi-card.kpi-forecast::before { background: var(--yellow); }
+  .kpi-card.kpi-income::before { background: var(--income); }
+  .kpi-card.kpi-expense::before { background: var(--expense); }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 6px;
+  }
+  .kpi-badge {
+    display: inline-block;
+    background: rgba(245,158,11,0.2);
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+  }
+
+  /* CHART SECTION */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+  }
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .chart-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .chart-container { position: relative; }
+
+  /* COMPARISON TABLE */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr {
+    background: var(--card2);
+  }
+  th {
+    padding: 10px 14px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    user-select: none;
+  }
+  th:first-child { text-align: left; }
+  th:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  th.sorted-asc::after { content: ' ↑'; color: var(--inter); }
+  th.sorted-desc::after { content: ' ↓'; color: var(--inter); }
+  td {
+    padding: 9px 14px;
+    text-align: right;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(51,65,85,0.5);
+    white-space: nowrap;
+  }
+  td:first-child { text-align: left; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+  .total-row td {
+    background: var(--card2);
+    font-weight: 700;
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+  }
+  .positive { color: var(--income); }
+  .negative { color: var(--expense); }
+  .inter-col { color: #93c5fd; }
+  .hubride-col { color: #6ee7b7; }
+
+  /* COLLAPSIBLE SECTION */
+  .collapsible-header {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+    transition: background 0.2s;
+  }
+  .collapsible-header:hover { background: var(--card2); }
+  .collapsible-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .collapsible-header .toggle-icon {
+    font-size: 18px;
+    color: var(--text2);
+    transition: transform 0.3s;
+  }
+  .collapsible-header.open .toggle-icon { transform: rotate(180deg); }
+  .collapsible-content {
+    display: none;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .collapsible-content.open { display: block; }
+  .collapsible-wrap { margin-bottom: 12px; }
+  .collapsible-wrap .collapsible-header { border-radius: 8px 8px 0 0; }
+  .collapsible-wrap.open .collapsible-header { border-radius: 8px 8px 0 0; }
+
+  /* CATEGORY LABEL */
+  .cat-label {
+    background: var(--card2);
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cat-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--inter);
+    display: inline-block;
+  }
+  .cat-dot.green { background: var(--hubride); }
+  .cat-dot.yellow { background: var(--yellow); }
+
+  /* DONUT CHARTS */
+  .donut-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* FORECAST SECTION */
+  .forecast-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .forecast-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .forecast-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .forecast-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(51,65,85,0.5);
+    font-size: 13px;
+  }
+  .forecast-row:last-child { border-bottom: none; }
+  .forecast-label { color: var(--text2); }
+  .forecast-value { font-weight: 600; }
+  .range-bar {
+    background: var(--card2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  .range-bar .range-label { color: var(--text2); margin-bottom: 4px; }
+  .range-bar .range-values { display: flex; justify-content: space-between; }
+  .range-bar .range-optimistic { color: var(--income); font-weight: 600; }
+  .range-bar .range-pessimistic { color: var(--expense); font-weight: 600; }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 12px;
+    margin-top: 32px;
+  }
+
+  /* PRINT STYLES */
+  @media print {
+    body { background: #fff; color: #000; font-size: 12px; }
+    .header { background: #f0f4f8; border-bottom: 2px solid #ddd; }
+    .header h1, .header .subtitle { color: #000; }
+    .kpi-card, .chart-card, .table-wrap, .forecast-card, .collapsible-header, .collapsible-content {
+      background: #fff;
+      border: 1px solid #ddd;
+    }
+    th { background: #f5f5f5; color: #333; }
+    td { color: #000; }
+    .btn-print { display: none; }
+    .collapsible-content { display: block !important; }
+    .total-row td { background: #f5f5f5; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <h1>インターシフト 資金管理ダッシュボード</h1>
+    <div class="subtitle">第3期 (2025年11月～) | データ更新: 2026年3月29日</div>
+  </div>
+  <div class="header-right">
+    <span class="badge-inter">INTER 本体</span>
+    <span class="badge-hubride">HUBRIDE 車両</span>
+    <button class="btn-print" onclick="window.print()">🖨 印刷</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SECTION 1: KPI CARDS -->
+  <div class="section">
+    <div class="section-title"><span class="dot-both"></span>主要指標</div>
+    <div class="kpi-grid" id="kpi-grid"></div>
+  </div>
+
+  <!-- SECTION 2: MONTHLY CHART -->
+  <div class="section">
+    <div class="section-title"><span class="dot-both"></span>月次入出金推移チャート</div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>月次入出金 (積み上げ棒) + 残高推移 (折れ線)</h3>
+        <div class="chart-container" style="height:320px">
+          <canvas id="monthlyChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>INTER vs HUBRIDE 月次純増減</h3>
+        <div class="chart-container" style="height:320px">
+          <canvas id="netChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: COMPARISON TABLE -->
+  <div class="section">
+    <div class="section-title"><span class="dot-both"></span>INTER / HUBRIDE 月次比較表</div>
+    <div class="table-wrap">
+      <table id="comparison-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('comparison-table',0)">月</th>
+            <th onclick="sortTable('comparison-table',1)" class="inter-col">INTER 入金</th>
+            <th onclick="sortTable('comparison-table',2)" class="inter-col">INTER 出金</th>
+            <th onclick="sortTable('comparison-table',3)" class="inter-col">INTER 差引</th>
+            <th onclick="sortTable('comparison-table',4)" class="hubride-col">HUBRIDE 入金</th>
+            <th onclick="sortTable('comparison-table',5)" class="hubride-col">HUBRIDE 出金</th>
+            <th onclick="sortTable('comparison-table',6)" class="hubride-col">HUBRIDE 差引</th>
+            <th onclick="sortTable('comparison-table',7)">合計差引</th>
+          </tr>
+        </thead>
+        <tbody id="comparison-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 4: INTER DETAIL -->
+  <div class="section">
+    <div class="section-title"><span class="dot-inter"></span>インターシフト本体 入出金推移 (取引先別)</div>
+
+    <div class="collapsible-wrap" id="wrap-inter-sales">
+      <div class="collapsible-header" onclick="toggleCollapsible('inter-sales')">
+        <h3>売上 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="inter-sales">
+        <table id="tbl-inter-sales">
+          <thead><tr id="head-inter-sales"></tr></thead>
+          <tbody id="body-inter-sales"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible-wrap" id="wrap-inter-borrow">
+      <div class="collapsible-header" onclick="toggleCollapsible('inter-borrow')">
+        <h3>借入・回収 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="inter-borrow">
+        <table id="tbl-inter-borrow">
+          <thead><tr id="head-inter-borrow"></tr></thead>
+          <tbody id="body-inter-borrow"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible-wrap" id="wrap-inter-lend">
+      <div class="collapsible-header" onclick="toggleCollapsible('inter-lend')">
+        <h3>貸付・返済 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="inter-lend">
+        <table id="tbl-inter-lend">
+          <thead><tr id="head-inter-lend"></tr></thead>
+          <tbody id="body-inter-lend"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible-wrap" id="wrap-inter-other">
+      <div class="collapsible-header" onclick="toggleCollapsible('inter-other')">
+        <h3>その他出金 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="inter-other">
+        <table id="tbl-inter-other">
+          <thead><tr id="head-inter-other"></tr></thead>
+          <tbody id="body-inter-other"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible-wrap" id="wrap-inter-salary">
+      <div class="collapsible-header" onclick="toggleCollapsible('inter-salary')">
+        <h3>給与関連 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="inter-salary">
+        <table id="tbl-inter-salary">
+          <thead><tr id="head-inter-salary"></tr></thead>
+          <tbody id="body-inter-salary"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: HUBRIDE DETAIL -->
+  <div class="section">
+    <div class="section-title"><span class="dot-hubride"></span>ハブライド事業 入出金推移 (取引先別)</div>
+
+    <div class="collapsible-wrap" id="wrap-hub-sales">
+      <div class="collapsible-header" onclick="toggleCollapsible('hub-sales')">
+        <h3>売上 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="hub-sales">
+        <table id="tbl-hub-sales">
+          <thead><tr id="head-hub-sales"></tr></thead>
+          <tbody id="body-hub-sales"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible-wrap" id="wrap-hub-purchase">
+      <div class="collapsible-header" onclick="toggleCollapsible('hub-purchase')">
+        <h3>仕入 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="hub-purchase">
+        <table id="tbl-hub-purchase">
+          <thead><tr id="head-hub-purchase"></tr></thead>
+          <tbody id="body-hub-purchase"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible-wrap" id="wrap-hub-other-out">
+      <div class="collapsible-header" onclick="toggleCollapsible('hub-other-out')">
+        <h3>その他出金 (勘定科目・取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="hub-other-out">
+        <table id="tbl-hub-other-out">
+          <thead><tr id="head-hub-other-out"></tr></thead>
+          <tbody id="body-hub-other-out"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="collapsible-wrap" id="wrap-hub-other-in">
+      <div class="collapsible-header" onclick="toggleCollapsible('hub-other-in')">
+        <h3>その他入金 (取引先別)</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="collapsible-content" id="hub-other-in">
+        <table id="tbl-hub-other-in">
+          <thead><tr id="head-hub-other-in"></tr></thead>
+          <tbody id="body-hub-other-in"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: DONUT CHARTS -->
+  <div class="section">
+    <div class="section-title"><span class="dot-both"></span>出金構成比チャート</div>
+    <div class="donut-grid">
+      <div class="chart-card">
+        <h3>INTER 出金構成 (今期累計)</h3>
+        <div class="chart-container" style="height:300px">
+          <canvas id="donutInter"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>HUBRIDE 出金構成 (今期累計)</h3>
+        <div class="chart-container" style="height:300px">
+          <canvas id="donutHubride"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: FORECAST -->
+  <div class="section">
+    <div class="section-title"><span class="dot-both"></span>4月末残高予測</div>
+    <div class="forecast-grid">
+      <div class="forecast-card">
+        <h3 style="color: #93c5fd;">INTER 予測</h3>
+        <div id="forecast-inter"></div>
+      </div>
+      <div class="forecast-card">
+        <h3 style="color: #6ee7b7;">HUBRIDE 予測</h3>
+        <div id="forecast-hubride"></div>
+      </div>
+      <div class="forecast-card">
+        <h3 style="color: #fcd34d;">総合予測 (概算)</h3>
+        <div id="forecast-combined"></div>
+      </div>
+    </div>
+    <div style="margin-top: 16px; background: var(--card2); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+      <div style="font-size: 13px; color: var(--text2); margin-bottom: 8px;">参考: 3月予測シートの値</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <span style="color: var(--text2); font-size: 12px;">INTER差引（3月予測）</span><br>
+          <span style="color: var(--expense); font-weight: 700; font-size: 16px;">▲15,889,232</span>
+          <div style="font-size: 11px; color: var(--text2); margin-top: 4px;">予測入金: ¥106,215,881 / 予測出金: ¥122,105,113</div>
+        </div>
+        <div>
+          <span style="color: var(--text2); font-size: 12px;">HUBRIDE差引（3月予測）</span><br>
+          <span style="color: var(--income); font-weight: 700; font-size: 16px;">+17,616,372</span>
+          <div style="font-size: 11px; color: var(--text2); margin-top: 4px;">予測入金: ¥69,097,283 / 予測出金: ¥51,480,911</div>
+        </div>
+      </div>
+      <div style="font-size: 11px; color: var(--text2); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);">
+        ※ 3月予測シートは月初に作成した全月計画値。実績との乖離は各セクションの明細で確認。
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Generated by Claude Code | Data source: 入出金サマリ-インター_20260329.xlsx
+</div>
+
+<script>
+// ============================================================
+// EMBEDDED DATA
+// ============================================================
+const DATA = {
+  "summary": {
+    "INTER": {
+      "11月": {"in": 132943365, "out": 109762407},
+      "12月": {"in": 61424885, "out": 58545818},
+      "1月": {"in": 88838465, "out": 95092698},
+      "2月": {"in": 73825791, "out": 75974731},
+      "3月": {"in": 73940633, "out": 48723544}
+    },
+    "HUBRIDE": {
+      "11月": {"in": 31677131, "out": 40848551},
+      "12月": {"in": 43805144, "out": 58654567},
+      "1月": {"in": 9519014, "out": 9251713},
+      "2月": {"in": 14307081, "out": 12263134},
+      "3月": {"in": 11457830, "out": 13786594}
+    }
+  },
+  "balances": {"1月": 13189019, "2月": 7202087, "3月": 7097094},
+  "inter_sales": [
+    {"vendor": "AND Medical Group", "total": 78962160, "11月": 25891962, "12月": 25609788, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｲﾂﾊﾟﾝｼﾔﾀﾞﾝﾎｳｼﾞﾝ ｱﾝﾄﾞﾒﾃﾞｲｶﾙｸﾞﾙ-ﾌﾟ", "total": 61281887, "11月": 0, "12月": 0, "1月": 19100725, "2月": 20467474, "3月": 21713688},
+    {"vendor": "MINET", "total": 44000000, "11月": 22000000, "12月": 22000000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ﾍﾞﾝｺﾞｼﾎｳｼﾞﾝﾕｱｴ-ｽ", "total": 13970000, "11月": 0, "12月": 0, "1月": 0, "2月": 7810000, "3月": 6160000},
+    {"vendor": "ｼﾎｳ)ﾐﾂﾊﾞｸﾞﾙ-ﾌﾟ", "total": 13638217, "11月": 0, "12月": 0, "1月": 4285040, "2月": 4488943, "3月": 4864234},
+    {"vendor": "みつ葉", "total": 11506656, "11月": 5324647, "12月": 3849569, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "響", "total": 8966546, "11月": 3109536, "12月": 2913089, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ﾍﾞﾝ)ﾕｱｴ-ｽ,ｹｲﾋｸﾞﾁ", "total": 7810000, "11月": 0, "12月": 0, "1月": 7810000, "2月": 0, "3月": 0},
+    {"vendor": "ｷﾕ-ﾌﾞ(ｶ", "total": 6930000, "11月": 0, "12月": 0, "1月": 1650000, "2月": 1650000, "3月": 3630000},
+    {"vendor": "キューブ", "total": 6050000, "11月": 2530000, "12月": 1760000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｱﾄﾘｴﾌﾛ-ﾙ(ｶ", "total": 5499340, "11月": 0, "12月": 0, "1月": 0, "2月": 5499340, "3月": 0},
+    {"vendor": "ﾄｳ-ﾋﾞ-ﾃｯｸ", "total": 4950000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 4950000},
+    {"vendor": "ｶ)ﾗﾂﾌﾟﾏ-ｹﾃｲﾝｸﾞ", "total": 4000000, "11月": 0, "12月": 0, "1月": 4000000, "2月": 0, "3月": 0},
+    {"vendor": "ﾄｳｼﾖｳﾎﾞｳｴｷ(ｶ", "total": 3960000, "11月": 0, "12月": 0, "1月": 1320000, "2月": 1320000, "3月": 1320000},
+    {"vendor": "ﾆｼﾆﾎﾝｹｱｻ-ﾋﾞｽ(ｶ", "total": 3850000, "11月": 0, "12月": 0, "1月": 3850000, "2月": 0, "3月": 0}
+  ],
+  "inter_borrow": [
+    {"vendor": "テラソル", "total": 115750000, "11月": 61500000, "12月": 4250000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｶ)ｸﾛﾉｽ", "total": 65000000, "11月": 0, "12月": 0, "1月": 40000000, "2月": 25000000, "3月": 0},
+    {"vendor": "ｺﾞﾕｳｼ", "total": 29259261, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 29259261},
+    {"vendor": "WrapMarketing", "total": 18620000, "11月": 8040000, "12月": 500000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "MINET", "total": 10000000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｶ)ﾗﾂﾌﾟﾏ-ｹﾃｲﾝｸﾞ", "total": 6038709, "11月": 0, "12月": 0, "1月": 38709, "2月": 4000000, "3月": 2000000},
+    {"vendor": "ミネット", "total": 3000000, "11月": 3000000, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｱｻﾞﾌﾞ", "total": 2779908, "11月": 0, "12月": 0, "1月": 2779908, "2月": 0, "3月": 0},
+    {"vendor": "ｶﾜｸﾞﾁ ｲｸﾏ", "total": 2550000, "11月": 0, "12月": 0, "1月": 2550000, "2月": 0, "3月": 0},
+    {"vendor": "AD", "total": 787172, "11月": 0, "12月": 0, "1月": 787172, "2月": 0, "3月": 0},
+    {"vendor": "freemova", "total": 528000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｲﾉｾ ﾐﾋﾛ", "total": 450000, "11月": 0, "12月": 0, "1月": 450000, "2月": 0, "3月": 0},
+    {"vendor": "横倉啓太", "total": 387488, "11月": 387488, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｱｻﾞﾌﾞｾﾞｲﾑｼﾖ", "total": 193200, "11月": 0, "12月": 0, "1月": 0, "2月": 193200, "3月": 0},
+    {"vendor": "ｶ)ﾘﾝｸ", "total": 101011, "11月": 0, "12月": 0, "1月": 101011, "2月": 0, "3月": 0}
+  ],
+  "inter_lend": [
+    {"vendor": "IB ｶ)ｸﾛﾉｽ", "total": 35000000, "11月": 0, "12月": 0, "1月": 0, "2月": 35000000, "3月": 0},
+    {"vendor": "Vialevo", "total": 19500000, "11月": 19500000, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "WrapMarketing", "total": 18500000, "11月": 8000000, "12月": 500000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "従業員(他社)", "total": 15000000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "リッチ&ビルド", "total": 13000000, "11月": 13000000, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "MINET", "total": 10000000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ｶ)ﾗﾂﾌﾟﾏ-ｹﾃｲﾝｸﾞ", "total": 2000000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 2000000},
+    {"vendor": "ﾍﾝｻｲ", "total": 1786400, "11月": 0, "12月": 0, "1月": 714200, "2月": 357100, "3月": 715100},
+    {"vendor": "りそな返済", "total": 715100, "11月": 0, "12月": 715100, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "りそな返済利息", "total": 90526, "11月": 0, "12月": 90526, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｶｼﾘｿｸ", "total": 86410, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 86410}
+  ],
+  "inter_other_out": [
+    {"vendor": "IB ｶ)ｸﾛﾉｽ", "total": 30495000, "11月": 0, "12月": 0, "1月": 30165000, "2月": 165000, "3月": 165000},
+    {"vendor": "キャリアビジョン", "total": 24174504, "11月": 10877630, "12月": 5266250, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "PE ｱｻﾞﾌﾞｾﾞｲﾑｼﾖ", "total": 19923580, "11月": 0, "12月": 0, "1月": 19923100, "2月": 0, "3月": 480},
+    {"vendor": "麻布税務署", "total": 17739962, "11月": 1324812, "12月": 1199950, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "日本年金機構", "total": 13626202, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ライトフィットコンサルティング", "total": 12000000, "11月": 12000000, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ｶ)ｷﾔﾘｱﾋﾞｼﾞﾖﾝ", "total": 10841744, "11月": 0, "12月": 0, "1月": 420750, "2月": 1432894, "3月": 8988100},
+    {"vendor": "IB ｶ)ﾗﾂﾌﾟﾏ-ｹﾃｲﾝｸﾞ", "total": 8110000, "11月": 0, "12月": 0, "1月": 4000000, "2月": 4110000, "3月": 0},
+    {"vendor": "UPSIDER", "total": 7176593, "11月": 2738693, "12月": 2473624, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "AMEX", "total": 7000427, "11月": 2205213, "12月": 1969131, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "エバンティア", "total": 7000000, "11月": 0, "12月": 7000000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "TRIGGER FORCE", "total": 6825312, "11月": 3651066, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ｶ)ﾄﾘｶﾞ- ﾌｫ-ｽ", "total": 6793072, "11月": 0, "12月": 0, "1月": 2179885, "2月": 1943285, "3月": 2669902},
+    {"vendor": "ギブファースト", "total": 5724040, "11月": 5197020, "12月": 197020, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ソルー", "total": 5083749, "11月": 1430000, "12月": 3641506, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "従業員(コンシエンス)", "total": 4625146, "11月": 1070000, "12月": 1267500, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ﾊﾟ-ｿﾙｷﾔﾘｱ(ｶ", "total": 4125000, "11月": 0, "12月": 0, "1月": 1375000, "2月": 2750000, "3月": 0},
+    {"vendor": "ｱﾒﾂｸｽ", "total": 3930922, "11月": 0, "12月": 0, "1月": 1263083, "2月": 1511563, "3月": 1156276},
+    {"vendor": "toBE Tech", "total": 3740000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ProNetix", "total": 3450000, "11月": 40000, "12月": 0, "1月": 0, "2月": 0, "3月": 0}
+  ],
+  "inter_salary": [
+    {"vendor": "従業員", "total": 57738347, "11月": 19571047, "12月": 18809607, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｼﾔｶｲﾎｹﾝﾘﾖｳ", "total": 23850908, "11月": 0, "12月": 0, "1月": 10513552, "2月": 5983096, "3月": 7354260},
+    {"vendor": "給与", "total": 17597557, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 17597557},
+    {"vendor": "日本年金機構", "total": 7510545, "11月": 0, "12月": 7510545, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ｼﾐｽﾞ ﾕｳﾀ", "total": 1372171, "11月": 0, "12月": 0, "1月": 783434, "2月": 588737, "3月": 0},
+    {"vendor": "IB ﾎｿｶﾜ ｹﾝﾄ", "total": 1128886, "11月": 0, "12月": 0, "1月": 596065, "2月": 532821, "3月": 0},
+    {"vendor": "IB ﾖｼｵｶ ﾅﾋﾛ", "total": 981460, "11月": 0, "12月": 0, "1月": 524851, "2月": 456609, "3月": 0},
+    {"vendor": "IB ｺﾔﾅｷﾞ ﾕｳｽｹ", "total": 930940, "11月": 0, "12月": 0, "1月": 495470, "2月": 435470, "3月": 0},
+    {"vendor": "IB ﾀﾆｻﾜ ﾏｲ", "total": 922462, "11月": 0, "12月": 0, "1月": 478434, "2月": 444028, "3月": 0},
+    {"vendor": "IB ﾅｶﾞﾇﾏ ｻﾔｶ", "total": 920564, "11月": 0, "12月": 0, "1月": 468773, "2月": 451791, "3月": 0},
+    {"vendor": "IB ﾎﾘ ﾀｶﾋﾛ", "total": 889333, "11月": 0, "12月": 0, "1月": 492542, "2月": 396791, "3月": 0},
+    {"vendor": "IB ﾏｴﾀﾞ ﾘﾖｳ", "total": 888111, "11月": 0, "12月": 0, "1月": 458942, "2月": 429169, "3月": 0},
+    {"vendor": "IB ﾐﾔﾓﾄ ｺｳﾍｲ", "total": 887248, "11月": 0, "12月": 0, "1月": 465887, "2月": 421361, "3月": 0},
+    {"vendor": "IB ﾀﾅｶ ｻﾄﾙ", "total": 866604, "11月": 0, "12月": 0, "1月": 444115, "2月": 422489, "3月": 0},
+    {"vendor": "IB ﾀｶﾊｼ ﾀﾂﾐ", "total": 854294, "11月": 0, "12月": 0, "1月": 451977, "2月": 402317, "3月": 0}
+  ],
+  "hubride_sales": [
+    {"vendor": "DIA", "total": 55256783, "11月": 891353, "12月": 2518008, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｶ)ﾃﾞｲ-ｱｲｴ-", "total": 24221419, "11月": 0, "12月": 0, "1月": 9276808, "2月": 6203040, "3月": 8741571},
+    {"vendor": "SBIオートサポート", "total": 23572600, "11月": 8784580, "12月": 8323080, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "シーティープランナー", "total": 20522556, "11月": 8110455, "12月": 10288843, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "CTプランナー", "total": 13849798, "11月": 4535599, "12月": 9314199, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ﾕ)ｼ-ﾃｲ-ﾌﾟﾗﾝﾅ-", "total": 10847035, "11月": 0, "12月": 0, "1月": 163446, "2月": 7967330, "3月": 2716259},
+    {"vendor": "SBI", "total": 8341340, "11月": 8341340, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ライフティ", "total": 3780000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "カラフルライン", "total": 3750000, "11月": 0, "12月": 1200000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "オートサーバー", "total": 1200000, "11月": 0, "12月": 1200000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "USS東京", "total": 915320, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "顧客", "total": 91295, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0}
+  ],
+  "hubride_purchase": [
+    {"vendor": "オートサーバー", "total": 59641623, "11月": 21271961, "12月": 28101462, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ﾕ)ｼ-ﾃｲ-ﾌﾟﾗﾝﾅ-", "total": 16360997, "11月": 0, "12月": 0, "1月": 5170590, "2月": 4215641, "3月": 6974766},
+    {"vendor": "IB ｶ)ﾃﾞｲ-ｱｲｴ-", "total": 9813756, "11月": 0, "12月": 0, "1月": 2248660, "2月": 5729501, "3月": 1835595},
+    {"vendor": "PROSPEED", "total": 7921200, "11月": 7921200, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "DIA", "total": 6677046, "11月": 2038900, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "確認中", "total": 4500000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "CAA東京", "total": 1438870, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "門口敬吾", "total": 1320000, "11月": 0, "12月": 1320000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "JU埼玉オークション", "total": 1181920, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "JU埼玉オートオークション", "total": 1180390, "11月": 0, "12月": 1180390, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "中村オートパーツ", "total": 682000, "11月": 0, "12月": 682000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "カーパスライフ", "total": 581290, "11月": 0, "12月": 581290, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "オートサーバー･DIA", "total": 458476, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "JU東京", "total": 229320, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "顧客", "total": 10000, "11月": 0, "12月": 10000, "1月": 0, "2月": 0, "3月": 0}
+  ],
+  "hubride_other_out": [
+    {"vendor": "コンシエンス", "total": 11330000, "11月": 0, "12月": 4400000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ソルー", "total": 5947246, "11月": 161246, "12月": 2486000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "エイクス", "total": 5200000, "11月": 0, "12月": 5200000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ﾊﾟﾌｫ-ﾏﾝｽﾃｸﾉﾛｼﾞ", "total": 5128879, "11月": 0, "12月": 0, "1月": 1282283, "2月": 1865322, "3月": 1981274},
+    {"vendor": "オートサーバー", "total": 4617921, "11月": 2287912, "12月": 509517, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "DIA関連", "total": 3581485, "11月": 13200, "12月": 13805, "1月": 13200, "2月": 13200, "3月": 13200},
+    {"vendor": "行政書士費用", "total": 3552473, "11月": 956450, "12月": 888990, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "MAVEL", "total": 3320000, "11月": 0, "12月": 1320000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "Performance Technologies", "total": 3252573, "11月": 1094605, "12月": 1076418, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "中小企業のチカラ", "total": 3204943, "11月": 1230000, "12月": 1580000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "陸送費（ゼロ等）", "total": 2075845, "11月": 471212, "12月": 1067944, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ヤマギシライフ", "total": 2000000, "11月": 0, "12月": 1750000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ﾕ)ｼ-ﾃｲ-ﾌﾟﾗﾝﾅ-", "total": 1718536, "11月": 0, "12月": 0, "1月": 0, "2月": 330000, "3月": 1388536},
+    {"vendor": "保険料", "total": 1516281, "11月": 340917, "12月": 603796, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "保証関連", "total": 1429560, "11月": 225060, "12月": 841720, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "絆ホールディングス", "total": 1320000, "11月": 660000, "12月": 330000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "SBIオートサポート", "total": 1286180, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ユアサ電池", "total": 1136017, "11月": 264118, "12月": 163603, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ｶﾌﾞｼｷｶﾞｲｼﾔ ﾁﾕｳ", "total": 1100000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 1100000},
+    {"vendor": "IB ｵｷﾞﾉ ｱｵｲ", "total": 913000, "11月": 0, "12月": 0, "1月": 473000, "2月": 0, "3月": 440000},
+    {"vendor": "顧客関連", "total": 912127, "11月": 124549, "12月": 732878, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "東晶貿易", "total": 880000, "11月": 550000, "12月": 330000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "オートアールズ", "total": 675400, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "Direction Motor Cars", "total": 583913, "11月": 252285, "12月": 117128, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "JU埼玉", "total": 529430, "11月": 0, "12月": 529430, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "合同会社オートベース", "total": 528000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "従業員関連", "total": 478013, "11月": 100000, "12月": 278013, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "創美企画", "total": 435890, "11月": 0, "12月": 435890, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "日昭自動車株式会社", "total": 418000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "和光ケミカル", "total": 386924, "11月": 7801, "12月": 43480, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "イコム", "total": 352000, "11月": 176000, "12月": 176000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "GIGUUU", "total": 330000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "シーティープランナー", "total": 330000, "11月": 0, "12月": 165000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "Resurrection", "total": 321750, "11月": 179300, "12月": 58850, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "長江産業", "total": 317600, "11月": 0, "12月": 317600, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ETC・リース料", "total": 301977, "11月": 6105, "12月": 63377, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "オン・フォワード", "total": 275000, "11月": 0, "12月": 275000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "いとう自動車", "total": 225220, "11月": 0, "12月": 129720, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "小田切部品", "total": 218816, "11月": 37653, "12月": 181163, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ジェイリース", "total": 185640, "11月": 61880, "12月": 61880, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "各地陸運振興センター", "total": 184400, "11月": 48240, "12月": 70820, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "東京デントリペアらびい", "total": 143000, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "キーエンス", "total": 141900, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "昭和メタル", "total": 132550, "11月": 30800, "12月": 75900, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "プロトコーポレーション", "total": 132000, "11月": 44000, "12月": 44000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "有限会社瀬山商店", "total": 124960, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "トータルリペア1093", "total": 104000, "11月": 52000, "12月": 52000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ユー・エス・エス", "total": 100000, "11月": 0, "12月": 100000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "アカネソリューションズ", "total": 99000, "11月": 33000, "12月": 33000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ﾀﾞｲﾄｳｹﾝﾀｸﾊﾟ-ﾄﾅ", "total": 96213, "11月": 0, "12月": 0, "1月": 0, "2月": 65470, "3月": 30743},
+    {"vendor": "GarageRoku", "total": 93500, "11月": 0, "12月": 93500, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "小島自動車ガラス", "total": 79000, "11月": 79000, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "IB ﾅｶﾊﾗ ｶｲﾄ", "total": 66000, "11月": 0, "12月": 0, "1月": 0, "2月": 44000, "3月": 22000},
+    {"vendor": "SMBC(ﾔﾁﾝ(ｾ-ﾌ", "total": 63980, "11月": 0, "12月": 0, "1月": 63980, "2月": 0, "3月": 0},
+    {"vendor": "SBIオートサポート株式会社", "total": 62230, "11月": 0, "12月": 62230, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "トヨクモ", "total": 52800, "11月": 17600, "12月": 17600, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ジョイゾー", "total": 49500, "11月": 16500, "12月": 16500, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "楽天モバイル", "total": 48665, "11月": 18002, "12月": 20178, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "システム利用料", "total": 33440, "11月": 18480, "12月": 7480, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "東京デントリペア", "total": 33000, "11月": 0, "12月": 33000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "アートハウジング", "total": 26620, "11月": 13420, "12月": 6600, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ZEAL", "total": 25740, "11月": 25740, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ユーストカードットコム", "total": 18150, "11月": 5500, "12月": 5500, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "東日本サービス", "total": 17600, "11月": 8800, "12月": 8800, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ユー･エス･エス", "total": 16280, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ヒューマンライフ", "total": 15345, "11月": 5115, "12月": 5115, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "atLast", "total": 11590, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "PE ｱｻﾞﾌﾞｾﾞｲﾑｼﾖ", "total": 480, "11月": 0, "12月": 0, "1月": 0, "2月": 0, "3月": 480}
+  ],
+  "hubride_other_in": [
+    {"vendor": "シーティープランナー", "total": 8130590, "11月": 0, "12月": 8083840, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "顧客", "total": 2341903, "11月": 790640, "12月": 423063, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "JU埼玉オートオークション", "total": 1883890, "11月": 0, "12月": 1883890, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "神長　貴徳", "total": 484000, "11月": 0, "12月": 484000, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ｵｵﾋﾅﾀ ﾖｼﾋﾛ", "total": 136711, "11月": 0, "12月": 0, "1月": 0, "2月": 136711, "3月": 0},
+    {"vendor": "オートサーバー", "total": 101500, "11月": 11000, "12月": 35500, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "アラジンファクトリー", "total": 100000, "11月": 100000, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "従業員", "total": 82510, "11月": 0, "12月": 12920, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ﾀﾅｶ ﾚｲ", "total": 78760, "11月": 0, "12月": 0, "1月": 78760, "2月": 0, "3月": 0},
+    {"vendor": "あいおいニッセイ同和損害保険", "total": 50862, "11月": 21733, "12月": 3621, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ゼロ", "total": 40206, "11月": 40206, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ソルー", "total": 35200, "11月": 35200, "12月": 0, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "ロジコ", "total": 31680, "11月": 0, "12月": 31680, "1月": 0, "2月": 0, "3月": 0},
+    {"vendor": "麻布税務署", "total": 2500, "11月": 0, "12月": 2500, "1月": 0, "2月": 0, "3月": 0}
+  ],
+  "mar_forecast": {
+    "INTER": {"in": 106215881, "out": 122105113},
+    "HUBRIDE": {"in": 69097283, "out": 51480911}
+  }
+};
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+const MONTHS = ["11月","12月","1月","2月","3月"];
+
+function fmt(n) {
+  if (n === 0 || n === null || n === undefined) return "—";
+  const abs = Math.abs(n);
+  const s = "¥" + abs.toLocaleString("ja-JP");
+  return n < 0 ? s : s;
+}
+
+function fmtSigned(n) {
+  if (n === 0) return '<span style="color:var(--text2)">¥0</span>';
+  const abs = Math.abs(n);
+  const s = "¥" + abs.toLocaleString("ja-JP");
+  if (n > 0) return `<span class="positive">+${s}</span>`;
+  return `<span class="negative">▲${s}</span>`;
+}
+
+function cellVal(n) {
+  if (!n || n === 0) return '<td style="color:var(--text2)">—</td>';
+  return `<td>${fmt(n)}</td>`;
+}
+
+// ============================================================
+// KPI CARDS
+// ============================================================
+function buildKPI() {
+  const s = DATA.summary;
+  // Mar end balance
+  const mar_inter_net = s.INTER["3月"].in - s.INTER["3月"].out;  // +25,217,089
+  const mar_hub_net   = s.HUBRIDE["3月"].in - s.HUBRIDE["3月"].out; // -2,328,764
+  const mar_end = DATA.balances["3月"] + mar_inter_net + mar_hub_net;
+  // 29,985,419
+
+  // 4月 forecast
+  const inter_nets = ["1月","2月","3月"].map(m => s.INTER[m].in - s.INTER[m].out);
+  const hub_nets   = ["1月","2月","3月"].map(m => s.HUBRIDE[m].in - s.HUBRIDE[m].out);
+  const inter_avg = inter_nets.reduce((a,b)=>a+b,0)/3;
+  const hub_avg   = hub_nets.reduce((a,b)=>a+b,0)/3;
+  const apr_end = mar_end + inter_avg + hub_avg;
+
+  // Cumulative totals
+  let total_in = 0, total_out = 0;
+  MONTHS.forEach(m => {
+    total_in  += s.INTER[m].in + s.HUBRIDE[m].in;
+    total_out += s.INTER[m].out + s.HUBRIDE[m].out;
+  });
+
+  const cards = [
+    {
+      cls: "kpi-balance",
+      label: "3月末 銀行残高 (実績)",
+      value: fmt(mar_end),
+      sub: `期初残高 ¥7,097,094 + INTER純増 ${mar_inter_net >= 0 ? "+" : ""}${mar_inter_net.toLocaleString()} + HUBRIDE純増 ${mar_hub_net >= 0 ? "+" : ""}${mar_hub_net.toLocaleString()}`
+    },
+    {
+      cls: "kpi-forecast",
+      label: "4月末 残高予測",
+      value: fmt(apr_end),
+      sub: `直近3ヶ月平均: INTER ${fmtSigned(Math.round(inter_avg))} / HUBRIDE ${fmtSigned(Math.round(hub_avg))}`,
+      badge: "概算"
+    },
+    {
+      cls: "kpi-income",
+      label: "今期累計 入金合計",
+      value: fmt(total_in),
+      sub: `INTER ¥${(s.INTER["11月"].in+s.INTER["12月"].in+s.INTER["1月"].in+s.INTER["2月"].in+s.INTER["3月"].in).toLocaleString()} + HUBRIDE ¥${(s.HUBRIDE["11月"].in+s.HUBRIDE["12月"].in+s.HUBRIDE["1月"].in+s.HUBRIDE["2月"].in+s.HUBRIDE["3月"].in).toLocaleString()}`
+    },
+    {
+      cls: "kpi-expense",
+      label: "今期累計 出金合計",
+      value: fmt(total_out),
+      sub: `INTER ¥${(s.INTER["11月"].out+s.INTER["12月"].out+s.INTER["1月"].out+s.INTER["2月"].out+s.INTER["3月"].out).toLocaleString()} + HUBRIDE ¥${(s.HUBRIDE["11月"].out+s.HUBRIDE["12月"].out+s.HUBRIDE["1月"].out+s.HUBRIDE["2月"].out+s.HUBRIDE["3月"].out).toLocaleString()}`
+    }
+  ];
+
+  const grid = document.getElementById("kpi-grid");
+  grid.innerHTML = cards.map(c => `
+    <div class="kpi-card ${c.cls}">
+      <div class="kpi-label">${c.label}${c.badge ? `<span class="kpi-badge">${c.badge}</span>` : ""}</div>
+      <div class="kpi-value">${c.value}</div>
+      <div class="kpi-sub">${c.sub}</div>
+    </div>
+  `).join("");
+}
+
+// ============================================================
+// MONTHLY CHART
+// ============================================================
+function buildMonthlyChart() {
+  const s = DATA.summary;
+
+  const interIn   = MONTHS.map(m => s.INTER[m].in / 1e6);
+  const interOut  = MONTHS.map(m => -s.INTER[m].out / 1e6);
+  const hubrideIn  = MONTHS.map(m => s.HUBRIDE[m].in / 1e6);
+  const hubrideOut = MONTHS.map(m => -s.HUBRIDE[m].out / 1e6);
+
+  // Cumulative balance (running)
+  const balances = [null, null]; // 11月・12月前は不明
+  // We know: 1月始 = 13,189,019, 2月始 = 7,202,087, 3月始 = 7,097,094
+  // So month-end approximation for chart: use 期初値としてデータ内の月初残高
+  const balLine = [null, null,
+    DATA.balances["1月"] / 1e6,
+    DATA.balances["2月"] / 1e6,
+    (DATA.balances["3月"] + (s.INTER["3月"].in - s.INTER["3月"].out) + (s.HUBRIDE["3月"].in - s.HUBRIDE["3月"].out)) / 1e6
+  ];
+
+  const ctx = document.getElementById("monthlyChart").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: MONTHS,
+      datasets: [
+        {
+          label: "INTER 入金",
+          data: interIn,
+          backgroundColor: "rgba(59,130,246,0.7)",
+          stack: "in"
+        },
+        {
+          label: "HUBRIDE 入金",
+          data: hubrideIn,
+          backgroundColor: "rgba(16,185,129,0.7)",
+          stack: "in"
+        },
+        {
+          label: "INTER 出金",
+          data: interOut,
+          backgroundColor: "rgba(239,68,68,0.5)",
+          stack: "out"
+        },
+        {
+          label: "HUBRIDE 出金",
+          data: hubrideOut,
+          backgroundColor: "rgba(239,68,68,0.3)",
+          stack: "out"
+        },
+        {
+          label: "月初残高 (百万円)",
+          data: balLine,
+          type: "line",
+          borderColor: "#f59e0b",
+          backgroundColor: "rgba(245,158,11,0.1)",
+          borderWidth: 2,
+          pointRadius: 5,
+          pointBackgroundColor: "#f59e0b",
+          tension: 0.3,
+          yAxisID: "y",
+          spanGaps: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: "#94a3b8", font: { size: 11 }, boxWidth: 12 }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const v = Math.abs(ctx.raw);
+              return ` ${ctx.dataset.label}: ¥${(v * 1e6).toLocaleString("ja-JP")}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(51,65,85,0.5)" } },
+        y: {
+          ticks: { color: "#94a3b8", callback: v => (v >= 0 ? "" : "▲") + Math.abs(v).toFixed(0) + "M" },
+          grid: { color: "rgba(51,65,85,0.5)" }
+        }
+      }
+    }
+  });
+
+  // NET chart
+  const interNet   = MONTHS.map(m => (s.INTER[m].in - s.INTER[m].out) / 1e6);
+  const hubrideNet = MONTHS.map(m => (s.HUBRIDE[m].in - s.HUBRIDE[m].out) / 1e6);
+
+  const ctx2 = document.getElementById("netChart").getContext("2d");
+  new Chart(ctx2, {
+    type: "bar",
+    data: {
+      labels: MONTHS,
+      datasets: [
+        {
+          label: "INTER 純増減",
+          data: interNet,
+          backgroundColor: interNet.map(v => v >= 0 ? "rgba(59,130,246,0.7)" : "rgba(239,68,68,0.6)"),
+          borderColor: interNet.map(v => v >= 0 ? "#3b82f6" : "#ef4444"),
+          borderWidth: 1,
+          borderRadius: 4
+        },
+        {
+          label: "HUBRIDE 純増減",
+          data: hubrideNet,
+          backgroundColor: hubrideNet.map(v => v >= 0 ? "rgba(16,185,129,0.7)" : "rgba(239,68,68,0.4)"),
+          borderColor: hubrideNet.map(v => v >= 0 ? "#10b981" : "#ef4444"),
+          borderWidth: 1,
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: "#94a3b8", font: { size: 11 }, boxWidth: 12 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const v = ctx.raw;
+              const abs = Math.abs(v * 1e6);
+              return ` ${ctx.dataset.label}: ${v >= 0 ? "+" : "▲"}¥${abs.toLocaleString("ja-JP")}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(51,65,85,0.5)" } },
+        y: {
+          ticks: { color: "#94a3b8", callback: v => (v >= 0 ? "+" : "▲") + Math.abs(v).toFixed(0) + "M" },
+          grid: { color: "rgba(51,65,85,0.5)" }
+        }
+      }
+    }
+  });
+}
+
+// ============================================================
+// COMPARISON TABLE
+// ============================================================
+function buildComparisonTable() {
+  const s = DATA.summary;
+  let html = "";
+  let totals = {ii:0, io:0, hi:0, ho:0};
+
+  MONTHS.forEach(m => {
+    const ii = s.INTER[m].in, io = s.INTER[m].out;
+    const hi = s.HUBRIDE[m].in, ho = s.HUBRIDE[m].out;
+    const iNet = ii - io, hNet = hi - ho, total = iNet + hNet;
+    totals.ii += ii; totals.io += io; totals.hi += hi; totals.ho += ho;
+    html += `<tr>
+      <td style="font-weight:600">${m}</td>
+      <td class="inter-col">${fmt(ii)}</td>
+      <td class="inter-col">${fmt(io)}</td>
+      <td data-val="${iNet}">${fmtSigned(iNet)}</td>
+      <td class="hubride-col">${fmt(hi)}</td>
+      <td class="hubride-col">${fmt(ho)}</td>
+      <td data-val="${hNet}">${fmtSigned(hNet)}</td>
+      <td data-val="${total}">${fmtSigned(total)}</td>
+    </tr>`;
+  });
+
+  const iNet = totals.ii - totals.io, hNet = totals.hi - totals.ho;
+  html += `<tr class="total-row">
+    <td>合計</td>
+    <td class="inter-col">${fmt(totals.ii)}</td>
+    <td class="inter-col">${fmt(totals.io)}</td>
+    <td>${fmtSigned(iNet)}</td>
+    <td class="hubride-col">${fmt(totals.hi)}</td>
+    <td class="hubride-col">${fmt(totals.ho)}</td>
+    <td>${fmtSigned(hNet)}</td>
+    <td>${fmtSigned(iNet + hNet)}</td>
+  </tr>`;
+
+  document.getElementById("comparison-body").innerHTML = html;
+}
+
+// ============================================================
+// DETAIL TABLES
+// ============================================================
+function buildDetailTable(headId, bodyId, data, colorClass) {
+  const cols = ["取引先", ...MONTHS, "合計"];
+  const headEl = document.getElementById(headId);
+  const bodyEl = document.getElementById(bodyId);
+  const tblId = headId.replace("head-", "tbl-");
+
+  headEl.innerHTML = cols.map((c,i) =>
+    `<th onclick="sortTable('${tblId}',${i})">${c}</th>`
+  ).join("");
+
+  // Calculate column totals
+  const colTotals = {};
+  MONTHS.forEach(m => { colTotals[m] = 0; });
+  colTotals["合計"] = 0;
+
+  let rows = data.map(row => {
+    MONTHS.forEach(m => { colTotals[m] += row[m] || 0; });
+    colTotals["合計"] += row.total || 0;
+
+    const cells = MONTHS.map(m => cellVal(row[m] || 0)).join("");
+    return `<tr>
+      <td class="${colorClass || ''}" style="font-weight:500">${row.vendor}</td>
+      ${cells}
+      <td style="font-weight:600">${fmt(row.total)}</td>
+    </tr>`;
+  }).join("");
+
+  // Total row
+  const totalCells = MONTHS.map(m => `<td style="font-weight:700">${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("");
+  rows += `<tr class="total-row">
+    <td>合計</td>
+    ${totalCells}
+    <td style="font-weight:700">${fmt(colTotals["合計"])}</td>
+  </tr>`;
+
+  bodyEl.innerHTML = rows;
+}
+
+// ============================================================
+// DONUT CHARTS
+// ============================================================
+function buildDonutCharts() {
+  // INTER: categories
+  const interCats = {
+    "売上": DATA.inter_sales.reduce((a,r)=>a+r.total,0),
+    "借入・回収": DATA.inter_borrow.reduce((a,r)=>a+r.total,0),
+    "貸付・返済": DATA.inter_lend.reduce((a,r)=>a+r.total,0),
+    "その他出金": DATA.inter_other_out.reduce((a,r)=>a+r.total,0),
+    "給与関連": DATA.inter_salary.reduce((a,r)=>a+r.total,0)
+  };
+  // For INTER donut: focus on OUT categories
+  const interOutCats = {
+    "貸付・返済": DATA.inter_lend.reduce((a,r)=>a+r.total,0),
+    "その他出金": DATA.inter_other_out.reduce((a,r)=>a+r.total,0),
+    "給与関連": DATA.inter_salary.reduce((a,r)=>a+r.total,0)
+  };
+
+  const donutColors = ["#3b82f6","#10b981","#f59e0b","#ef4444","#a855f7","#06b6d4","#ec4899","#84cc16"];
+
+  const ctx3 = document.getElementById("donutInter").getContext("2d");
+  const iLabels = Object.keys(interOutCats);
+  const iVals   = Object.values(interOutCats);
+  new Chart(ctx3, {
+    type: "doughnut",
+    data: {
+      labels: iLabels,
+      datasets: [{
+        data: iVals,
+        backgroundColor: donutColors.slice(0, iLabels.length),
+        borderColor: "#1e293b",
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#94a3b8", font: { size: 11 }, boxWidth: 12, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct = ((ctx.raw / total) * 100).toFixed(1);
+              return ` ¥${ctx.raw.toLocaleString("ja-JP")} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // HUBRIDE donut
+  const hubOutCats = {
+    "仕入": DATA.hubride_purchase.reduce((a,r)=>a+r.total,0),
+    "その他出金": DATA.hubride_other_out.reduce((a,r)=>a+r.total,0)
+  };
+  const ctx4 = document.getElementById("donutHubride").getContext("2d");
+  const hLabels = Object.keys(hubOutCats);
+  const hVals   = Object.values(hubOutCats);
+  new Chart(ctx4, {
+    type: "doughnut",
+    data: {
+      labels: hLabels,
+      datasets: [{
+        data: hVals,
+        backgroundColor: ["#10b981","#f59e0b"],
+        borderColor: "#1e293b",
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#94a3b8", font: { size: 11 }, boxWidth: 12, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct = ((ctx.raw / total) * 100).toFixed(1);
+              return ` ¥${ctx.raw.toLocaleString("ja-JP")} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ============================================================
+// FORECAST SECTION
+// ============================================================
+function buildForecast() {
+  const s = DATA.summary;
+  // INTER monthly nets
+  const iNets = MONTHS.map(m => s.INTER[m].in - s.INTER[m].out);
+  const hNets = MONTHS.map(m => s.HUBRIDE[m].in - s.HUBRIDE[m].out);
+
+  // Recent 3 months (1月,2月,3月 = index 2,3,4)
+  const iRecent = [iNets[2], iNets[3], iNets[4]];
+  const hRecent = [hNets[2], hNets[3], hNets[4]];
+  const iAvg = iRecent.reduce((a,b)=>a+b,0)/3;
+  const hAvg = hRecent.reduce((a,b)=>a+b,0)/3;
+
+  const iOpt  = Math.max(...iRecent);
+  const iPes  = Math.min(...iRecent);
+  const hOpt  = Math.max(...hRecent);
+  const hPes  = Math.min(...hRecent);
+
+  const mar_end = DATA.balances["3月"]
+    + (s.INTER["3月"].in - s.INTER["3月"].out)
+    + (s.HUBRIDE["3月"].in - s.HUBRIDE["3月"].out);
+  // = 29,985,419
+
+  const apr_base = mar_end + iAvg + hAvg;
+  const apr_opt  = mar_end + iOpt + hOpt;
+  const apr_pes  = mar_end + iPes + hPes;
+
+  // INTER section
+  document.getElementById("forecast-inter").innerHTML = `
+    <div class="forecast-row"><span class="forecast-label">1月 純増減</span><span class="forecast-value">${fmtSigned(iNets[2])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">2月 純増減</span><span class="forecast-value">${fmtSigned(iNets[3])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">3月 純増減</span><span class="forecast-value">${fmtSigned(iNets[4])}</span></div>
+    <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
+      <span class="forecast-label">直近3ヶ月平均</span>
+      <span class="forecast-value" style="color:#93c5fd">${fmtSigned(Math.round(iAvg))}</span>
+    </div>
+    <div class="range-bar">
+      <div class="range-label">レンジ (4月予測)</div>
+      <div class="range-values">
+        <span class="range-pessimistic">悲観: ${fmtSigned(iPes)}</span>
+        <span class="range-optimistic">楽観: ${fmtSigned(iOpt)}</span>
+      </div>
+    </div>
+  `;
+
+  // HUBRIDE section
+  document.getElementById("forecast-hubride").innerHTML = `
+    <div class="forecast-row"><span class="forecast-label">1月 純増減</span><span class="forecast-value">${fmtSigned(hNets[2])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">2月 純増減</span><span class="forecast-value">${fmtSigned(hNets[3])}</span></div>
+    <div class="forecast-row"><span class="forecast-label">3月 純増減</span><span class="forecast-value">${fmtSigned(hNets[4])}</span></div>
+    <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
+      <span class="forecast-label">直近3ヶ月平均</span>
+      <span class="forecast-value" style="color:#6ee7b7">${fmtSigned(Math.round(hAvg))}</span>
+    </div>
+    <div class="range-bar">
+      <div class="range-label">レンジ (4月予測)</div>
+      <div class="range-values">
+        <span class="range-pessimistic">悲観: ${fmtSigned(hPes)}</span>
+        <span class="range-optimistic">楽観: ${fmtSigned(hOpt)}</span>
+      </div>
+    </div>
+  `;
+
+  // Combined
+  document.getElementById("forecast-combined").innerHTML = `
+    <div class="forecast-row"><span class="forecast-label">3月末残高 (実績)</span><span class="forecast-value" style="color:#fcd34d">${fmt(mar_end)}</span></div>
+    <div class="forecast-row"><span class="forecast-label">4月 INTER予測</span><span class="forecast-value">${fmtSigned(Math.round(iAvg))}</span></div>
+    <div class="forecast-row"><span class="forecast-label">4月 HUBRIDE予測</span><span class="forecast-value">${fmtSigned(Math.round(hAvg))}</span></div>
+    <div class="forecast-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:8px">
+      <span class="forecast-label" style="font-weight:700">4月末 残高予測</span>
+      <span class="forecast-value" style="color:#fcd34d;font-size:15px">${fmt(Math.round(apr_base))}</span>
+    </div>
+    <div class="range-bar">
+      <div class="range-label">信頼レンジ</div>
+      <div class="range-values">
+        <span class="range-pessimistic">悲観: ${fmt(Math.round(apr_pes))}</span>
+        <span class="range-optimistic">楽観: ${fmt(Math.round(apr_opt))}</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text2);line-height:1.5">
+      ※ 直近3ヶ月の平均純増減を4月に適用した概算値。<br>
+      ※ 事業規模の変動が大きいため参考値として扱うこと。
+    </div>
+  `;
+}
+
+// ============================================================
+// SORT TABLE
+// ============================================================
+function sortTable(tableId, colIdx) {
+  const tbl = document.getElementById(tableId);
+  if (!tbl) return;
+  const tbody = tbl.querySelector("tbody");
+  const rows  = Array.from(tbody.querySelectorAll("tr:not(.total-row)"));
+  const totalRow = tbody.querySelector(".total-row");
+  const ths = tbl.querySelectorAll("th");
+
+  let asc = !ths[colIdx].classList.contains("sorted-asc");
+  ths.forEach(t => t.classList.remove("sorted-asc","sorted-desc"));
+  ths[colIdx].classList.add(asc ? "sorted-asc" : "sorted-desc");
+
+  rows.sort((a, b) => {
+    const aCell = a.cells[colIdx];
+    const bCell = b.cells[colIdx];
+    const aVal = aCell.dataset.val !== undefined
+      ? parseFloat(aCell.dataset.val)
+      : (parseFloat(aCell.textContent.replace(/[¥,▲+—]/g,"")) || aCell.textContent.trim());
+    const bVal = bCell.dataset.val !== undefined
+      ? parseFloat(bCell.dataset.val)
+      : (parseFloat(bCell.textContent.replace(/[¥,▲+—]/g,"")) || bCell.textContent.trim());
+
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      return asc ? aVal - bVal : bVal - aVal;
+    }
+    return asc
+      ? String(aVal).localeCompare(String(bVal), "ja")
+      : String(bVal).localeCompare(String(aVal), "ja");
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+  if (totalRow) tbody.appendChild(totalRow);
+}
+
+// ============================================================
+// COLLAPSIBLE
+// ============================================================
+function toggleCollapsible(id) {
+  const content = document.getElementById(id);
+  const wrap = document.getElementById("wrap-" + id);
+  const header = wrap ? wrap.querySelector(".collapsible-header") : null;
+  if (!content) return;
+  const isOpen = content.classList.contains("open");
+  content.classList.toggle("open", !isOpen);
+  if (header) header.classList.toggle("open", !isOpen);
+}
+
+// Open all by default on load
+function openAllCollapsibles() {
+  document.querySelectorAll(".collapsible-content").forEach(c => c.classList.add("open"));
+  document.querySelectorAll(".collapsible-header").forEach(h => h.classList.add("open"));
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  buildKPI();
+  buildMonthlyChart();
+  buildComparisonTable();
+
+  // INTER detail tables
+  buildDetailTable("head-inter-sales",  "body-inter-sales",  DATA.inter_sales,  "inter-col");
+  buildDetailTable("head-inter-borrow", "body-inter-borrow", DATA.inter_borrow, "inter-col");
+  buildDetailTable("head-inter-lend",   "body-inter-lend",   DATA.inter_lend,   "inter-col");
+  buildDetailTable("head-inter-other",  "body-inter-other",  DATA.inter_other_out, "inter-col");
+  buildDetailTable("head-inter-salary", "body-inter-salary", DATA.inter_salary, "inter-col");
+
+  // HUBRIDE detail tables
+  buildDetailTable("head-hub-sales",    "body-hub-sales",    DATA.hubride_sales,     "hubride-col");
+  buildDetailTable("head-hub-purchase", "body-hub-purchase", DATA.hubride_purchase,  "hubride-col");
+  buildDetailTable("head-hub-other-out","body-hub-other-out",DATA.hubride_other_out, "hubride-col");
+  buildDetailTable("head-hub-other-in", "body-hub-other-in", DATA.hubride_other_in,  "hubride-col");
+
+  buildDonutCharts();
+  buildForecast();
+  openAllCollapsibles();
+});
+</script>
+</body>
+</html>
