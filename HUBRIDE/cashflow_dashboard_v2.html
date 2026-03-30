@@ -485,6 +485,11 @@
   <div class="header-right">
     <span class="badge-inter">INTER 本体</span>
     <span class="badge-hubride">HUBRIDE 車両</span>
+    <select id="unit-selector" onchange="changeUnit(this.value)" style="background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">
+      <option value="yen" selected>単位：円</option>
+      <option value="thousand">単位：千円</option>
+      <option value="million">単位：百万円</option>
+    </select>
     <button class="btn-print" onclick="window.print()">🖨 印刷</button>
   </div>
 </div>
@@ -1356,18 +1361,42 @@ function addAprEstimatesToGroups(groups, aprTotal) {
 // UTILITY FUNCTIONS
 // ============================================================
 const MONTHS = ["11月","12月","1月","2月","3月","4月予"];
+let CURRENT_UNIT = "yen"; // "yen" | "thousand" | "million"
+let CHART_INSTANCES = []; // Chart.jsインスタンス管理
+
+function destroyCharts() {
+  CHART_INSTANCES.forEach(c => c.destroy());
+  CHART_INSTANCES = [];
+}
+function registerChart(c) { CHART_INSTANCES.push(c); return c; }
+
+function fmtByUnit(n) {
+  if (n === 0 || n === null || n === undefined) return "—";
+  const abs = Math.abs(n);
+  if (CURRENT_UNIT === "million") {
+    return "¥" + (abs / 1e6).toFixed(1);
+  } else if (CURRENT_UNIT === "thousand") {
+    return "¥" + Math.round(abs / 1e3).toLocaleString("ja-JP");
+  }
+  return "¥" + abs.toLocaleString("ja-JP");
+}
 
 function fmt(n) {
   if (n === 0 || n === null || n === undefined) return "—";
-  const abs = Math.abs(n);
-  const s = "¥" + abs.toLocaleString("ja-JP");
-  return n < 0 ? s : s;
+  return fmtByUnit(n);
 }
 
 function fmtSigned(n) {
   if (n === 0) return '<span style="color:var(--text2)">¥0</span>';
   const abs = Math.abs(n);
-  const s = "¥" + abs.toLocaleString("ja-JP");
+  let s;
+  if (CURRENT_UNIT === "million") {
+    s = "¥" + (abs / 1e6).toFixed(1);
+  } else if (CURRENT_UNIT === "thousand") {
+    s = "¥" + Math.round(abs / 1e3).toLocaleString("ja-JP");
+  } else {
+    s = "¥" + abs.toLocaleString("ja-JP");
+  }
   if (n > 0) return `<span class="positive">+${s}</span>`;
   return `<span class="negative">▲${s}</span>`;
 }
@@ -1375,6 +1404,12 @@ function fmtSigned(n) {
 function cellVal(n) {
   if (!n || n === 0) return '<td style="color:var(--text2)">—</td>';
   return `<td>${fmt(n)}</td>`;
+}
+
+function getUnitLabel() {
+  if (CURRENT_UNIT === "million") return "（百万円）";
+  if (CURRENT_UNIT === "thousand") return "（千円）";
+  return "";
 }
 
 // ============================================================
@@ -1404,20 +1439,20 @@ function buildKPI() {
       cls: "kpi-forecast",
       label: "4月末 残高予測",
       value: fmt(apr_end),
-      sub: `HUBRIDE: ${af.hubride.sales_count}台入金 ¥${(af.hubride.sales_in/1e6).toFixed(1)}M - ${af.hubride.purchase_count}台仕入 - 経費 / INTER: 1-2月平均 ${fmtSigned(af.inter.net)}`,
+      sub: `HUBRIDE: ${af.hubride.sales_count}台入金 ${fmt(af.hubride.sales_in)} - ${af.hubride.purchase_count}台仕入 - 経費 / INTER: 1-2月平均 ${fmtSigned(af.inter.net)}`,
       badge: "KINTONE連動"
     },
     {
       cls: "kpi-income",
       label: "今期累計 入金合計",
       value: fmt(total_in),
-      sub: `INTER ¥${(s.INTER["11月"].in+s.INTER["12月"].in+s.INTER["1月"].in+s.INTER["2月"].in+s.INTER["3月"].in).toLocaleString()} + HUBRIDE ¥${(s.HUBRIDE["11月"].in+s.HUBRIDE["12月"].in+s.HUBRIDE["1月"].in+s.HUBRIDE["2月"].in+s.HUBRIDE["3月"].in).toLocaleString()}`
+      sub: `INTER ${fmt(s.INTER["11月"].in+s.INTER["12月"].in+s.INTER["1月"].in+s.INTER["2月"].in+s.INTER["3月"].in)} + HUBRIDE ${fmt(s.HUBRIDE["11月"].in+s.HUBRIDE["12月"].in+s.HUBRIDE["1月"].in+s.HUBRIDE["2月"].in+s.HUBRIDE["3月"].in)}`
     },
     {
       cls: "kpi-expense",
       label: "今期累計 出金合計",
       value: fmt(total_out),
-      sub: `INTER ¥${(s.INTER["11月"].out+s.INTER["12月"].out+s.INTER["1月"].out+s.INTER["2月"].out+s.INTER["3月"].out).toLocaleString()} + HUBRIDE ¥${(s.HUBRIDE["11月"].out+s.HUBRIDE["12月"].out+s.HUBRIDE["1月"].out+s.HUBRIDE["2月"].out+s.HUBRIDE["3月"].out).toLocaleString()}`
+      sub: `INTER ${fmt(s.INTER["11月"].out+s.INTER["12月"].out+s.INTER["1月"].out+s.INTER["2月"].out+s.INTER["3月"].out)} + HUBRIDE ${fmt(s.HUBRIDE["11月"].out+s.HUBRIDE["12月"].out+s.HUBRIDE["1月"].out+s.HUBRIDE["2月"].out+s.HUBRIDE["3月"].out)}`
     }
   ];
 
@@ -1452,7 +1487,7 @@ function buildMonthlyChart() {
   ];
 
   const ctx = document.getElementById("monthlyChart").getContext("2d");
-  new Chart(ctx, {
+  registerChart(new Chart(ctx, {
     type: "bar",
     data: {
       labels: MONTHS,
@@ -1520,14 +1555,14 @@ function buildMonthlyChart() {
         }
       }
     }
-  });
+  }));
 
   // NET chart
   const interNet   = MONTHS.map(m => (s.INTER[m].in - s.INTER[m].out) / 1e6);
   const hubrideNet = MONTHS.map(m => (s.HUBRIDE[m].in - s.HUBRIDE[m].out) / 1e6);
 
   const ctx2 = document.getElementById("netChart").getContext("2d");
-  new Chart(ctx2, {
+  registerChart(new Chart(ctx2, {
     type: "bar",
     data: {
       labels: MONTHS,
@@ -1573,7 +1608,7 @@ function buildMonthlyChart() {
         }
       }
     }
-  });
+  }));
 }
 
 // ============================================================
@@ -1649,7 +1684,7 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts, aprTo
 
   const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
     <td style="color:#94a3b8;font-weight:400">月計</td>
-    ${MONTHS.map(m => `<td>${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("")}
+    ${MONTHS.map(m => `<td data-val="${colTotals[m]}">${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("")}
   </tr>`;
   headEl.innerHTML = headerRow;
   headEl.insertAdjacentHTML("afterend", summaryRow + vehicleRow);
@@ -1686,7 +1721,7 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
   ).join("");
   const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
     <td style="color:#94a3b8;font-weight:400">月計</td>
-    ${MONTHS.map(m => `<td>${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`).join("")}
+    ${MONTHS.map(m => `<td data-val="${grandTotals[m]}">${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`).join("")}
   </tr>`;
   headEl.innerHTML = headerRow;
   headEl.insertAdjacentHTML("afterend", summaryRow);
@@ -1765,7 +1800,7 @@ function buildDonutCharts() {
   const ctx3 = document.getElementById("donutInter").getContext("2d");
   const iLabels = Object.keys(interOutCats);
   const iVals   = Object.values(interOutCats);
-  new Chart(ctx3, {
+  registerChart(new Chart(ctx3, {
     type: "doughnut",
     data: {
       labels: iLabels,
@@ -1791,7 +1826,7 @@ function buildDonutCharts() {
         }
       }
     }
-  });
+  }));
 
   // HUBRIDE donut
   const hubOutCats = {
@@ -1801,7 +1836,7 @@ function buildDonutCharts() {
   const ctx4 = document.getElementById("donutHubride").getContext("2d");
   const hLabels = Object.keys(hubOutCats);
   const hVals   = Object.values(hubOutCats);
-  new Chart(ctx4, {
+  registerChart(new Chart(ctx4, {
     type: "doughnut",
     data: {
       labels: hLabels,
@@ -1827,7 +1862,7 @@ function buildDonutCharts() {
         }
       }
     }
-  });
+  }));
 }
 
 // ============================================================
@@ -1877,9 +1912,9 @@ function buildForecast() {
       <span class="forecast-value" style="color:#6ee7b7">${fmtSigned(h.net)}</span>
     </div>
     <div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.5">
-      入金: ¥${h.sales_in.toLocaleString()} (${h.sales_count}台)<br>
-      仕入: ¥${h.purchase_out.toLocaleString()} (${h.purchase_count}台)<br>
-      経費: ¥${h.other_out.toLocaleString()} (1-2月平均)
+      入金: ${fmt(h.sales_in)} (${h.sales_count}台)<br>
+      仕入: ${fmt(h.purchase_out)} (${h.purchase_count}台)<br>
+      経費: ${fmt(h.other_out)} (1-2月平均)
     </div>
   `;
 
@@ -1972,14 +2007,14 @@ function updateSummaryBar(sectionId) {
   let headerCells = '<th>合計</th>';
   MONTHS.forEach(m => { headerCells += `<th>${m}</th>`; });
 
-  // 月計値
+  // 月計値（data-val属性から実数値を取得してfmt関数で表示）
   let monthCells = '';
   let grandTotal = 0;
   for (let i = 0; i < MONTHS.length; i++) {
-    const txt = cells[i + 1] ? cells[i + 1].textContent.replace(/[¥,\s]/g, "").replace("—", "") : "";
-    const n = parseFloat(txt);
+    const cell = cells[i + 1];
+    const n = cell && cell.dataset.val ? parseFloat(cell.dataset.val) : 0;
     if (!isNaN(n) && n > 0) {
-      let display = "¥" + (n / 1e6).toFixed(1) + "M";
+      let display = fmt(n);
       if (vehicleData && vehicleData[MONTHS[i]]) {
         display += '<br><span style="color:#a78bfa;font-size:10px;font-weight:400">' + vehicleData[MONTHS[i]] + '台</span>';
       }
@@ -1990,7 +2025,7 @@ function updateSummaryBar(sectionId) {
     }
   }
   const totalCell = grandTotal > 0
-    ? `<td style="color:#fcd34d">¥${(grandTotal / 1e6).toFixed(1)}M</td>`
+    ? `<td style="color:#fcd34d">${fmt(grandTotal)}</td>`
     : '<td style="color:var(--text2);font-weight:400">—</td>';
   const valueCells = totalCell + monthCells;
 
@@ -2019,32 +2054,57 @@ function openAllCollapsibles() {
 // ============================================================
 // INIT
 // ============================================================
-document.addEventListener("DOMContentLoaded", () => {
+// Prepared data (名寄せ + 4月予按分は初回のみ)
+let PREPARED = {};
+function prepareData() {
+  const APR = DATA.apr_forecast;
+  PREPARED = {
+    interSales:    addAprEstimates(consolidateVendors(DATA.inter_sales), 43319838),
+    interBorrow:   addAprEstimates(consolidateVendors(DATA.inter_borrow), 32500000),
+    interLend:     addAprEstimates(consolidateVendors(DATA.inter_lend), 18035650),
+    interOther:    addAprEstimates(consolidateVendors(DATA.inter_other_out), 17789021),
+    interSalary:   addAprEstimates(consolidateVendors(DATA.inter_salary), 24664994),
+    hubSales:      addAprEstimates(consolidateVendors(DATA.hubride_sales), 24029751),
+    hubPurchase:   addAprEstimates(consolidateVendors(DATA.hubride_purchase), APR.hubride.purchase_out),
+    hubOtherIn:    addAprEstimates(consolidateVendors(DATA.hubride_other_in), APR.hubride.other_in),
+    APR: APR
+  };
+  addAprEstimatesToGroups(DATA.hubride_other_grouped, 2075228);
+}
+
+function renderAll() {
+  destroyCharts();
+  const APR = PREPARED.APR;
   buildKPI();
   buildMonthlyChart();
   buildComparisonTable();
 
-  // INTER detail tables (名寄せ + 4月予を直近実績ベースで按分)
-  const APR = DATA.apr_forecast;
-  buildDetailTable("head-inter-sales",  "body-inter-sales",  addAprEstimates(consolidateVendors(DATA.inter_sales), 43319838),  "inter-col", null, 43319838);
-  buildDetailTable("head-inter-borrow", "body-inter-borrow", addAprEstimates(consolidateVendors(DATA.inter_borrow), 32500000), "inter-col", null, 32500000);
-  buildDetailTable("head-inter-lend",   "body-inter-lend",   addAprEstimates(consolidateVendors(DATA.inter_lend), 18035650),   "inter-col", null, 18035650);
-  buildDetailTable("head-inter-other",  "body-inter-other",  addAprEstimates(consolidateVendors(DATA.inter_other_out), 17789021), "inter-col", null, 17789021);
-  buildDetailTable("head-inter-salary", "body-inter-salary", addAprEstimates(consolidateVendors(DATA.inter_salary), 24664994), "inter-col", null, 24664994);
+  buildDetailTable("head-inter-sales",  "body-inter-sales",  PREPARED.interSales,  "inter-col", null, 43319838);
+  buildDetailTable("head-inter-borrow", "body-inter-borrow", PREPARED.interBorrow, "inter-col", null, 32500000);
+  buildDetailTable("head-inter-lend",   "body-inter-lend",   PREPARED.interLend,   "inter-col", null, 18035650);
+  buildDetailTable("head-inter-other",  "body-inter-other",  PREPARED.interOther,  "inter-col", null, 17789021);
+  buildDetailTable("head-inter-salary", "body-inter-salary", PREPARED.interSalary, "inter-col", null, 24664994);
 
-  // HUBRIDE detail tables (売上・仕入はKINTONE, 他は1月-2月平均, 4月予を按分)
-  buildDetailTable("head-hub-sales",    "body-hub-sales",    addAprEstimates(consolidateVendors(DATA.hubride_sales), 24029751),     "hubride-col", DATA.vehicle_counts.sales, 24029751);
-  buildDetailTable("head-hub-purchase", "body-hub-purchase", addAprEstimates(consolidateVendors(DATA.hubride_purchase), APR.hubride.purchase_out),  "hubride-col", DATA.vehicle_counts.purchase, APR.hubride.purchase_out);
-  addAprEstimatesToGroups(DATA.hubride_other_grouped, 2075228);
+  buildDetailTable("head-hub-sales",    "body-hub-sales",    PREPARED.hubSales,     "hubride-col", DATA.vehicle_counts.sales, 24029751);
+  buildDetailTable("head-hub-purchase", "body-hub-purchase",  PREPARED.hubPurchase,  "hubride-col", DATA.vehicle_counts.purchase, APR.hubride.purchase_out);
   buildGroupedTable("head-hub-other-out","body-hub-other-out", DATA.hubride_other_grouped, "hubride-col", 2075228);
-  buildDetailTable("head-hub-other-in", "body-hub-other-in", addAprEstimates(consolidateVendors(DATA.hubride_other_in), APR.hubride.other_in),  "hubride-col", null, APR.hubride.other_in);
+  buildDetailTable("head-hub-other-in", "body-hub-other-in",  PREPARED.hubOtherIn,  "hubride-col", null, APR.hubride.other_in);
 
-  // Update all summary bars
   ["inter-sales","inter-borrow","inter-lend","inter-other","inter-salary",
    "hub-sales","hub-purchase","hub-other-out","hub-other-in"].forEach(updateSummaryBar);
 
   buildDonutCharts();
   buildForecast();
+}
+
+function changeUnit(unit) {
+  CURRENT_UNIT = unit;
+  renderAll();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  prepareData();
+  renderAll();
   openAllCollapsibles();
 });
 </script>
