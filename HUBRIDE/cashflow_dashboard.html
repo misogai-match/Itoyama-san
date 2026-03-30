@@ -1957,7 +1957,7 @@ function buildKPI() {
       value: fmt(apr_end),
       sub: `HUBRIDE: ${af.hubride.sales_count}台入金 - ${af.hubride.purchase_count}台仕入 - 経費 / INTER: 1-2月平均 NET ${fmtSigned(af.inter.net)}`,
       badge: "KINTONE連動",
-      warning: `⚠ 純借入 ${fmt(af.inter.borrow_net)}/月含む（借入なしの場合 4月末 ${fmt(af.apr_end - af.inter.borrow_net)}）`
+      warning: `⚠ INTER内訳: 借入 ${fmt(af.inter.borrow_avg)} − 返済等 ${fmt(af.inter.lend_avg)} = Net ${fmtSigned(af.inter.borrow_net)}（借入なしの場合 4月末 ${fmt(af.apr_end - af.inter.borrow_net)}）`
     },
     {
       cls: "kpi-income",
@@ -2522,7 +2522,10 @@ function buildForecast() {
       ※ 仕入: 55台×5ヶ月平均台単価¥855K（鈴木常務と要相談。新規リース事業分は未反映）
     </div>
     <div style="margin-top:8px;padding:6px 10px;background:rgba(248,113,113,0.1);border-left:3px solid #f87171;border-radius:4px;font-size:11px;color:#f87171;line-height:1.5">
-      ⚠ <strong>借入依存度</strong>: 純借入 ${fmt(af.inter.borrow_net)}/月含む（借入¥${(af.inter.borrow_avg/1e6).toFixed(1)}M - 貸付¥${(af.inter.lend_avg/1e6).toFixed(1)}M）<br>
+      ⚠ <strong>借入依存度</strong><br>
+      　借入: ${fmt(af.inter.borrow_avg)}<br>
+      　返済等: ${fmt(af.inter.lend_avg)}<br>
+      　Net: ${fmtSigned(af.inter.borrow_net)}<br>
       借入なしの場合 4月末残高 ${fmt(af.apr_end - af.inter.borrow_net)}（マイナス）
     </div>
   `;
@@ -2820,7 +2823,7 @@ function updateSimulator() {
   document.getElementById('sim-result').innerHTML = `
     <div class="sim-scenarios">
       <div class="sim-scenario" style="border-color:#a78bfa">
-        <div class="sim-scenario-title" style="color:#a78bfa">借入あり<span style="font-size:11px;font-weight:400;opacity:0.8">（借入 ${fmt(af.inter.borrow_avg)} 前提）</span></div>
+        <div class="sim-scenario-title" style="color:#a78bfa">借入あり<span style="font-size:11px;font-weight:400;opacity:0.8">（借入${fmt(af.inter.borrow_avg)} − 返済等${fmt(af.inter.lend_avg)} = Net ${fmtSigned(af.inter.borrow_net)}）</span></div>
         <div class="sim-cars" style="color:#a78bfa">${cars1}<span>台</span></div>
         <div class="sim-detail">
           仕入額: ${fmt(cars1 * unitPrice)}<br>
@@ -2839,7 +2842,9 @@ function updateSimulator() {
     <div class="sim-breakdown">
       <div class="sim-line"><span>3月末残高</span><span>${fmt(marEnd)}</span></div>
       <div class="sim-line"><span>INTER差引（借入あり）</span><span style="color:${interNet >= 0 ? 'var(--income)' : 'var(--expense)'}">${sign(interNet)}</span></div>
-      <div class="sim-line" style="font-size:10px;padding-left:12px"><span>└ うち借入NET</span><span>+${borrowNet.toLocaleString()}</span></div>
+      <div class="sim-line" style="font-size:10px;padding-left:12px"><span>└ 借入</span><span>+${af.inter.borrow_avg.toLocaleString()}</span></div>
+      <div class="sim-line" style="font-size:10px;padding-left:12px"><span>└ 返済等</span><span>-${af.inter.lend_avg.toLocaleString()}</span></div>
+      <div class="sim-line" style="font-size:10px;padding-left:12px"><span>└ Net</span><span>+${borrowNet.toLocaleString()}</span></div>
       <div class="sim-line"><span>HUBRIDE売上入金（67台）</span><span style="color:var(--income)">+${hubSalesIn.toLocaleString()}</span></div>
       <div class="sim-line"><span>HUBRIDEその他入金</span><span style="color:var(--income)">+${hubOtherIn.toLocaleString()}</span></div>
       <div class="sim-line"><span>HUBRIDEその他出金</span><span style="color:var(--expense)">-${hubOtherOut.toLocaleString()}</span></div>
