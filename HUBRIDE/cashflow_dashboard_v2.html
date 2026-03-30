@@ -25,7 +25,7 @@
     font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
     background: var(--bg);
     color: var(--text);
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
   }
   /* HEADER */
@@ -89,7 +89,7 @@
   /* SECTION */
   .section { margin-bottom: 32px; }
   .section-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     color: #fff;
     margin-bottom: 16px;
@@ -132,19 +132,19 @@
   .kpi-card.kpi-income::before { background: var(--income); }
   .kpi-card.kpi-expense::before { background: var(--expense); }
   .kpi-label {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text2);
     margin-bottom: 8px;
     font-weight: 500;
   }
   .kpi-value {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     color: #fff;
     letter-spacing: -0.5px;
   }
   .kpi-sub {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text2);
     margin-top: 6px;
   }
@@ -208,7 +208,7 @@
   th {
     padding: 10px 14px;
     text-align: right;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text2);
     cursor: pointer;
@@ -223,7 +223,7 @@
   td {
     padding: 9px 14px;
     text-align: right;
-    font-size: 13px;
+    font-size: 14px;
     border-bottom: 1px solid rgba(51,65,85,0.5);
     white-space: nowrap;
   }
@@ -256,7 +256,7 @@
   }
   .collapsible-header:hover { background: var(--card2); }
   .collapsible-header h3 {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text);
   }
@@ -372,7 +372,7 @@
     justify-content: space-between;
     padding: 7px 0;
     border-bottom: 1px solid rgba(51,65,85,0.5);
-    font-size: 13px;
+    font-size: 14px;
   }
   .forecast-row:last-child { border-bottom: none; }
   .forecast-label { color: var(--text2); }
@@ -476,7 +476,7 @@
     background: none;
     border: none;
     color: var(--text2);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     padding: 12px 24px;
     cursor: pointer;
@@ -530,7 +530,7 @@
     border-bottom: 1px solid var(--border);
   }
   .report-bp-balance {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 700;
     color: #fcd34d;
     margin-bottom: 10px;
@@ -692,6 +692,22 @@
     color: var(--inter);
   }
   .collapsible-header.open .click-hint { display: none; }
+
+  /* FORECAST COLUMN HIGHLIGHT */
+  .forecast-col-bg { background: rgba(245,158,11,0.08) !important; }
+  .forecast-row-bg td { background: rgba(245,158,11,0.08) !important; }
+  .forecast-badge {
+    display: inline-block;
+    background: rgba(245,158,11,0.25);
+    color: var(--yellow);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+  }
 
   /* PRINT STYLES */
   @media print {
@@ -909,6 +925,9 @@
       <span class="tooltip-text">下の取引先別テーブルの表示を切り替えます。INTER/HUBRIDEを選ぶと該当セクションのみ表示。</span>
     </span>
   </div>
+
+  <!-- COMBINED MONTHLY SUMMARY (ALL mode) -->
+  <div id="combined-monthly-summary" class="table-wrap" style="margin-bottom:16px"></div>
 
   <!-- SECTION 4: INTER DETAIL -->
   <div class="section" id="section-inter-detail">
@@ -1977,6 +1996,18 @@ function buildMonthlyChart() {
   const hubrideIn  = MONTHS.map(m => s.HUBRIDE[m].in / 1e6);
   const hubrideOut = MONTHS.map(m => -s.HUBRIDE[m].out / 1e6);
 
+  // 4月予バーを半透明にするヘルパー
+  const fcIdx = MONTHS.indexOf('4月予');
+  function makeBarColors(base, forecastAlpha) {
+    return MONTHS.map((m, i) => i === fcIdx ? forecastAlpha : base);
+  }
+  function makeBarBorders(base, forecastBorder) {
+    return MONTHS.map((m, i) => i === fcIdx ? forecastBorder : base);
+  }
+  function makeBarBorderWidths(normal, forecast) {
+    return MONTHS.map((m, i) => i === fcIdx ? forecast : normal);
+  }
+
   // Balance line
   const balLine = [null, null,
     DATA.balances["1月"] / 1e6,
@@ -1994,25 +2025,37 @@ function buildMonthlyChart() {
         {
           label: "INTER 入金",
           data: interIn,
-          backgroundColor: "rgba(59,130,246,0.7)",
+          backgroundColor: makeBarColors("rgba(59,130,246,0.7)", "rgba(59,130,246,0.35)"),
+          borderColor: makeBarBorders("transparent", "rgba(59,130,246,0.9)"),
+          borderWidth: makeBarBorderWidths(0, 2),
+
           stack: "in"
         },
         {
           label: "HUBRIDE 入金",
           data: hubrideIn,
-          backgroundColor: "rgba(16,185,129,0.7)",
+          backgroundColor: makeBarColors("rgba(16,185,129,0.7)", "rgba(16,185,129,0.35)"),
+          borderColor: makeBarBorders("transparent", "rgba(16,185,129,0.9)"),
+          borderWidth: makeBarBorderWidths(0, 2),
+
           stack: "in"
         },
         {
           label: "INTER 出金",
           data: interOut,
-          backgroundColor: "rgba(239,68,68,0.5)",
+          backgroundColor: makeBarColors("rgba(239,68,68,0.5)", "rgba(239,68,68,0.25)"),
+          borderColor: makeBarBorders("transparent", "rgba(239,68,68,0.8)"),
+          borderWidth: makeBarBorderWidths(0, 2),
+
           stack: "out"
         },
         {
           label: "HUBRIDE 出金",
           data: hubrideOut,
-          backgroundColor: "rgba(239,68,68,0.3)",
+          backgroundColor: makeBarColors("rgba(239,68,68,0.3)", "rgba(239,68,68,0.15)"),
+          borderColor: makeBarBorders("transparent", "rgba(239,68,68,0.6)"),
+          borderWidth: makeBarBorderWidths(0, 2),
+
           stack: "out"
         },
         {
@@ -2123,8 +2166,10 @@ function buildComparisonTable() {
     const hi = s.HUBRIDE[m].in, ho = s.HUBRIDE[m].out;
     const iNet = ii - io, hNet = hi - ho, total = iNet + hNet;
     totals.ii += ii; totals.io += io; totals.hi += hi; totals.ho += ho;
-    html += `<tr>
-      <td style="font-weight:600">${m}</td>
+    const trCls = m === '4月予' ? ' class="forecast-row-bg"' : '';
+    const badge = m === '4月予' ? '<span class="forecast-badge">予測</span>' : '';
+    html += `<tr${trCls}>
+      <td style="font-weight:600">${m}${badge}</td>
       <td class="inter-col">${fmt(ii)}</td>
       <td class="inter-col">${fmt(io)}</td>
       <td data-val="${iNet}">${fmtSigned(iNet)}</td>
@@ -2168,28 +2213,36 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts, aprTo
   // 4月予の月計を上書き（vendor-levelデータがないため）
   if (aprTotal !== undefined) { colTotals["4月予"] = aprTotal; }
 
-  const headerRow = cols.map((c,i) =>
-    `<th onclick="sortTable('${tblId}',${i})">${c}</th>`
-  ).join("");
+  const headerRow = cols.map((c,i) => {
+    const isForecast = c === '4月予';
+    const cls = isForecast ? ' class="forecast-col-bg"' : '';
+    const badge = isForecast ? '<span class="forecast-badge">予測</span>' : '';
+    return `<th onclick="sortTable('${tblId}',${i})"${cls}>${c}${badge}</th>`;
+  }).join("");
 
   // 台数行 (vehicleCounts がある場合)
   let vehicleRow = "";
   if (vehicleCounts) {
     vehicleRow = `<tr style="background:#1a2744;font-size:12px;color:#a78bfa">
       <td style="font-weight:400">台数</td>
-      ${MONTHS.map(m => `<td>${vehicleCounts[m] ? vehicleCounts[m] + "台" : "—"}</td>`).join("")}
+      ${MONTHS.map(m => `<td${m==='4月予' ? ' class="forecast-col-bg"' : ''}>${vehicleCounts[m] ? vehicleCounts[m] + "台" : "—"}</td>`).join("")}
     </tr>`;
   }
 
   const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
     <td style="color:#94a3b8;font-weight:400">月計</td>
-    ${MONTHS.map(m => `<td data-val="${colTotals[m]}">${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("")}
+    ${MONTHS.map(m => `<td data-val="${colTotals[m]}"${m==='4月予' ? ' class="forecast-col-bg"' : ''}>${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("")}
   </tr>`;
   headEl.innerHTML = headerRow;
 
   let rows = summaryRow + vehicleRow;
   rows += data.map(row => {
-    const cells = MONTHS.map(m => cellVal(row[m] || 0)).join("");
+    const cells = MONTHS.map(m => {
+      const n = row[m] || 0;
+      const fcCls = m === '4月予' ? ' forecast-col-bg' : '';
+      if (!n || n === 0) return `<td style="color:var(--text2)" class="${fcCls}">—</td>`;
+      return `<td class="${fcCls}">${fmt(n)}</td>`;
+    }).join("");
     return `<tr>
       <td class="${colorClass || ''}" style="font-weight:500">${row.vendor}</td>
       ${cells}
@@ -2215,12 +2268,15 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
   });
   if (aprTotal !== undefined) { grandTotals["4月予"] = aprTotal; }
 
-  const headerRow = cols.map((c, i) =>
-    `<th style="cursor:default">${c}</th>`
-  ).join("");
+  const headerRow = cols.map((c, i) => {
+    const isForecast = c === '4月予';
+    const cls = isForecast ? ' class="forecast-col-bg"' : '';
+    const badge = isForecast ? '<span class="forecast-badge">予測</span>' : '';
+    return `<th style="cursor:default"${cls}>${c}${badge}</th>`;
+  }).join("");
   const summaryRow = `<tr class="summary-row" style="background:#1a2744;font-size:13px;font-weight:700;color:#f59e0b">
     <td style="color:#94a3b8;font-weight:400">月計</td>
-    ${MONTHS.map(m => `<td data-val="${grandTotals[m]}">${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`).join("")}
+    ${MONTHS.map(m => `<td data-val="${grandTotals[m]}"${m==='4月予' ? ' class="forecast-col-bg"' : ''}>${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`).join("")}
   </tr>`;
   headEl.innerHTML = headerRow;
 
@@ -2229,11 +2285,12 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
   groupedData.forEach(group => {
 
     // Category header row
-    const catMonthlyCells = MONTHS.map(m =>
-      group.subtotal[m] > 0
-        ? `<td style="font-weight:700;color:#6ee7b7">${fmt(group.subtotal[m])}</td>`
-        : `<td style="color:var(--text2)">—</td>`
-    ).join("");
+    const catMonthlyCells = MONTHS.map(m => {
+      const fcCls = m === '4月予' ? ' forecast-col-bg' : '';
+      return group.subtotal[m] > 0
+        ? `<td style="font-weight:700;color:#6ee7b7" class="${fcCls}">${fmt(group.subtotal[m])}</td>`
+        : `<td style="color:var(--text2)" class="${fcCls}">—</td>`;
+    }).join("");
     rows += `<tr style="background:#1a2744">
       <td style="font-weight:700;color:#6ee7b7;padding-left:14px">■ ${group.category}</td>
       ${catMonthlyCells}
@@ -2241,7 +2298,12 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
 
     // Vendor detail rows
     group.vendors.forEach(v => {
-      const vendorCells = MONTHS.map(m => cellVal(v[m] || 0)).join("");
+      const vendorCells = MONTHS.map(m => {
+        const n = v[m] || 0;
+        const fcCls = m === '4月予' ? ' forecast-col-bg' : '';
+        if (!n || n === 0) return `<td style="color:var(--text2)" class="${fcCls}">—</td>`;
+        return `<td class="${fcCls}">${fmt(n)}</td>`;
+      }).join("");
       rows += `<tr>
         <td class="${colorClass || ''}" style="font-weight:500;padding-left:38px">${v.vendor}</td>
         ${vendorCells}
@@ -2250,11 +2312,12 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
 
     // Subtotal row (only show if more than 1 vendor)
     if (group.vendors.length > 1) {
-      const subMonthlyCells = MONTHS.map(m =>
-        group.subtotal[m] > 0
-          ? `<td style="font-weight:600;font-size:12px">${fmt(group.subtotal[m])}</td>`
-          : `<td style="color:var(--text2);font-size:12px">—</td>`
-      ).join("");
+      const subMonthlyCells = MONTHS.map(m => {
+        const fcCls = m === '4月予' ? ' forecast-col-bg' : '';
+        return group.subtotal[m] > 0
+          ? `<td style="font-weight:600;font-size:12px" class="${fcCls}">${fmt(group.subtotal[m])}</td>`
+          : `<td style="color:var(--text2);font-size:12px" class="${fcCls}">—</td>`;
+      }).join("");
       rows += `<tr style="background:#162033">
         <td style="font-weight:600;font-size:12px;color:var(--text2);padding-left:38px">小計</td>
         ${subMonthlyCells}
@@ -2264,7 +2327,7 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
 
   // Grand total row
   const grandMonthlyCells = MONTHS.map(m =>
-    `<td style="font-weight:700">${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`
+    `<td style="font-weight:700"${m==='4月予' ? ' class="forecast-col-bg"' : ''}>${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`
   ).join("");
   rows += `<tr class="total-row">
     <td>合計</td>
@@ -2613,6 +2676,14 @@ function buildEntityMonthlySummary() {
   buildMonthlySummaryTable('hubride-monthly-summary', MONTHS, m => {
     return { in: s.HUBRIDE[m].in, out: s.HUBRIDE[m].out };
   }, 'hubride-col');
+
+  // 全体合算 (INTER + HUBRIDE)
+  buildMonthlySummaryTable('combined-monthly-summary', MONTHS, m => {
+    return { in: s.INTER[m].in + s.HUBRIDE[m].in, out: s.INTER[m].out + s.HUBRIDE[m].out };
+  }, 'combined-col');
+
+  // 表示/非表示の初期状態を反映
+  filterSummaryEntity();
 }
 
 function buildMonthlySummaryTable(containerId, months, getData, colorClass) {
@@ -2624,29 +2695,39 @@ function buildMonthlySummaryTable(containerId, months, getData, colorClass) {
   const totalOut = data.reduce((a, d) => a + d.out, 0);
   const totalCF = totalIn - totalOut;
 
-  const headerColor = colorClass === 'inter-col' ? 'var(--inter)' : 'var(--hubride)';
-  const label = colorClass === 'inter-col' ? 'INTER' : 'HUBRIDE';
+  const headerColor = colorClass === 'inter-col' ? 'var(--inter)' : (colorClass === 'hubride-col' ? 'var(--hubride)' : 'var(--yellow)');
+  const label = colorClass === 'inter-col' ? 'INTER' : (colorClass === 'hubride-col' ? 'HUBRIDE' : '全体合算');
 
   let html = `<table>
     <thead><tr style="background:rgba(59,130,246,0.1)">
       <th style="cursor:default;text-align:left;color:${headerColor};font-weight:700">${label} 月次合計</th>
-      ${months.map(m => `<th style="cursor:default">${m}</th>`).join('')}
+      ${months.map((m, i) => {
+        const isForecast = m === '4月予';
+        const cls = isForecast ? ' class="forecast-col-bg"' : '';
+        const badge = isForecast ? '<span class="forecast-badge">予測</span>' : '';
+        return `<th style="cursor:default"${cls}>${m}${badge}</th>`;
+      }).join('')}
+      <th style="cursor:default;color:var(--yellow);font-weight:700">合計</th>
     </tr></thead>
     <tbody>
     <tr>
       <td style="font-weight:600;color:var(--income)">入金 計</td>
-      ${data.map(d => `<td class="positive">${fmt(d.in)}</td>`).join('')}
+      ${data.map((d, i) => `<td class="positive${months[i]==='4月予' ? ' forecast-col-bg' : ''}">${fmt(d.in)}</td>`).join('')}
+      <td class="positive" style="font-weight:700">${fmt(totalIn)}</td>
     </tr>
     <tr>
       <td style="font-weight:600;color:var(--expense)">出金 計</td>
-      ${data.map(d => `<td class="negative">${fmt(d.out)}</td>`).join('')}
+      ${data.map((d, i) => `<td class="negative${months[i]==='4月予' ? ' forecast-col-bg' : ''}">${fmt(d.out)}</td>`).join('')}
+      <td class="negative" style="font-weight:700">${fmt(totalOut)}</td>
     </tr>
     <tr class="total-row">
       <td style="font-weight:700">月次CF</td>
-      ${data.map(d => {
+      ${data.map((d, i) => {
         const cf = d.in - d.out;
-        return `<td style="font-weight:700">${fmtSigned(cf)}</td>`;
+        const cls = months[i] === '4月予' ? ' forecast-col-bg' : '';
+        return `<td style="font-weight:700" class="${cls}">${fmtSigned(cf)}</td>`;
       }).join('')}
+      <td style="font-weight:700">${fmtSigned(totalCF)}</td>
     </tr>
     </tbody></table>`;
 
@@ -2765,15 +2846,19 @@ function filterSummaryEntity() {
   const filter = document.getElementById('summary-entity-filter').value;
   const interSection = document.getElementById('section-inter-detail');
   const hubrideSection = document.getElementById('section-hubride-detail');
+  const combinedSummary = document.getElementById('combined-monthly-summary');
   if (filter === 'ALL') {
     interSection.style.display = '';
     hubrideSection.style.display = '';
+    if (combinedSummary) combinedSummary.style.display = '';
   } else if (filter === 'INTER') {
     interSection.style.display = '';
     hubrideSection.style.display = 'none';
+    if (combinedSummary) combinedSummary.style.display = 'none';
   } else {
     interSection.style.display = 'none';
     hubrideSection.style.display = '';
+    if (combinedSummary) combinedSummary.style.display = 'none';
   }
 }
 
