@@ -148,6 +148,15 @@
     color: var(--text2);
     margin-top: 6px;
   }
+  .kpi-warning {
+    font-size: 11px;
+    color: #f87171;
+    margin-top: 6px;
+    padding: 4px 8px;
+    background: rgba(248,113,113,0.1);
+    border-radius: 4px;
+    border-left: 3px solid #f87171;
+  }
   .kpi-badge {
     display: inline-block;
     background: rgba(245,158,11,0.2);
@@ -602,8 +611,8 @@
         </table>
         <div style="margin-top:12px;padding:12px 16px;background:#2d1f0e;border:1px solid #f59e0b;border-radius:8px;font-size:13px;color:#fcd34d;">
           <strong>⚠ 4月予 その他出金について</strong><br>
-          <span style="color:#e2e8f0">1月-2月平均から<strong>麻布税務署 ¥19,923,100（一時的税金支払）</strong>と<strong>クロノス ¥30,165,000</strong>を除外して算出。<br>
-          除外後: 1月 ¥17,878,242 / 2月 ¥17,699,800 → 平均 ¥17,789,021</span>
+          <span style="color:#e2e8f0">1月-2月平均 ¥52,548,655を採用（除外なし）。<br>
+          ※ 麻布税務署・日本年金機構等の大口一時支出を含む。月によるブレが大きいため信頼レンジで対応。</span>
         </div>
       </div>
     </div>
@@ -640,17 +649,15 @@
         </table>
         <div style="margin-top:12px;padding:12px 16px;background:#0e2d1f;border:2px solid #f59e0b;border-radius:8px;font-size:13px;color:#fcd34d;">
           <strong>⚠ 4月予 売上について</strong><br>
-          <span style="color:#e2e8f0">KINTONE上の入金予定額は67台 ¥82,936,564。<br>
-          ただし直近3ヶ月の実績台単価（1月¥278K / 2月¥489K / 3月¥310K = 平均¥359K）と乖離が大きいため、<br>
-          <strong>67台 × 平均台単価 ¥358,653 = ¥24,029,751 を採用。</strong><br>
-          ※ KINTONEの入金予定額は要確認（鈴木常務と相談予定）。</span>
+          <span style="color:#e2e8f0">KINTONE登録の4月入金予定額 <strong>67台 ¥82,936,564（台単価¥1,237K）</strong>をそのまま採用。<br>
+          ※ 実績台単価（5ヶ月平均¥1,504K）より保守的な値。心ちゃん確認済み。</span>
         </div>
       </div>
     </div>
 
     <div class="collapsible-wrap" id="wrap-hub-purchase">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-purchase')">
-        <h3>仕入 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月32台 / 12月38台 / 1月29台 / 2月50台 / 3月32台 / 4月予41台</span></h3>
+        <h3>仕入 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月32台 / 12月38台 / 1月29台 / 2月50台 / 3月32台 / 4月予55台</span></h3>
         <span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-hub-purchase"></div>
@@ -661,9 +668,8 @@
         </table>
         <div style="margin-top:12px;padding:12px 16px;background:#2d1f0e;border:2px solid #f59e0b;border-radius:8px;font-size:13px;color:#fcd34d;">
           <strong>⚠ 4月予 仕入について</strong><br>
-          <span style="color:#e2e8f0">KINTONE登録済みの4月出金は2台 ¥1,561,719のみ。<br>
-          ダッシュボードでは<strong>直近2ヶ月平均（2月50台+3月32台→41台 ¥8,682,196）</strong>を採用。<br>
-          ※ 予測ロジックは鈴木常務と相談の上、確定予定。</span>
+          <span style="color:#e2e8f0">ダッシュボードでは<strong>55台×5ヶ月平均台単価¥855K＝¥47,025,000</strong>を採用。<br>
+          ※ 鈴木常務と要相談。新規リース事業分は未反映。</span>
         </div>
       </div>
     </div>
@@ -772,7 +778,7 @@ const DATA = {
       "1月": {"in": 92344639, "out": 100592612},
       "2月": {"in": 108582507, "out": 91650561},
       "3月": {"in": 106215881, "out": 122105113},
-      "4月予": {"in": 81332128, "out": 60489665}
+      "4月予": {"in": 100463573, "out": 96121587}
     },
     "HUBRIDE": {
       "11月": {"in": 31677131, "out": 40848551},
@@ -780,7 +786,7 @@ const DATA = {
       "1月": {"in": 47851939, "out": 47694286},
       "2月": {"in": 43984780, "out": 71025741},
       "3月": {"in": 69097283, "out": 51611431},
-      "4月予": {"in": 24137487, "out": 10757424}
+      "4月予": {"in": 86511924, "out": 72632525}
     }
   },
   "balances": {"11月": 31879953, "12月": 19909597, "1月": 11819277, "2月": 1710262, "3月": 3306882},
@@ -1252,13 +1258,13 @@ const DATA = {
   },
   "vehicle_counts": {
     "sales":    {"11月": 18, "12月": 24, "1月": 34, "2月": 29, "3月": 37, "4月予": 67},
-    "purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32, "4月予": 41}
+    "purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32, "4月予": 55}
   },
   "apr_forecast": {
     "mar_end": 3306882,
-    "inter": {"in": 81332128, "out": 60489665, "net": 20842463, "note": "1月-2月平均（その他出金は麻布税務署・クロノス除外）"},
-    "hubride": {"sales_in": 24029751, "sales_count": 67, "purchase_out": 8682196, "purchase_count": 41, "other_out": 2075228, "other_in": 107736, "net": 13380063, "note": "売上: 67台×直近3ヶ月平均台単価¥358,653 / 仕入: 直近2ヶ月平均41台"},
-    "apr_end": 37529408
+    "inter": {"in": 100463573, "out": 96121587, "net": 4341986, "note": "1月-2月平均", "borrow_avg": 41780500, "lend_avg": 18910013, "borrow_net": 22870487},
+    "hubride": {"sales_in": 82936564, "sales_count": 67, "purchase_out": 47025000, "purchase_count": 55, "other_out": 25607525, "other_in": 3575360, "net": 13879399, "note": "売上: KINTONE 67台 / 仕入: 55台×5ヶ月平均台単価¥855K / その他: 1-3月平均"},
+    "apr_end": 21528267
   }
 };
 
@@ -1483,7 +1489,7 @@ function buildKPI() {
   const s = DATA.summary;
   const af = DATA.apr_forecast;
   const mar_end = af.mar_end;   // ¥3,306,882
-  const apr_end = af.apr_end;   // ¥71,392,171
+  const apr_end = af.apr_end;
 
   // Cumulative totals
   let total_in = 0, total_out = 0;
@@ -1503,8 +1509,9 @@ function buildKPI() {
       cls: "kpi-forecast",
       label: "4月末 残高予測",
       value: fmt(apr_end),
-      sub: `HUBRIDE: ${af.hubride.sales_count}台入金 ${fmt(af.hubride.sales_in)} - ${af.hubride.purchase_count}台仕入 - 経費 / INTER: 1-2月平均 ${fmtSigned(af.inter.net)}`,
-      badge: "KINTONE連動"
+      sub: `HUBRIDE: ${af.hubride.sales_count}台入金 - ${af.hubride.purchase_count}台仕入 - 経費 / INTER: 1-2月平均 NET ${fmtSigned(af.inter.net)}`,
+      badge: "KINTONE連動",
+      warning: `⚠ 純借入 ${fmt(af.inter.borrow_net)}/月含む（借入なしの場合 4月末 ${fmt(af.apr_end - af.inter.borrow_net)}）`
     },
     {
       cls: "kpi-income",
@@ -1526,6 +1533,7 @@ function buildKPI() {
       <div class="kpi-label">${c.label}${c.badge ? `<span class="kpi-badge">${c.badge}</span>` : ""}</div>
       <div class="kpi-value">${c.value}</div>
       <div class="kpi-sub">${c.sub}</div>
+      ${c.warning ? `<div class="kpi-warning">${c.warning}</div>` : ""}
     </div>
   `).join("");
 }
@@ -1977,7 +1985,7 @@ function buildForecast() {
     <div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.5">
       入金: ${fmt(h.sales_in)} (${h.sales_count}台)<br>
       仕入: ${fmt(h.purchase_out)} (${h.purchase_count}台)<br>
-      経費: ${fmt(h.other_out)} (1-2月平均)
+      経費: ${fmt(h.other_out)} (1-3月平均)
     </div>
   `;
 
@@ -2000,7 +2008,12 @@ function buildForecast() {
       ※ 3月末残高: 入出金サマリ予測 ¥${mar_end.toLocaleString()}<br>
       ※ HUBRIDE 4月: KINTONE ${h.sales_count}台入金 ¥${h.sales_in.toLocaleString()} - ${h.purchase_count}台仕入 ¥${h.purchase_out.toLocaleString()} - 経費 ¥${h.other_out.toLocaleString()}<br>
       ※ INTER 4月: 1-2月確定実績平均 ${fmtSigned(iAvg)}<br>
-      ※ 3月予測シート: INTER ${fmtSigned(mar_forecast_iNet)} / HUBRIDE ${fmtSigned(mar_forecast_hNet)}
+      ※ 3月予測シート: INTER ${fmtSigned(mar_forecast_iNet)} / HUBRIDE ${fmtSigned(mar_forecast_hNet)}<br>
+      ※ 仕入: 55台×5ヶ月平均台単価¥855K（鈴木常務と要相談。新規リース事業分は未反映）
+    </div>
+    <div style="margin-top:8px;padding:6px 10px;background:rgba(248,113,113,0.1);border-left:3px solid #f87171;border-radius:4px;font-size:11px;color:#f87171;line-height:1.5">
+      ⚠ <strong>借入依存度</strong>: 純借入 ${fmt(af.inter.borrow_net)}/月含む（借入¥${(af.inter.borrow_avg/1e6).toFixed(1)}M - 貸付¥${(af.inter.lend_avg/1e6).toFixed(1)}M）<br>
+      借入なしの場合 4月末残高 ${fmt(af.apr_end - af.inter.borrow_net)}（マイナス）
     </div>
   `;
 }
@@ -2049,7 +2062,7 @@ function sortTable(tableId, colIdx) {
 // KINTONE vehicle count data
 const KINTONE_VEHICLES = {
   "hub-sales":    {"11月": 18, "12月": 24, "1月": 34, "2月": 29, "3月": 37, "4月予": 67},
-  "hub-purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32, "4月予": 41}
+  "hub-purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32, "4月予": 55}
 };
 
 // セクションの月別合計をsummary-barにテーブル形式で表示
@@ -2122,17 +2135,17 @@ let PREPARED = {};
 function prepareData() {
   const APR = DATA.apr_forecast;
   PREPARED = {
-    interSales:    addAprEstimates(consolidateVendors(DATA.inter_sales), 43319838),
-    interBorrow:   addAprEstimates(consolidateVendors(DATA.inter_borrow), 32500000),
-    interLend:     addAprEstimates(consolidateVendors(DATA.inter_lend), 18035650),
-    interOther:    addAprEstimates(consolidateVendors(DATA.inter_other_out), 17789021),
-    interSalary:   addAprEstimates(consolidateVendors(DATA.inter_salary), 24664994),
-    hubSales:      addAprEstimates(consolidateVendors(DATA.hubride_sales), 24029751),
+    interSales:    addAprEstimates(consolidateVendors(DATA.inter_sales), 57924942),
+    interBorrow:   addAprEstimates(consolidateVendors(DATA.inter_borrow), 41780500),
+    interLend:     addAprEstimates(consolidateVendors(DATA.inter_lend), 18910013),
+    interOther:    addAprEstimates(consolidateVendors(DATA.inter_other_out), 52548655),
+    interSalary:   addAprEstimates(consolidateVendors(DATA.inter_salary), 24662919),
+    hubSales:      addAprEstimates(consolidateVendors(DATA.hubride_sales), 82936564),
     hubPurchase:   addAprEstimates(consolidateVendors(DATA.hubride_purchase), APR.hubride.purchase_out),
     hubOtherIn:    addAprEstimates(consolidateVendors(DATA.hubride_other_in), APR.hubride.other_in),
     APR: APR
   };
-  addAprEstimatesToGroups(DATA.hubride_other_grouped, 2075228);
+  addAprEstimatesToGroups(DATA.hubride_other_grouped, 25607525);
 }
 
 function renderAll() {
