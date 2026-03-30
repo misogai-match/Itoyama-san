@@ -1264,6 +1264,62 @@ function consolidateVendors(data) {
   return Object.values(map).sort((a, b) => b.total - a.total);
 }
 
+// 4月予の配分：各取引先の直近実績に基づいてaprTotalを按分
+function addAprEstimates(data, aprTotal) {
+  if (!aprTotal || aprTotal === 0) return data;
+  const weights = data.map(row => {
+    // 直近月（1-3月）の実績平均を優先、なければ11-12月
+    const recent = [row["1月"]||0, row["2月"]||0, row["3月"]||0].filter(v => v > 0);
+    if (recent.length > 0) return recent.reduce((a,b)=>a+b,0) / recent.length;
+    const older = [row["11月"]||0, row["12月"]||0].filter(v => v > 0);
+    if (older.length > 0) return older.reduce((a,b)=>a+b,0) / older.length;
+    return 0;
+  });
+  const totalWeight = weights.reduce((a,b)=>a+b,0);
+  if (totalWeight === 0) return data;
+  let distributed = 0;
+  data.forEach((row, i) => {
+    const est = Math.round(aprTotal * (weights[i] / totalWeight));
+    row["4月予"] = est;
+    distributed += est;
+  });
+  // 端数調整：最大取引先に差額を加算
+  if (distributed !== aprTotal && data.length > 0) {
+    data[0]["4月予"] += (aprTotal - distributed);
+  }
+  return data;
+}
+
+// グループテーブル用4月予配分
+function addAprEstimatesToGroups(groups, aprTotal) {
+  if (!aprTotal || aprTotal === 0) return groups;
+  const catWeights = groups.map(g => {
+    const sub = g.subtotal;
+    const recent = [sub["1月"]||0, sub["2月"]||0, sub["3月"]||0].filter(v => v > 0);
+    if (recent.length > 0) return recent.reduce((a,b)=>a+b,0) / recent.length;
+    const older = [sub["11月"]||0, sub["12月"]||0].filter(v => v > 0);
+    if (older.length > 0) return older.reduce((a,b)=>a+b,0) / older.length;
+    return 0;
+  });
+  const totalCatWeight = catWeights.reduce((a,b)=>a+b,0);
+  if (totalCatWeight === 0) return groups;
+  let totalDistributed = 0;
+  groups.forEach((g, gi) => {
+    const catShare = Math.round(aprTotal * (catWeights[gi] / totalCatWeight));
+    addAprEstimates(g.vendors, catShare);
+    g.subtotal["4月予"] = catShare;
+    totalDistributed += catShare;
+  });
+  if (totalDistributed !== aprTotal && groups.length > 0) {
+    const diff = aprTotal - totalDistributed;
+    groups[0].subtotal["4月予"] += diff;
+    if (groups[0].vendors.length > 0) {
+      groups[0].vendors[0]["4月予"] = (groups[0].vendors[0]["4月予"]||0) + diff;
+    }
+  }
+  return groups;
+}
+
 // ============================================================
 // UTILITY FUNCTIONS
 // ============================================================
@@ -1934,19 +1990,20 @@ document.addEventListener("DOMContentLoaded", () => {
   buildMonthlyChart();
   buildComparisonTable();
 
-  // INTER detail tables (名寄せ適用 + 4月予カテゴリ別合計)
+  // INTER detail tables (名寄せ + 4月予を直近実績ベースで按分)
   const APR = DATA.apr_forecast;
-  buildDetailTable("head-inter-sales",  "body-inter-sales",  consolidateVendors(DATA.inter_sales),  "inter-col", null, 43319838);
-  buildDetailTable("head-inter-borrow", "body-inter-borrow", consolidateVendors(DATA.inter_borrow), "inter-col", null, 32500000);
-  buildDetailTable("head-inter-lend",   "body-inter-lend",   consolidateVendors(DATA.inter_lend),   "inter-col", null, 18035650);
-  buildDetailTable("head-inter-other",  "body-inter-other",  consolidateVendors(DATA.inter_other_out), "inter-col", null, 17789021);
-  buildDetailTable("head-inter-salary", "body-inter-salary", consolidateVendors(DATA.inter_salary), "inter-col", null, 24664994);
+  buildDetailTable("head-inter-sales",  "body-inter-sales",  addAprEstimates(consolidateVendors(DATA.inter_sales), 43319838),  "inter-col", null, 43319838);
+  buildDetailTable("head-inter-borrow", "body-inter-borrow", addAprEstimates(consolidateVendors(DATA.inter_borrow), 32500000), "inter-col", null, 32500000);
+  buildDetailTable("head-inter-lend",   "body-inter-lend",   addAprEstimates(consolidateVendors(DATA.inter_lend), 18035650),   "inter-col", null, 18035650);
+  buildDetailTable("head-inter-other",  "body-inter-other",  addAprEstimates(consolidateVendors(DATA.inter_other_out), 17789021), "inter-col", null, 17789021);
+  buildDetailTable("head-inter-salary", "body-inter-salary", addAprEstimates(consolidateVendors(DATA.inter_salary), 24664994), "inter-col", null, 24664994);
 
-  // HUBRIDE detail tables (売上・仕入はKINTONE, 他は1月-2月平均)
-  buildDetailTable("head-hub-sales",    "body-hub-sales",    consolidateVendors(DATA.hubride_sales),     "hubride-col", DATA.vehicle_counts.sales, 24029751);
-  buildDetailTable("head-hub-purchase", "body-hub-purchase", consolidateVendors(DATA.hubride_purchase),  "hubride-col", DATA.vehicle_counts.purchase, APR.hubride.purchase_out);
+  // HUBRIDE detail tables (売上・仕入はKINTONE, 他は1月-2月平均, 4月予を按分)
+  buildDetailTable("head-hub-sales",    "body-hub-sales",    addAprEstimates(consolidateVendors(DATA.hubride_sales), 24029751),     "hubride-col", DATA.vehicle_counts.sales, 24029751);
+  buildDetailTable("head-hub-purchase", "body-hub-purchase", addAprEstimates(consolidateVendors(DATA.hubride_purchase), APR.hubride.purchase_out),  "hubride-col", DATA.vehicle_counts.purchase, APR.hubride.purchase_out);
+  addAprEstimatesToGroups(DATA.hubride_other_grouped, 2075228);
   buildGroupedTable("head-hub-other-out","body-hub-other-out", DATA.hubride_other_grouped, "hubride-col", 2075228);
-  buildDetailTable("head-hub-other-in", "body-hub-other-in", consolidateVendors(DATA.hubride_other_in),  "hubride-col", null, APR.hubride.other_in);
+  buildDetailTable("head-hub-other-in", "body-hub-other-in", addAprEstimates(consolidateVendors(DATA.hubride_other_in), APR.hubride.other_in),  "hubride-col", null, APR.hubride.other_in);
 
   // Update all summary bars
   ["inter-sales","inter-borrow","inter-lend","inter-other","inter-salary",
