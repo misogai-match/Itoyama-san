@@ -727,6 +727,7 @@
     <button class="tab-btn active" onclick="switchTab('summary')">月次サマリ</button>
     <button class="tab-btn" onclick="switchTab('report')">月次報告</button>
     <button class="tab-btn" onclick="switchTab('daily')">日次推移</button>
+    <button class="tab-btn" onclick="switchTab('forecast')">予測・シミュレーション</button>
   </div>
 
   <!-- TAB 1: 月次サマリ (既存コンテンツ) -->
@@ -779,8 +780,18 @@
     </div>
   </div>
 
+  <!-- ENTITY FILTER for Detail Sections -->
+  <div class="daily-controls" style="margin-bottom:16px">
+    <label style="color:var(--text2);font-size:13px">取引先別表示:</label>
+    <select id="summary-entity-filter" onchange="filterSummaryEntity()">
+      <option value="ALL" selected>全体（INTER + HUBRIDE）</option>
+      <option value="INTER">インターシフト</option>
+      <option value="HUBRIDE">ハブライド</option>
+    </select>
+  </div>
+
   <!-- SECTION 4: INTER DETAIL -->
-  <div class="section">
+  <div class="section" id="section-inter-detail">
     <div class="section-title"><span class="dot-inter"></span>インターシフト本体 入出金推移 (取引先別)</div>
 
     <div class="collapsible-wrap" id="wrap-inter-sales">
@@ -860,7 +871,7 @@
   </div>
 
   <!-- SECTION 5: HUBRIDE DETAIL -->
-  <div class="section">
+  <div class="section" id="section-hubride-detail">
     <div class="section-title"><span class="dot-hubride"></span>ハブライド事業 入出金推移 (取引先別)</div>
 
     <div class="collapsible-wrap" id="wrap-hub-sales">
@@ -930,26 +941,12 @@
     </div>
   </div>
 
-  <!-- SECTION 6: DONUT CHARTS -->
-  <div class="section">
-    <div class="section-title"><span class="dot-both"></span>出金構成比チャート</div>
-    <div class="donut-grid">
-      <div class="chart-card">
-        <h3>INTER 出金構成 (今期累計)</h3>
-        <div class="chart-container" style="height:300px">
-          <canvas id="donutInter"></canvas>
-        </div>
-      </div>
-      <div class="chart-card">
-        <h3>HUBRIDE 出金構成 (今期累計)</h3>
-        <div class="chart-container" style="height:300px">
-          <canvas id="donutHubride"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SECTION 7: FORECAST -->
+  </div><!-- /tab-summary -->
+
+  <!-- TAB 4: 予測・シミュレーション -->
+  <div id="tab-forecast" class="tab-panel">
+
   <div class="section">
     <div class="section-title"><span class="dot-both"></span>4月末残高予測</div>
     <div class="forecast-grid">
@@ -1008,7 +1005,7 @@
     </div>
   </div>
 
-  </div><!-- /tab-summary -->
+  </div><!-- /tab-forecast -->
 
   <!-- TAB 2: 月次報告 -->
   <div id="tab-report" class="tab-panel">
@@ -2459,8 +2456,8 @@ function renderAll() {
   ["inter-sales","inter-borrow","inter-lend","inter-other","inter-salary",
    "hub-sales","hub-purchase","hub-other-out","hub-other-in"].forEach(updateSummaryBar);
 
-  buildDonutCharts();
   buildForecast();
+  updateSimulator();
 }
 
 function changeUnit(unit) {
@@ -2561,19 +2558,29 @@ function switchTab(tabId) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tabId).classList.add('active');
   // Find matching button
+  const tabLabels = {summary:'月次サマリ', report:'月次報告', daily:'日次推移', forecast:'予測・シミュレーション'};
   document.querySelectorAll('.tab-btn').forEach(b => {
-    if ((tabId === 'summary' && b.textContent === '月次サマリ') ||
-        (tabId === 'report' && b.textContent === '月次報告') ||
-        (tabId === 'daily' && b.textContent === '日次推移')) {
-      b.classList.add('active');
-    }
+    if (b.textContent === tabLabels[tabId]) b.classList.add('active');
   });
   // Lazy build
-  if (tabId === 'report') {
-    buildReportTab();
-  }
-  if (tabId === 'daily') {
-    buildDailyChart();
+  if (tabId === 'report') buildReportTab();
+  if (tabId === 'daily') buildDailyChart();
+  if (tabId === 'forecast') { buildForecast(); updateSimulator(); }
+}
+
+function filterSummaryEntity() {
+  const filter = document.getElementById('summary-entity-filter').value;
+  const interSection = document.getElementById('section-inter-detail');
+  const hubrideSection = document.getElementById('section-hubride-detail');
+  if (filter === 'ALL') {
+    interSection.style.display = '';
+    hubrideSection.style.display = '';
+  } else if (filter === 'INTER') {
+    interSection.style.display = '';
+    hubrideSection.style.display = 'none';
+  } else {
+    interSection.style.display = 'none';
+    hubrideSection.style.display = '';
   }
 }
 
@@ -2841,7 +2848,6 @@ function buildDailyTable(daily, month, startBalance, filter) {
 document.addEventListener("DOMContentLoaded", () => {
   prepareData();
   renderAll();
-  updateSimulator();
   openAllCollapsibles();
 });
 </script>
