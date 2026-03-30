@@ -1133,7 +1133,16 @@
   <!-- TAB 2: 月次報告 -->
   <div id="tab-report" class="tab-panel">
     <div class="daily-controls">
-      <label style="color:var(--text2);font-size:13px;font-weight:600">表示:</label>
+      <label style="color:var(--text2);font-size:13px;font-weight:600">月選択:</label>
+      <select id="report-month-selector" onchange="buildReportTab()" style="font-size:14px;font-weight:600;padding:8px 14px">
+        <option value="ALL" selected>全月</option>
+        <option value="11月">11月</option>
+        <option value="12月">12月</option>
+        <option value="1月">1月</option>
+        <option value="2月">2月</option>
+        <option value="3月">3月</option>
+      </select>
+      <label style="color:var(--text2);font-size:13px;font-weight:600;margin-left:12px">表示:</label>
       <select id="report-entity-filter" onchange="buildReportTab()" style="font-size:14px;font-weight:600;padding:8px 14px">
         <option value="ALL" selected>全体</option>
         <option value="INTER">インターシフト</option>
@@ -1141,7 +1150,7 @@
       </select>
       <span class="tooltip-wrap">
         <span class="tooltip-icon">?</span>
-        <span class="tooltip-text">10日/20日/末日の残高と科目別内訳を、全体またはエンティティ別に表示します。</span>
+        <span class="tooltip-text">月を選んで10日/20日/末日の残高と科目別内訳を表示。「全月」で一覧表示。</span>
       </span>
     </div>
     <div id="report-content"></div>
@@ -2776,7 +2785,9 @@ const CAT_ORDER = ["売上","借入･回収","その他入金","仕入","貸付
 function buildReportTab() {
   const container = document.getElementById('report-content');
   const filter = document.getElementById('report-entity-filter').value; // ALL, INTER, HUBRIDE
-  const months = ["11月","12月","1月","2月","3月"];
+  const monthFilter = document.getElementById('report-month-selector').value;
+  const allMonths = ["11月","12月","1月","2月","3月"];
+  const months = monthFilter === 'ALL' ? allMonths : allMonths.filter(m => m === monthFilter);
   let html = '';
 
   const dotClass = filter === 'INTER' ? 'dot-inter' : (filter === 'HUBRIDE' ? 'dot-hubride' : 'dot-both');
