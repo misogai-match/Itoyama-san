@@ -465,6 +465,126 @@
     }
   }
 
+  /* TAB NAVIGATION */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active {
+    color: #fff;
+    border-bottom-color: var(--inter);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* REPORT TAB */
+  .report-month-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .report-month-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .report-bp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .report-bp-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .report-bp-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .report-bp-balance {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fcd34d;
+    margin-bottom: 10px;
+  }
+  .report-cat-table {
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+  }
+  .report-cat-table th {
+    padding: 4px 8px;
+    font-size: 11px;
+    text-align: right;
+    cursor: default;
+    border-bottom: 1px solid rgba(51,65,85,0.5);
+  }
+  .report-cat-table th:first-child { text-align: left; }
+  .report-cat-table td {
+    padding: 4px 8px;
+    font-size: 12px;
+    text-align: right;
+    border-bottom: 1px solid rgba(51,65,85,0.3);
+    white-space: nowrap;
+  }
+  .report-cat-table td:first-child { text-align: left; }
+  .report-cat-table .subtotal-row td {
+    font-weight: 700;
+    border-top: 1px solid var(--border);
+    padding-top: 6px;
+  }
+
+  /* DAILY TAB */
+  .daily-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .daily-controls select {
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .daily-chart-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
   /* PRINT STYLES */
   @media print {
     body { background: #fff; color: #000; font-size: 12px; }
@@ -504,6 +624,16 @@
 </div>
 
 <div class="main">
+
+  <!-- TAB NAVIGATION -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('summary')">月次サマリ</button>
+    <button class="tab-btn" onclick="switchTab('report')">月次報告</button>
+    <button class="tab-btn" onclick="switchTab('daily')">日次推移</button>
+  </div>
+
+  <!-- TAB 1: 月次サマリ (既存コンテンツ) -->
+  <div id="tab-summary" class="tab-panel active">
 
   <!-- SECTION 1: KPI CARDS -->
   <div class="section">
@@ -757,6 +887,33 @@
         ※ 3月予測シートは月初に作成した全月計画値。実績との乖離は各セクションの明細で確認。
       </div>
     </div>
+  </div>
+
+  </div><!-- /tab-summary -->
+
+  <!-- TAB 2: 月次報告 -->
+  <div id="tab-report" class="tab-panel">
+    <div id="report-content"></div>
+  </div>
+
+  <!-- TAB 3: 日次推移 -->
+  <div id="tab-daily" class="tab-panel">
+    <div class="daily-controls">
+      <label style="color:var(--text2);font-size:13px">月選択:</label>
+      <select id="daily-month-selector" onchange="buildDailyChart()">
+        <option value="11月">11月</option>
+        <option value="12月">12月</option>
+        <option value="1月">1月</option>
+        <option value="2月">2月</option>
+        <option value="3月" selected>3月</option>
+      </select>
+    </div>
+    <div class="daily-chart-wrap">
+      <div class="chart-container" style="height:400px">
+        <canvas id="dailyChart"></canvas>
+      </div>
+    </div>
+    <div id="daily-table-wrap" class="table-wrap" style="margin-top:16px"></div>
   </div>
 
 </div>
@@ -2176,6 +2333,239 @@ function renderAll() {
 function changeUnit(unit) {
   CURRENT_UNIT = unit;
   renderAll();
+}
+
+// ============================================================
+// TAB 2 & 3: EMBEDDED DATA
+// ============================================================
+const REPORT_DATA = {"11月":{"start_balance":17870415,"end_balance":31879953,"total_in":164620496,"total_out":150610958,"breakpoints":{"10日":{"balance":39974102,"period_in":39233574,"period_out":17129887,"detail":{"INTER":{"total_in":29434183,"total_out":8465945,"categories":{"借入･回収":{"in":21000000,"out":0},"その他出金":{"in":0,"out":8465945},"売上":{"in":8434183,"out":0}}},"HUBRIDE":{"total_in":9799391,"total_out":8663942,"categories":{"その他入金":{"in":276306,"out":0},"その他出金":{"in":0,"out":875949},"借入･回収":{"in":15025,"out":0},"仕入":{"in":0,"out":7787993},"売上":{"in":9508060,"out":0}}}}},"20日":{"balance":66997089,"period_in":57366002,"period_out":30343015,"detail":{"INTER":{"total_in":51510200,"total_out":10927278,"categories":{"借入･回収":{"in":51500000,"out":0},"その他出金":{"in":0,"out":2927278},"その他入金":{"in":10200,"out":0},"貸付･返済":{"in":0,"out":8000000}}},"HUBRIDE":{"total_in":5855802,"total_out":19415737,"categories":{"その他出金":{"in":0,"out":957499},"その他入金":{"in":247733,"out":0},"仕入":{"in":0,"out":18458238},"売上":{"in":5608069,"out":0}}}}},"末日":{"balance":31879953,"period_in":68020920,"period_out":103138056,"detail":{"INTER":{"total_in":51998982,"total_out":90369184,"categories":{"売上":{"in":51571494,"out":0},"その他出金":{"in":0,"out":38298137},"借入･回収":{"in":387488,"out":0},"貸付･返済":{"in":0,"out":32500000},"給与関連":{"in":0,"out":19571047},"その他入金":{"in":40000,"out":0}}},"HUBRIDE":{"total_in":16021938,"total_out":12768872,"categories":{"その他出金":{"in":0,"out":7783042},"仕入":{"in":0,"out":4985830},"その他入金":{"in":474740,"out":0},"売上":{"in":15547198,"out":0}}}}}}},"12月":{"start_balance":31879953,"end_balance":19909597,"total_in":105230029,"total_out":117200385,"breakpoints":{"10日":{"balance":19100273,"period_in":27224850,"period_out":40004530,"detail":{"INTER":{"total_in":6762658,"total_out":13416543,"categories":{"貸付･返済":{"in":0,"out":805626},"給与関連":{"in":0,"out":7510545},"その他出金":{"in":0,"out":5100372},"売上":{"in":6762658,"out":0}}},"HUBRIDE":{"total_in":20462192,"total_out":26587987,"categories":{"その他出金":{"in":0,"out":12811134},"仕入":{"in":0,"out":13776853},"その他入金":{"in":859150,"out":0},"売上":{"in":19603042,"out":0}}}}},"20日":{"balance":10515602,"period_in":8507064,"period_out":17091735,"detail":{"INTER":{"total_in":10720,"total_out":2456400,"categories":{"その他出金":{"in":0,"out":2456400},"その他入金":{"in":10720,"out":0}}},"HUBRIDE":{"total_in":8496344,"total_out":14635335,"categories":{"その他出金":{"in":0,"out":3020093},"仕入":{"in":0,"out":11615242},"売上":{"in":8412120,"out":0},"その他入金":{"in":84224,"out":0}}}}},"末日":{"balance":19909597,"period_in":69498115,"period_out":60104120,"detail":{"INTER":{"total_in":54651507,"total_out":42672875,"categories":{"その他出金":{"in":0,"out":23345268},"その他入金":{"in":640,"out":0},"借入･回収":{"in":4750000,"out":0},"売上":{"in":49900867,"out":0},"給与関連":{"in":0,"out":18827607},"貸付･返済":{"in":0,"out":500000}}},"HUBRIDE":{"total_in":14846608,"total_out":17431245,"categories":{"その他出金":{"in":0,"out":10948198},"売上":{"in":4828968,"out":0},"仕入":{"in":0,"out":6483047},"その他入金":{"in":10017640,"out":0}}}}}}},"1月":{"start_balance":19909597,"end_balance":11819277,"total_in":140196578,"total_out":148286898,"breakpoints":{"10日":{"balance":9894982,"period_in":30278455,"period_out":40293070,"detail":{"INTER":{"total_in":16945410,"total_out":30676374,"categories":{"借入･回収":{"in":10000000,"out":0},"その他出金":{"in":0,"out":26426374},"その他入金":{"in":120000,"out":0},"貸付･返済":{"in":0,"out":4250000},"売上":{"in":6825410,"out":0}}},"HUBRIDE":{"total_in":13333045,"total_out":9616696,"categories":{"その他出金":{"in":0,"out":3596780},"その他入金":{"in":1015265,"out":0},"仕入":{"in":0,"out":6019916},"売上":{"in":12317780,"out":0}}}}},"20日":{"balance":11245989,"period_in":18418970,"period_out":17067963,"detail":{"INTER":{"total_in":0,"total_out":9468972,"categories":{"その他出金":{"in":0,"out":9468972}}},"HUBRIDE":{"total_in":18418970,"total_out":7598991,"categories":{"その他出金":{"in":0,"out":1471862},"売上":{"in":16149821,"out":0},"仕入":{"in":0,"out":6127129},"その他入金":{"in":2269149,"out":0}}}}},"末日":{"balance":11819277,"period_in":91499153,"period_out":90925865,"detail":{"INTER":{"total_in":75399229,"total_out":60447266,"categories":{"借入･回収":{"in":11000000,"out":0},"その他出金":{"in":0,"out":29088952},"その他入金":{"in":21770,"out":0},"貸付･返済":{"in":0,"out":9170026},"売上":{"in":64377459,"out":0},"給与関連":{"in":0,"out":22188288}}},"HUBRIDE":{"total_in":16099924,"total_out":30478599,"categories":{"その他出金":{"in":0,"out":19450643},"仕入":{"in":0,"out":11027956},"売上":{"in":16034924,"out":0},"その他入金":{"in":65000,"out":0}}}}}}},"2月":{"start_balance":11819277,"end_balance":1710262,"total_in":152567287,"total_out":162676302,"breakpoints":{"10日":{"balance":8643808,"period_in":41177060,"period_out":44352529,"detail":{"INTER":{"total_in":28105878,"total_out":24355764,"categories":{"その他出金":{"in":0,"out":17578734},"給与関連":{"in":0,"out":6777030},"借入･回収":{"in":16000000,"out":0},"売上":{"in":12105178,"out":0},"その他入金":{"in":700,"out":0}}},"HUBRIDE":{"total_in":13071182,"total_out":19996765,"categories":{"その他出金":{"in":0,"out":3857516},"仕入":{"in":0,"out":16139249},"その他入金":{"in":5761985,"out":0},"売上":{"in":7309197,"out":0}}}}},"20日":{"balance":124221,"period_in":20303854,"period_out":28823441,"detail":{"INTER":{"total_in":3020574,"total_out":8353462,"categories":{"貸付･返済":{"in":0,"out":5400000},"その他入金":{"in":20574,"out":0},"その他出金":{"in":0,"out":2953462},"借入･回収":{"in":3000000,"out":0}}},"HUBRIDE":{"total_in":17283280,"total_out":20469979,"categories":{"その他入金":{"in":216012,"out":0},"売上":{"in":17067268,"out":0},"その他出金":{"in":0,"out":5716309},"仕入":{"in":0,"out":14753670}}}}},"末日":{"balance":1710262,"period_in":91086373,"period_out":89500332,"detail":{"INTER":{"total_in":77456055,"total_out":58941335,"categories":{"借入･回収":{"in":43561000,"out":0},"貸付･返済":{"in":0,"out":19000000},"その他出金":{"in":0,"out":19580816},"その他入金":{"in":1353219,"out":0},"売上":{"in":32541836,"out":0},"給与関連":{"in":0,"out":20360519}}},"HUBRIDE":{"total_in":13630318,"total_out":30558997,"categories":{"売上":{"in":13556698,"out":0},"その他入金":{"in":73620,"out":0},"その他出金":{"in":0,"out":13832966},"仕入":{"in":0,"out":16726031}}}}}}},"3月":{"start_balance":1710262,"end_balance":3306882,"total_in":175313164,"total_out":173716544,"breakpoints":{"10日":{"balance":6128972,"period_in":57261731,"period_out":52843021,"detail":{"INTER":{"total_in":45276361,"total_out":43353823,"categories":{"借入･回収":{"in":25000000,"out":0},"その他出金":{"in":0,"out":28353823},"その他入金":{"in":15000000,"out":0},"貸付･返済":{"in":0,"out":15000000},"売上":{"in":5276361,"out":0}}},"HUBRIDE":{"total_in":11985370,"total_out":9489198,"categories":{"その他出金":{"in":0,"out":2172556},"仕入":{"in":0,"out":7316642},"その他入金":{"in":72790,"out":0},"売上":{"in":11912580,"out":0}}}}},"20日":{"balance":7711898,"period_in":20118127,"period_out":18535201,"detail":{"INTER":{"total_in":0,"total_out":3348961,"categories":{"その他出金":{"in":0,"out":3348961}}},"HUBRIDE":{"total_in":20118127,"total_out":15186240,"categories":{"その他入金":{"in":1227258,"out":0},"売上":{"in":18890869,"out":0},"仕入":{"in":0,"out":8061060},"その他出金":{"in":0,"out":7125180}}}}},"末日":{"balance":3306882,"period_in":97933306,"period_out":102338322,"detail":{"INTER":{"total_in":60939520,"total_out":75402329,"categories":{"その他出金":{"in":0,"out":36044636},"貸付･返済":{"in":0,"out":20000000},"借入･回収":{"in":30050000,"out":0},"売上":{"in":30215030,"out":0},"給与関連":{"in":0,"out":19357693},"その他入金":{"in":674490,"out":0}}},"HUBRIDE":{"total_in":36993786,"total_out":26935993,"categories":{"その他出金":{"in":0,"out":19598763},"売上":{"in":36968786,"out":0},"その他入金":{"in":25000,"out":0},"仕入":{"in":0,"out":7337230}}}}}}}};
+
+const DAILY_DATA = {"11月":{"start_balance":17870415,"end_balance":31879953,"daily":[{"date":"2025-11-01","day":1,"balance":18070415,"in":200000,"out":0,"inter_in":0,"inter_out":0,"hubride_in":200000,"hubride_out":0},{"date":"2025-11-02","day":2,"balance":18070415,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-03","day":3,"balance":18086815,"in":16400,"out":0,"inter_in":0,"inter_out":0,"hubride_in":16400,"hubride_out":0},{"date":"2025-11-04","day":4,"balance":38025993,"in":21015025,"out":1075847,"inter_in":21000000,"inter_out":0,"hubride_in":15025,"hubride_out":1075847},{"date":"2025-11-05","day":5,"balance":37753914,"in":1186420,"out":1458499,"inter_in":0,"inter_out":45280,"hubride_in":1186420,"hubride_out":1413219},{"date":"2025-11-06","day":6,"balance":34540448,"in":0,"out":3213466,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":3213466},{"date":"2025-11-07","day":7,"balance":33954286,"in":40206,"out":626368,"inter_in":0,"inter_out":0,"hubride_in":40206,"hubride_out":626368},{"date":"2025-11-08","day":8,"balance":33954286,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-09","day":9,"balance":33954286,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-10","day":10,"balance":39974102,"in":16775523,"out":10755707,"inter_in":8434183,"inter_out":8420665,"hubride_in":8341340,"hubride_out":2335042},{"date":"2025-11-11","day":11,"balance":39791412,"in":15000,"out":197690,"inter_in":0,"inter_out":0,"hubride_in":15000,"hubride_out":197690},{"date":"2025-11-12","day":12,"balance":69868143,"in":31700000,"out":1623269,"inter_in":31500000,"inter_out":0,"hubride_in":200000,"hubride_out":1623269},{"date":"2025-11-13","day":13,"balance":61510018,"in":0,"out":8358125,"inter_in":0,"inter_out":22210,"hubride_in":0,"hubride_out":8335915},{"date":"2025-11-14","day":14,"balance":61487970,"in":2071136,"out":2093184,"inter_in":0,"inter_out":0,"hubride_in":2071136,"hubride_out":2093184},{"date":"2025-11-15","day":15,"balance":61487970,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-16","day":16,"balance":61487970,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-17","day":17,"balance":58247909,"in":891353,"out":4131414,"inter_in":0,"inter_out":166375,"hubride_in":891353,"hubride_out":3965039},{"date":"2025-11-18","day":18,"balance":56658831,"in":42933,"out":1632011,"inter_in":10200,"inter_out":0,"hubride_in":32733,"hubride_out":1632011},{"date":"2025-11-19","day":19,"balance":48555241,"in":0,"out":8103590,"inter_in":0,"inter_out":8000000,"hubride_in":0,"hubride_out":103590},{"date":"2025-11-20","day":20,"balance":66997089,"in":22645580,"out":4203732,"inter_in":20000000,"inter_out":2738693,"hubride_in":2645580,"hubride_out":1465039},{"date":"2025-11-21","day":21,"balance":86766594,"in":22150000,"out":2380495,"inter_in":22000000,"inter_out":1168000,"hubride_in":150000,"hubride_out":1212495},{"date":"2025-11-22","day":22,"balance":86766594,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-23","day":23,"balance":86766594,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-24","day":24,"balance":86766594,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-25","day":25,"balance":83609802,"in":1447743,"out":4604535,"inter_in":0,"inter_out":15020,"hubride_in":1447743,"hubride_out":4589515},{"date":"2025-11-26","day":26,"balance":83421685,"in":32500,"out":220617,"inter_in":32500,"inter_out":40000,"hubride_in":0,"hubride_out":180617},{"date":"2025-11-27","day":27,"balance":43603773,"in":8165455,"out":47983367,"inter_in":0,"inter_out":47033647,"hubride_in":8165455,"hubride_out":949720},{"date":"2025-11-28","day":28,"balance":31879953,"in":36225222,"out":47949042,"inter_in":29966482,"inter_out":42112517,"hubride_in":6258740,"hubride_out":5836525},{"date":"2025-11-29","day":29,"balance":31879953,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-11-30","day":30,"balance":31879953,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0}]},"12月":{"start_balance":31879953,"end_balance":19909597,"daily":[{"date":"2025-12-01","day":1,"balance":10284300,"in":12920,"out":21608573,"inter_in":0,"inter_out":8316171,"hubride_in":12920,"hubride_out":13292402},{"date":"2025-12-02","day":2,"balance":6544087,"in":32230,"out":3772443,"inter_in":0,"inter_out":0,"hubride_in":32230,"hubride_out":3772443},{"date":"2025-12-03","day":3,"balance":4605096,"in":0,"out":1938991,"inter_in":0,"inter_out":1100000,"hubride_in":0,"hubride_out":838991},{"date":"2025-12-04","day":4,"balance":14403295,"in":9798199,"out":0,"inter_in":0,"inter_out":0,"hubride_in":9798199,"hubride_out":0},{"date":"2025-12-05","day":5,"balance":12689320,"in":0,"out":1713975,"inter_in":0,"inter_out":208241,"hubride_in":0,"hubride_out":1505734},{"date":"2025-12-06","day":6,"balance":12689320,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-07","day":7,"balance":12689320,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-08","day":8,"balance":8765918,"in":0,"out":3923402,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":3923402},{"date":"2025-12-09","day":9,"balance":8286771,"in":0,"out":479147,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":479147},{"date":"2025-12-10","day":10,"balance":19100273,"in":17381501,"out":6567999,"inter_in":6762658,"inter_out":3792131,"hubride_in":10618843,"hubride_out":2775868},{"date":"2025-12-11","day":11,"balance":16581340,"in":1200000,"out":3718933,"inter_in":0,"inter_out":1199950,"hubride_in":1200000,"hubride_out":2518983},{"date":"2025-12-12","day":12,"balance":14709801,"in":0,"out":1871539,"inter_in":0,"inter_out":3000,"hubride_in":0,"hubride_out":1868539},{"date":"2025-12-13","day":13,"balance":14709801,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-14","day":14,"balance":14709801,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-15","day":15,"balance":11186535,"in":31744,"out":3555010,"inter_in":0,"inter_out":153450,"hubride_in":31744,"hubride_out":3401560},{"date":"2025-12-16","day":16,"balance":10996173,"in":0,"out":190362,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":190362},{"date":"2025-12-17","day":17,"balance":8564585,"in":6720,"out":2438308,"inter_in":6720,"inter_out":0,"hubride_in":0,"hubride_out":2438308},{"date":"2025-12-18","day":18,"balance":5973426,"in":20800,"out":2611959,"inter_in":0,"inter_out":0,"hubride_in":20800,"hubride_out":2611959},{"date":"2025-12-19","day":19,"balance":10515602,"in":7247800,"out":2705624,"inter_in":4000,"inter_out":1100000,"hubride_in":7243800,"hubride_out":1605624},{"date":"2025-12-20","day":20,"balance":10515602,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-21","day":21,"balance":10515602,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-22","day":22,"balance":7371090,"in":2072154,"out":5216666,"inter_in":640,"inter_out":2473624,"hubride_in":2071514,"hubride_out":2743042},{"date":"2025-12-23","day":23,"balance":7299090,"in":16500,"out":88500,"inter_in":0,"inter_out":0,"hubride_in":16500,"hubride_out":88500},{"date":"2025-12-24","day":24,"balance":13427716,"in":8083840,"out":1955214,"inter_in":0,"inter_out":19000,"hubride_in":8083840,"hubride_out":1936214},{"date":"2025-12-25","day":25,"balance":17540796,"in":4250000,"out":136920,"inter_in":4250000,"inter_out":50950,"hubride_in":0,"hubride_out":85970},{"date":"2025-12-26","day":26,"balance":23163613,"in":22145609,"out":16522792,"inter_in":22137609,"inter_out":11661672,"hubride_in":8000,"hubride_out":4861120},{"date":"2025-12-27","day":27,"balance":23163613,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-28","day":28,"balance":23163613,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2025-12-29","day":29,"balance":19432033,"in":5648320,"out":9379900,"inter_in":2653470,"inter_out":4209249,"hubride_in":2994850,"hubride_out":5170651},{"date":"2025-12-30","day":30,"balance":19909597,"in":27281692,"out":26804128,"inter_in":25609788,"inter_out":24258380,"hubride_in":1671904,"hubride_out":2545748},{"date":"2025-12-31","day":31,"balance":19909597,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0}]},"1月":{"start_balance":19909597,"end_balance":11819277,"daily":[{"date":"2026-01-01","day":1,"balance":19909597,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-02","day":2,"balance":19909597,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-03","day":3,"balance":19909597,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-04","day":4,"balance":29909597,"in":10000000,"out":0,"inter_in":10000000,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-05","day":5,"balance":6272862,"in":42970,"out":23679705,"inter_in":0,"inter_out":21945147,"hubride_in":42970,"hubride_out":1734558},{"date":"2026-01-06","day":6,"balance":7263440,"in":5385335,"out":4394757,"inter_in":120000,"inter_out":4383757,"hubride_in":5265335,"hubride_out":11000},{"date":"2026-01-07","day":7,"balance":4758609,"in":850000,"out":3354831,"inter_in":0,"inter_out":25200,"hubride_in":850000,"hubride_out":3329631},{"date":"2026-01-08","day":8,"balance":3615720,"in":0,"out":1142889,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":1142889},{"date":"2026-01-09","day":9,"balance":9885182,"in":13990350,"out":7720888,"inter_in":6825410,"inter_out":4322270,"hubride_in":7164940,"hubride_out":3398618},{"date":"2026-01-10","day":10,"balance":9894982,"in":9800,"out":0,"inter_in":0,"inter_out":0,"hubride_in":9800,"hubride_out":0},{"date":"2026-01-11","day":11,"balance":9894982,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-12","day":12,"balance":9894982,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-13","day":13,"balance":4502048,"in":3866827,"out":9259761,"inter_in":0,"inter_out":5295066,"hubride_in":3866827,"hubride_out":3964695},{"date":"2026-01-14","day":14,"balance":4402048,"in":0,"out":100000,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":100000},{"date":"2026-01-15","day":15,"balance":5420230,"in":1640327,"out":622145,"inter_in":0,"inter_out":182980,"hubride_in":1640327,"hubride_out":439165},{"date":"2026-01-16","day":16,"balance":7587916,"in":2977692,"out":810006,"inter_in":0,"inter_out":414366,"hubride_in":2977692,"hubride_out":395640},{"date":"2026-01-17","day":17,"balance":7587916,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-18","day":18,"balance":7587916,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-19","day":19,"balance":6922316,"in":4900,"out":670500,"inter_in":0,"inter_out":660000,"hubride_in":4900,"hubride_out":10500},{"date":"2026-01-20","day":20,"balance":11245989,"in":9929224,"out":5605551,"inter_in":0,"inter_out":2916560,"hubride_in":9929224,"hubride_out":2688991},{"date":"2026-01-21","day":21,"balance":21495260,"in":12936438,"out":2687167,"inter_in":11000000,"inter_out":0,"hubride_in":1936438,"hubride_out":2687167},{"date":"2026-01-22","day":22,"balance":20601722,"in":40000,"out":933538,"inter_in":0,"inter_out":362646,"hubride_in":40000,"hubride_out":570892},{"date":"2026-01-23","day":23,"balance":19565094,"in":0,"out":1036628,"inter_in":0,"inter_out":57848,"hubride_in":0,"hubride_out":978780},{"date":"2026-01-24","day":24,"balance":19565094,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-25","day":25,"balance":19565094,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-01-26","day":26,"balance":13927441,"in":0,"out":5637653,"inter_in":0,"inter_out":357980,"hubride_in":0,"hubride_out":5279673},{"date":"2026-01-27","day":27,"balance":13049281,"in":1585935,"out":2464095,"inter_in":21770,"inter_out":824811,"hubride_in":1564165,"hubride_out":1639284},{"date":"2026-01-28","day":28,"balance":36618570,"in":38391302,"out":14822013,"inter_in":36300000,"inter_out":13480000,"hubride_in":2091302,"hubride_out":1342013},{"date":"2026-01-29","day":29,"balance":28609344,"in":0,"out":8009226,"inter_in":0,"inter_out":3170026,"hubride_in":0,"hubride_out":4839200},{"date":"2026-01-30","day":30,"balance":9299427,"in":36025628,"out":55335545,"inter_in":28077459,"inter_out":42193955,"hubride_in":7948169,"hubride_out":13141590},{"date":"2026-01-31","day":31,"balance":11819277,"in":2519850,"out":0,"inter_in":0,"inter_out":0,"hubride_in":2519850,"hubride_out":0}]},"2月":{"start_balance":11819277,"end_balance":1710262,"daily":[{"date":"2026-02-01","day":1,"balance":11819277,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-02-02","day":2,"balance":12379616,"in":11365872,"out":10805533,"inter_in":11362670,"inter_out":7562493,"hubride_in":3202,"hubride_out":3243040},{"date":"2026-02-03","day":3,"balance":13516366,"in":2431820,"out":1295070,"inter_in":0,"inter_out":0,"hubride_in":2431820,"hubride_out":1295070},{"date":"2026-02-04","day":4,"balance":16906602,"in":7047822,"out":3657586,"inter_in":0,"inter_out":0,"hubride_in":7047822,"hubride_out":3657586},{"date":"2026-02-05","day":5,"balance":9196347,"in":5000000,"out":12710255,"inter_in":5000000,"inter_out":9570445,"hubride_in":0,"hubride_out":3139810},{"date":"2026-02-06","day":6,"balance":5352774,"in":495359,"out":4338932,"inter_in":700,"inter_out":2626250,"hubride_in":494659,"hubride_out":1712682},{"date":"2026-02-07","day":7,"balance":6130168,"in":777394,"out":0,"inter_in":0,"inter_out":0,"hubride_in":777394,"hubride_out":0},{"date":"2026-02-08","day":8,"balance":6130168,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-02-09","day":9,"balance":5096231,"in":5000000,"out":6033937,"inter_in":5000000,"inter_out":0,"hubride_in":0,"hubride_out":6033937},{"date":"2026-02-10","day":10,"balance":8643808,"in":9058793,"out":5511216,"inter_in":6742508,"inter_out":4596576,"hubride_in":2316285,"hubride_out":914640},{"date":"2026-02-11","day":11,"balance":8664808,"in":21000,"out":0,"inter_in":0,"inter_out":0,"hubride_in":21000,"hubride_out":0},{"date":"2026-02-12","day":12,"balance":14950876,"in":7561707,"out":1275639,"inter_in":0,"inter_out":0,"hubride_in":7561707,"hubride_out":1275639},{"date":"2026-02-13","day":13,"balance":5625126,"in":100000,"out":9425750,"inter_in":0,"inter_out":5000000,"hubride_in":100000,"hubride_out":4425750},{"date":"2026-02-14","day":14,"balance":5645700,"in":20574,"out":0,"inter_in":20574,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-02-15","day":15,"balance":5645700,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-02-16","day":16,"balance":3436839,"in":0,"out":2208861,"inter_in":0,"inter_out":165385,"hubride_in":0,"hubride_out":2043476},{"date":"2026-02-17","day":17,"balance":5386390,"in":5617718,"out":3668167,"inter_in":3000000,"inter_out":400000,"hubride_in":2617718,"hubride_out":3268167},{"date":"2026-02-18","day":18,"balance":2850375,"in":0,"out":2536015,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":2536015},{"date":"2026-02-19","day":19,"balance":4021027,"in":1773088,"out":602436,"inter_in":0,"inter_out":0,"hubride_in":1773088,"hubride_out":602436},{"date":"2026-02-20","day":20,"balance":124221,"in":5209767,"out":9106573,"inter_in":0,"inter_out":2788077,"hubride_in":5209767,"hubride_out":6318496},{"date":"2026-02-21","day":21,"balance":2335087,"in":2210866,"out":0,"inter_in":0,"inter_out":0,"hubride_in":2210866,"hubride_out":0},{"date":"2026-02-22","day":22,"balance":2335087,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-02-23","day":23,"balance":2385087,"in":50000,"out":0,"inter_in":0,"inter_out":0,"hubride_in":50000,"hubride_out":0},{"date":"2026-02-24","day":24,"balance":34360868,"in":36482914,"out":4507133,"inter_in":33561000,"inter_out":0,"hubride_in":2921914,"hubride_out":4507133},{"date":"2026-02-25","day":25,"balance":17440836,"in":295899,"out":17215931,"inter_in":295899,"inter_out":8176258,"hubride_in":0,"hubride_out":9039673},{"date":"2026-02-26","day":26,"balance":13906773,"in":6816538,"out":10350601,"inter_in":1760000,"inter_out":8234441,"hubride_in":5056538,"hubride_out":2116160},{"date":"2026-02-27","day":27,"balance":1710262,"in":45230156,"out":57426667,"inter_in":41839156,"inter_out":42530636,"hubride_in":3391000,"hubride_out":14896031},{"date":"2026-02-28","day":28,"balance":1710262,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0}]},"3月":{"start_balance":1710262,"end_balance":3306882,"daily":[{"date":"2026-03-01","day":1,"balance":11710262,"in":10000000,"out":0,"inter_in":10000000,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-02","day":2,"balance":2576143,"in":15069590,"out":24203709,"inter_in":15000000,"inter_out":22605260,"hubride_in":69590,"hubride_out":1598449},{"date":"2026-03-03","day":3,"balance":1419621,"in":967594,"out":2124116,"inter_in":0,"inter_out":100000,"hubride_in":967594,"hubride_out":2024116},{"date":"2026-03-04","day":4,"balance":3355709,"in":10000000,"out":8063912,"inter_in":10000000,"inter_out":6410600,"hubride_in":0,"hubride_out":1653312},{"date":"2026-03-05","day":5,"balance":2898311,"in":872628,"out":1330026,"inter_in":0,"inter_out":18910,"hubride_in":872628,"hubride_out":1311116},{"date":"2026-03-06","day":6,"balance":4121304,"in":2029662,"out":806669,"inter_in":0,"inter_out":0,"hubride_in":2029662,"hubride_out":806669},{"date":"2026-03-07","day":7,"balance":4121304,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-08","day":8,"balance":4121304,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-09","day":9,"balance":10638262,"in":7123258,"out":606300,"inter_in":5000000,"inter_out":0,"hubride_in":2123258,"hubride_out":606300},{"date":"2026-03-10","day":10,"balance":6128972,"in":11198999,"out":15708289,"inter_in":5276361,"inter_out":14219053,"hubride_in":5922638,"hubride_out":1489236},{"date":"2026-03-11","day":11,"balance":8869645,"in":4388147,"out":1647474,"inter_in":0,"inter_out":0,"hubride_in":4388147,"hubride_out":1647474},{"date":"2026-03-12","day":12,"balance":11389810,"in":3740845,"out":1220680,"inter_in":0,"inter_out":0,"hubride_in":3740845,"hubride_out":1220680},{"date":"2026-03-13","day":13,"balance":7657781,"in":1872755,"out":5604784,"inter_in":0,"inter_out":3174246,"hubride_in":1872755,"hubride_out":2430538},{"date":"2026-03-14","day":14,"balance":7657781,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-15","day":15,"balance":7657781,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-16","day":16,"balance":5679969,"in":1438013,"out":3415825,"inter_in":0,"inter_out":174715,"hubride_in":1438013,"hubride_out":3241110},{"date":"2026-03-17","day":17,"balance":6839213,"in":2633704,"out":1474460,"inter_in":0,"inter_out":0,"hubride_in":2633704,"hubride_out":1474460},{"date":"2026-03-18","day":18,"balance":5767024,"in":1075796,"out":2147985,"inter_in":0,"inter_out":0,"hubride_in":1075796,"hubride_out":2147985},{"date":"2026-03-19","day":19,"balance":4641070,"in":1898039,"out":3023993,"inter_in":0,"inter_out":0,"hubride_in":1898039,"hubride_out":3023993},{"date":"2026-03-20","day":20,"balance":7711898,"in":3070828,"out":0,"inter_in":0,"inter_out":0,"hubride_in":3070828,"hubride_out":0},{"date":"2026-03-21","day":21,"balance":7711898,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-22","day":22,"balance":7711898,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-23","day":23,"balance":12796883,"in":8586339,"out":3501354,"inter_in":0,"inter_out":1964276,"hubride_in":8586339,"hubride_out":1537078},{"date":"2026-03-24","day":24,"balance":13540403,"in":796205,"out":52685,"inter_in":0,"inter_out":0,"hubride_in":796205,"hubride_out":52685},{"date":"2026-03-25","day":25,"balance":19377293,"in":5954608,"out":117718,"inter_in":0,"inter_out":58800,"hubride_in":5954608,"hubride_out":58918},{"date":"2026-03-26","day":26,"balance":21863227,"in":4489952,"out":2004018,"inter_in":0,"inter_out":665681,"hubride_in":4489952,"hubride_out":1338337},{"date":"2026-03-27","day":27,"balance":9095136,"in":91295,"out":12859386,"inter_in":0,"inter_out":10855241,"hubride_in":91295,"hubride_out":2004145},{"date":"2026-03-28","day":28,"balance":9095136,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-29","day":29,"balance":9095136,"in":0,"out":0,"inter_in":0,"inter_out":0,"hubride_in":0,"hubride_out":0},{"date":"2026-03-30","day":30,"balance":46146183,"in":40958659,"out":3907612,"inter_in":30561000,"inter_out":0,"hubride_in":10397659,"hubride_out":3907612},{"date":"2026-03-31","day":31,"balance":3306882,"in":37056248,"out":79895549,"inter_in":30378520,"inter_out":61858331,"hubride_in":6677728,"hubride_out":18037218}]}};
+
+let DAILY_CHART_INSTANCE = null;
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  // Find matching button
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if ((tabId === 'summary' && b.textContent === '月次サマリ') ||
+        (tabId === 'report' && b.textContent === '月次報告') ||
+        (tabId === 'daily' && b.textContent === '日次推移')) {
+      b.classList.add('active');
+    }
+  });
+  // Lazy build
+  if (tabId === 'report' && !document.getElementById('report-content').hasChildNodes()) {
+    buildReportTab();
+  }
+  if (tabId === 'daily') {
+    buildDailyChart();
+  }
+}
+
+// ============================================================
+// TAB 2: 月次報告
+// ============================================================
+const CAT_ORDER = ["売上","借入･回収","その他入金","仕入","貸付･返済","給与関連","その他出金"];
+
+function buildReportTab() {
+  const container = document.getElementById('report-content');
+  const months = ["11月","12月","1月","2月","3月"];
+  let html = '';
+
+  months.forEach(m => {
+    const rd = REPORT_DATA[m];
+    if (!rd) return;
+
+    html += `<div class="report-month-card">
+      <h3><span class="dot-both"></span>${m}（先月末 ${fmt(rd.start_balance)} → 月末 ${fmt(rd.end_balance)}）</h3>
+      <div style="margin-bottom:12px;display:flex;gap:24px;font-size:13px">
+        <span>入金合計: <span class="positive">${fmt(rd.total_in)}</span></span>
+        <span>出金合計: <span class="negative">${fmt(rd.total_out)}</span></span>
+        <span>差引: ${fmtSigned(rd.total_in - rd.total_out)}</span>
+      </div>
+      <div class="report-bp-grid">`;
+
+    ["10日","20日","末日"].forEach(bp => {
+      const bpData = rd.breakpoints[bp];
+      const periodLabel = bp === "10日" ? "1日〜10日" : (bp === "20日" ? "11日〜20日" : "21日〜末日");
+
+      html += `<div class="report-bp-card">
+        <h4>${bp}時点 残高</h4>
+        <div class="report-bp-balance">${fmt(bpData.balance)}</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:8px">${periodLabel}の入出金</div>`;
+
+      // INTER table
+      html += buildCatTable("INTER", bpData.detail.INTER, "inter-col");
+      // HUBRIDE table
+      html += buildCatTable("HUBRIDE", bpData.detail.HUBRIDE, "hubride-col");
+
+      // Period totals
+      html += `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;display:flex;justify-content:space-between">
+        <span style="color:var(--text2)">期間計</span>
+        <span>入金 ${fmt(bpData.period_in)} / 出金 ${fmt(bpData.period_out)}</span>
+      </div>`;
+
+      html += `</div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function buildCatTable(entityLabel, entityData, colorClass) {
+  if (!entityData || entityData.total_in + entityData.total_out === 0) return '';
+
+  let html = `<div style="margin-bottom:8px">
+    <div style="font-size:11px;font-weight:600;margin-bottom:4px" class="${colorClass}">${entityLabel}</div>
+    <table class="report-cat-table"><thead><tr>
+      <th>科目</th><th>入金</th><th>出金</th>
+    </tr></thead><tbody>`;
+
+  const cats = entityData.categories;
+  CAT_ORDER.forEach(cat => {
+    if (!cats[cat]) return;
+    const c = cats[cat];
+    if (c.in === 0 && c.out === 0) return;
+    html += `<tr>
+      <td>${cat}</td>
+      <td>${c.in > 0 ? fmt(c.in) : '<span style="color:var(--text2)">—</span>'}</td>
+      <td>${c.out > 0 ? fmt(c.out) : '<span style="color:var(--text2)">—</span>'}</td>
+    </tr>`;
+  });
+
+  html += `<tr class="subtotal-row">
+    <td style="color:var(--text2)">計</td>
+    <td class="positive">${fmt(entityData.total_in)}</td>
+    <td class="negative">${fmt(entityData.total_out)}</td>
+  </tr>`;
+
+  html += `</tbody></table></div>`;
+  return html;
+}
+
+// ============================================================
+// TAB 3: 日次推移チャート
+// ============================================================
+function buildDailyChart() {
+  const month = document.getElementById('daily-month-selector').value;
+  const mData = DAILY_DATA[month];
+  if (!mData) return;
+
+  const daily = mData.daily;
+  const labels = daily.map(d => d.day + '日');
+  const balances = daily.map(d => d.balance / 1e6);
+  const inflows = daily.map(d => d.in / 1e6);
+  const outflows = daily.map(d => -d.out / 1e6);
+
+  // Destroy previous
+  if (DAILY_CHART_INSTANCE) {
+    DAILY_CHART_INSTANCE.destroy();
+    DAILY_CHART_INSTANCE = null;
+  }
+
+  const ctx = document.getElementById('dailyChart').getContext('2d');
+  DAILY_CHART_INSTANCE = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '入金 (百万円)',
+          data: inflows,
+          backgroundColor: 'rgba(34,197,94,0.6)',
+          borderRadius: 2,
+          order: 2
+        },
+        {
+          label: '出金 (百万円)',
+          data: outflows,
+          backgroundColor: 'rgba(239,68,68,0.5)',
+          borderRadius: 2,
+          order: 3
+        },
+        {
+          label: '残高 (百万円)',
+          data: balances,
+          type: 'line',
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245,158,11,0.1)',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#f59e0b',
+          tension: 0.2,
+          fill: true,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const v = Math.abs(ctx.raw);
+              const prefix = ctx.raw < 0 ? '▲' : (ctx.dataset.label.includes('出金') ? '' : '');
+              return ` ${ctx.dataset.label}: ${prefix}¥${(v * 1e6).toLocaleString('ja-JP')}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(51,65,85,0.5)' } },
+        y: {
+          ticks: { color: '#94a3b8', callback: v => (v >= 0 ? '' : '▲') + Math.abs(v).toFixed(0) + 'M' },
+          grid: { color: 'rgba(51,65,85,0.5)' }
+        }
+      }
+    }
+  });
+
+  // Daily table
+  buildDailyTable(daily, month, mData.start_balance);
+}
+
+function buildDailyTable(daily, month, startBalance) {
+  const wrap = document.getElementById('daily-table-wrap');
+  let html = `<table><thead><tr>
+    <th style="cursor:default">日付</th>
+    <th style="cursor:default">残高</th>
+    <th style="cursor:default">入金</th>
+    <th style="cursor:default">出金</th>
+    <th style="cursor:default">INTER入</th>
+    <th style="cursor:default">INTER出</th>
+    <th style="cursor:default">HUBRIDE入</th>
+    <th style="cursor:default">HUBRIDE出</th>
+  </tr></thead><tbody>`;
+
+  daily.forEach(d => {
+    const hasActivity = d.in > 0 || d.out > 0;
+    const opacity = hasActivity ? '' : 'style="opacity:0.4"';
+    html += `<tr ${opacity}>
+      <td style="text-align:left;font-weight:500">${d.day}日</td>
+      <td style="color:#fcd34d;font-weight:600">${fmt(d.balance)}</td>
+      <td>${d.in > 0 ? '<span class="positive">'+fmt(d.in)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
+      <td>${d.out > 0 ? '<span class="negative">'+fmt(d.out)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
+      <td class="inter-col">${d.inter_in > 0 ? fmt(d.inter_in) : '—'}</td>
+      <td class="inter-col">${d.inter_out > 0 ? fmt(d.inter_out) : '—'}</td>
+      <td class="hubride-col">${d.hubride_in > 0 ? fmt(d.hubride_in) : '—'}</td>
+      <td class="hubride-col">${d.hubride_out > 0 ? fmt(d.hubride_out) : '—'}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
