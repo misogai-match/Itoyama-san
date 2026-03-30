@@ -585,6 +585,114 @@
     padding: 20px;
   }
 
+  /* TOOLTIP */
+  .tooltip-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(59,130,246,0.2);
+    color: var(--inter);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: help;
+    margin-left: 6px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .tooltip-icon:hover {
+    background: rgba(59,130,246,0.4);
+    transform: scale(1.15);
+  }
+  .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a2e;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.6;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--inter);
+    white-space: normal;
+    width: 280px;
+    z-index: 1000;
+    transition: opacity 0.2s, visibility 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    pointer-events: none;
+  }
+  .tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--inter);
+  }
+  .tooltip-wrap:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+  /* Tab tooltip - position below */
+  .tab-btn { position: relative; }
+  .tab-btn .tooltip-text {
+    bottom: auto;
+    top: calc(100% + 8px);
+    font-size: 11px;
+    width: 240px;
+  }
+  .tab-btn .tooltip-text::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: var(--inter);
+  }
+
+  /* COLLAPSIBLE PULSE EFFECT */
+  .collapsible-header .toggle-icon {
+    animation: pulse-hint 2s ease-in-out 3;
+    font-size: 18px;
+  }
+  @keyframes pulse-hint {
+    0%, 100% { color: var(--text2); transform: scale(1); }
+    50% { color: var(--inter); transform: scale(1.3); }
+  }
+  .collapsible-header:hover .toggle-icon {
+    animation: none;
+    color: var(--inter);
+    transform: scale(1.2);
+  }
+  .collapsible-header.open .toggle-icon {
+    animation: none;
+  }
+  /* Click hint text */
+  .collapsible-header .click-hint {
+    font-size: 11px;
+    color: var(--text2);
+    opacity: 0.6;
+    margin-left: auto;
+    margin-right: 12px;
+    transition: opacity 0.2s;
+  }
+  .collapsible-header:hover .click-hint {
+    opacity: 1;
+    color: var(--inter);
+  }
+  .collapsible-header.open .click-hint { display: none; }
+
   /* PRINT STYLES */
   @media print {
     body { background: #fff; color: #000; font-size: 12px; }
@@ -724,11 +832,18 @@
 
   <!-- TAB NAVIGATION -->
   <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('summary')">月次サマリ</button>
-    <button class="tab-btn" onclick="switchTab('report')">月次報告</button>
-    <button class="tab-btn" onclick="switchTab('daily')">日次推移</button>
-    <button class="tab-btn" onclick="switchTab('forecast')">予測・シミュレーション</button>
-    <button class="tab-btn" onclick="switchTab('guide')">使い方</button>
+    <button class="tab-btn active" onclick="switchTab('summary')">月次サマリ
+      <span class="tooltip-text">主要指標・月次チャート・比較表・取引先別明細。「取引先別表示」で INTER/HUBRIDE 切替可能。</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('report')">月次報告
+      <span class="tooltip-text">10日・20日・末日時点の残高と科目別入出金。Excelの「報告シート」に相当。</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('daily')">日次推移
+      <span class="tooltip-text">月別の日次残高推移チャート＋テーブル。Excelの「グラフ用シート」に相当。</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('forecast')">予測・シミュレーション
+      <span class="tooltip-text">4月末残高予測と仕入可能台数シミュレーター。台単価・維持残高を変更してリアルタイム計算。</span>
+    </button>
   </div>
 
   <!-- TAB 1: 月次サマリ (既存コンテンツ) -->
@@ -783,12 +898,16 @@
 
   <!-- ENTITY FILTER for Detail Sections -->
   <div class="daily-controls" style="margin-bottom:16px">
-    <label style="color:var(--text2);font-size:13px">取引先別表示:</label>
-    <select id="summary-entity-filter" onchange="filterSummaryEntity()">
+    <label style="color:var(--text2);font-size:13px;font-weight:600">取引先別表示:</label>
+    <select id="summary-entity-filter" onchange="filterSummaryEntity()" style="font-size:14px;font-weight:600;padding:8px 14px">
       <option value="ALL" selected>全体（INTER + HUBRIDE）</option>
       <option value="INTER">インターシフト</option>
       <option value="HUBRIDE">ハブライド</option>
     </select>
+    <span class="tooltip-wrap">
+      <span class="tooltip-icon">?</span>
+      <span class="tooltip-text">下の取引先別テーブルの表示を切り替えます。INTER/HUBRIDEを選ぶと該当セクションのみ表示。</span>
+    </span>
   </div>
 
   <!-- SECTION 4: INTER DETAIL -->
@@ -798,7 +917,7 @@
     <div class="collapsible-wrap" id="wrap-inter-sales">
       <div class="collapsible-header" onclick="toggleCollapsible('inter-sales')">
         <h3>売上 (取引先別)</h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-inter-sales"></div>
       <div class="collapsible-content" id="inter-sales">
@@ -812,7 +931,7 @@
     <div class="collapsible-wrap" id="wrap-inter-borrow">
       <div class="collapsible-header" onclick="toggleCollapsible('inter-borrow')">
         <h3>借入・回収 (取引先別)</h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-inter-borrow"></div>
       <div class="collapsible-content" id="inter-borrow">
@@ -826,7 +945,7 @@
     <div class="collapsible-wrap" id="wrap-inter-lend">
       <div class="collapsible-header" onclick="toggleCollapsible('inter-lend')">
         <h3>貸付・返済 (取引先別)</h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-inter-lend"></div>
       <div class="collapsible-content" id="inter-lend">
@@ -840,7 +959,7 @@
     <div class="collapsible-wrap" id="wrap-inter-other">
       <div class="collapsible-header" onclick="toggleCollapsible('inter-other')">
         <h3>その他出金 (取引先別)</h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-inter-other"></div>
       <div class="collapsible-content" id="inter-other">
@@ -859,7 +978,7 @@
     <div class="collapsible-wrap" id="wrap-inter-salary">
       <div class="collapsible-header" onclick="toggleCollapsible('inter-salary')">
         <h3>給与関連 (取引先別)</h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-inter-salary"></div>
       <div class="collapsible-content" id="inter-salary">
@@ -878,7 +997,7 @@
     <div class="collapsible-wrap" id="wrap-hub-sales">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-sales')">
         <h3>売上 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月18台 / 12月24台 / 1月34台 / 2月29台 / 3月37台 / 4月67台</span></h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-hub-sales"></div>
       <div class="collapsible-content" id="hub-sales">
@@ -897,7 +1016,7 @@
     <div class="collapsible-wrap" id="wrap-hub-purchase">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-purchase')">
         <h3>仕入 (取引先別) <span style="font-size:11px;font-weight:400;color:#6ee7b7;margin-left:8px">KINTONE: 11月32台 / 12月38台 / 1月29台 / 2月50台 / 3月32台 / 4月予55台</span></h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-hub-purchase"></div>
       <div class="collapsible-content" id="hub-purchase">
@@ -916,7 +1035,7 @@
     <div class="collapsible-wrap" id="wrap-hub-other-out">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-other-out')">
         <h3>その他出金 (勘定科目・取引先別)</h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-hub-other-out"></div>
       <div class="collapsible-content" id="hub-other-out">
@@ -930,7 +1049,7 @@
     <div class="collapsible-wrap" id="wrap-hub-other-in">
       <div class="collapsible-header" onclick="toggleCollapsible('hub-other-in')">
         <h3>その他入金 (取引先別)</h3>
-        <span class="toggle-icon">▼</span>
+        <span class="click-hint">クリックで展開</span><span class="toggle-icon">▼</span>
       </div>
       <div class="summary-bar" id="summary-hub-other-in"></div>
       <div class="collapsible-content" id="hub-other-in">
@@ -1008,111 +1127,20 @@
 
   </div><!-- /tab-forecast -->
 
-  <!-- TAB 5: 使い方ガイド -->
-  <div id="tab-guide" class="tab-panel">
-  <div class="section">
-    <div class="section-title"><span class="dot-both"></span>ダッシュボード 使い方ガイド</div>
-
-    <div style="display:grid;gap:16px">
-
-      <!-- 全体説明 -->
-      <div class="forecast-card">
-        <h3 style="color:#fcd34d">📊 このダッシュボードについて</h3>
-        <div style="font-size:13px;line-height:1.8;color:var(--text)">
-          インターシフト（INTER本体）とハブライド（HUBRIDE車両事業）の資金の流れを一画面で把握するためのツールです。<br>
-          データソースは<strong>入出金サマリExcel</strong>（城さん・心ちゃんが毎日更新）。ダッシュボードは現在<strong>週1更新</strong>です。
-        </div>
-      </div>
-
-      <!-- タブ1 -->
-      <div class="forecast-card">
-        <h3 style="color:#93c5fd">📋 月次サマリ</h3>
-        <div style="font-size:13px;line-height:1.8;color:var(--text)">
-          <strong>主要指標</strong> — 3月末残高、4月末予測、今期累計の入出金合計を表示。<br>
-          <strong>月次チャート</strong> — 棒グラフ（入出金）+ 折れ線（残高）で5ヶ月のトレンドを確認。<br>
-          <strong>比較表</strong> — INTER / HUBRIDE それぞれの月次入出金・差引を一覧比較。<br>
-          <strong>取引先別テーブル</strong> — 各カテゴリ（売上・借入・仕入など）の取引先別明細。<br>
-          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
-            💡 <strong>操作ポイント</strong><br>
-            ・「取引先別表示」セレクタで<strong>全体/INTER/HUBRIDE</strong>を切替可能<br>
-            ・各取引先テーブルは<strong>▼をクリックで展開/折りたたみ</strong><br>
-            ・折りたたみ時も<strong>月計サマリバー</strong>で概要を確認可能<br>
-            ・ヘッダーの「単位」セレクタで<strong>円/千円/百万円</strong>を切替可能<br>
-            ・列ヘッダーをクリックすると<strong>ソート</strong>
-          </div>
-        </div>
-      </div>
-
-      <!-- タブ2 -->
-      <div class="forecast-card">
-        <h3 style="color:#93c5fd">📅 月次報告</h3>
-        <div style="font-size:13px;line-height:1.8;color:var(--text)">
-          各月の<strong>10日・20日・末日時点の残高</strong>と、その期間の科目別入出金を表示します。<br>
-          Excelの「報告シート」に相当する内容です。
-          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
-            💡 <strong>操作ポイント</strong><br>
-            ・「表示」セレクタで<strong>全体/INTER/HUBRIDE</strong>を切替<br>
-            ・各ブレークポイント（10日/20日/末日）のカードにINTER・HUBRIDEの科目別内訳を表示
-          </div>
-        </div>
-      </div>
-
-      <!-- タブ3 -->
-      <div class="forecast-card">
-        <h3 style="color:#93c5fd">📈 日次推移</h3>
-        <div style="font-size:13px;line-height:1.8;color:var(--text)">
-          選択した月の<strong>日別の残高推移</strong>（折れ線）と<strong>入出金</strong>（棒グラフ）を表示します。<br>
-          Excelの「グラフ用シート」に相当する内容です。
-          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
-            💡 <strong>操作ポイント</strong><br>
-            ・「月選択」で<strong>11月〜3月</strong>を切替<br>
-            ・「表示」で<strong>全体/INTER/HUBRIDE</strong>を切替<br>
-            ・INTER/HUBRIDE単独表示時は「残高」ではなく<strong>累計NET</strong>（その月の累積差引）を表示<br>
-            ・チャートの下に<strong>日別テーブル</strong>も表示
-          </div>
-        </div>
-      </div>
-
-      <!-- タブ4 -->
-      <div class="forecast-card">
-        <h3 style="color:#93c5fd">🔮 予測・シミュレーション</h3>
-        <div style="font-size:13px;line-height:1.8;color:var(--text)">
-          <strong>4月末残高予測</strong> — INTER（1-2月平均）とHUBRIDE（KINTONE確定値）から4月末残高を予測。楽観/悲観レンジ付き。<br>
-          <strong>仕入可能台数シミュレーター</strong> — 4月の仕入以外の入出金を全部織込んだ上で「あと何台仕入れられるか」を逆算。
-          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
-            💡 <strong>操作ポイント</strong><br>
-            ・<strong>台単価</strong>と<strong>最低維持残高</strong>を自由に変更可能（リアルタイム計算）<br>
-            ・<strong>借入あり/借入なし</strong>の2パターンを同時表示<br>
-            ・下部の内訳で計算根拠を確認可能
-          </div>
-        </div>
-      </div>
-
-      <!-- データ更新 -->
-      <div class="forecast-card" style="border-color:var(--yellow)">
-        <h3 style="color:#f59e0b">🔄 データ更新について</h3>
-        <div style="font-size:13px;line-height:1.8;color:var(--text)">
-          <strong>入出金サマリExcel</strong>は城さん・心ちゃんが毎日更新しています。<br>
-          ダッシュボードへの反映は現在<strong>週1回</strong>（まっち or Claude Codeが更新）。<br>
-          <div style="margin-top:8px;font-size:12px;color:var(--text2)">
-            更新日はヘッダーの「データ更新: YYYY年M月D日」で確認できます。
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  </div><!-- /tab-guide -->
 
   <!-- TAB 2: 月次報告 -->
   <div id="tab-report" class="tab-panel">
     <div class="daily-controls">
-      <label style="color:var(--text2);font-size:13px">表示:</label>
-      <select id="report-entity-filter" onchange="buildReportTab()">
+      <label style="color:var(--text2);font-size:13px;font-weight:600">表示:</label>
+      <select id="report-entity-filter" onchange="buildReportTab()" style="font-size:14px;font-weight:600;padding:8px 14px">
         <option value="ALL" selected>全体</option>
         <option value="INTER">インターシフト</option>
         <option value="HUBRIDE">ハブライド</option>
       </select>
+      <span class="tooltip-wrap">
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-text">10日/20日/末日の残高と科目別内訳を、全体またはエンティティ別に表示します。</span>
+      </span>
     </div>
     <div id="report-content"></div>
   </div>
@@ -1120,20 +1148,24 @@
   <!-- TAB 3: 日次推移 -->
   <div id="tab-daily" class="tab-panel">
     <div class="daily-controls">
-      <label style="color:var(--text2);font-size:13px">月選択:</label>
-      <select id="daily-month-selector" onchange="buildDailyChart()">
+      <label style="color:var(--text2);font-size:13px;font-weight:600">月選択:</label>
+      <select id="daily-month-selector" onchange="buildDailyChart()" style="font-size:14px;font-weight:600;padding:8px 14px">
         <option value="11月">11月</option>
         <option value="12月">12月</option>
         <option value="1月">1月</option>
         <option value="2月">2月</option>
         <option value="3月" selected>3月</option>
       </select>
-      <label style="color:var(--text2);font-size:13px;margin-left:12px">表示:</label>
-      <select id="daily-entity-filter" onchange="buildDailyChart()">
+      <label style="color:var(--text2);font-size:13px;font-weight:600;margin-left:12px">表示:</label>
+      <select id="daily-entity-filter" onchange="buildDailyChart()" style="font-size:14px;font-weight:600;padding:8px 14px">
         <option value="ALL" selected>全体</option>
         <option value="INTER">インターシフト</option>
         <option value="HUBRIDE">ハブライド</option>
       </select>
+      <span class="tooltip-wrap">
+        <span class="tooltip-icon">?</span>
+        <span class="tooltip-text">日次の残高推移と入出金をチャート＋テーブルで表示。INTER/HUBRIDE単独時は累計NETを表示。</span>
+      </span>
     </div>
     <div class="daily-chart-wrap">
       <div class="chart-container" style="height:400px">
@@ -1899,15 +1931,15 @@ function buildKPI() {
     },
     {
       cls: "kpi-income",
-      label: "今期累計 入金合計",
-      value: fmt(total_in),
-      sub: `INTER ${fmt(s.INTER["11月"].in+s.INTER["12月"].in+s.INTER["1月"].in+s.INTER["2月"].in+s.INTER["3月"].in)} + HUBRIDE ${fmt(s.HUBRIDE["11月"].in+s.HUBRIDE["12月"].in+s.HUBRIDE["1月"].in+s.HUBRIDE["2月"].in+s.HUBRIDE["3月"].in)}`
+      label: "今期累計 差引",
+      value: fmtSigned(total_in - total_out),
+      sub: `入金 ${fmt(total_in)} − 出金 ${fmt(total_out)}`
     },
     {
       cls: "kpi-expense",
-      label: "今期累計 出金合計",
-      value: fmt(total_out),
-      sub: `INTER ${fmt(s.INTER["11月"].out+s.INTER["12月"].out+s.INTER["1月"].out+s.INTER["2月"].out+s.INTER["3月"].out)} + HUBRIDE ${fmt(s.HUBRIDE["11月"].out+s.HUBRIDE["12月"].out+s.HUBRIDE["1月"].out+s.HUBRIDE["2月"].out+s.HUBRIDE["3月"].out)}`
+      label: "月平均キャッシュフロー",
+      value: fmtSigned(Math.round((total_in - total_out) / 5)),
+      sub: `5ヶ月平均（11月〜3月） INTER ${fmtSigned(Math.round(MONTHS.slice(0,5).reduce((a,m) => a + s.INTER[m].in - s.INTER[m].out, 0) / 5))}/月 + HUBRIDE ${fmtSigned(Math.round(MONTHS.slice(0,5).reduce((a,m) => a + s.HUBRIDE[m].in - s.HUBRIDE[m].out, 0) / 5))}/月`
     }
   ];
 
@@ -2655,9 +2687,9 @@ function switchTab(tabId) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tabId).classList.add('active');
   // Find matching button
-  const tabLabels = {summary:'月次サマリ', report:'月次報告', daily:'日次推移', forecast:'予測・シミュレーション', guide:'使い方'};
+  const tabLabels = {summary:'月次サマリ', report:'月次報告', daily:'日次推移', forecast:'予測・シミュレーション'};
   document.querySelectorAll('.tab-btn').forEach(b => {
-    if (b.textContent === tabLabels[tabId]) b.classList.add('active');
+    if (b.textContent.includes(tabLabels[tabId])) b.classList.add('active');
   });
   // Lazy build
   if (tabId === 'report') buildReportTab();
