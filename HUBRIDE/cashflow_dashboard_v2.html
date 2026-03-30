@@ -728,6 +728,7 @@
     <button class="tab-btn" onclick="switchTab('report')">月次報告</button>
     <button class="tab-btn" onclick="switchTab('daily')">日次推移</button>
     <button class="tab-btn" onclick="switchTab('forecast')">予測・シミュレーション</button>
+    <button class="tab-btn" onclick="switchTab('guide')">使い方</button>
   </div>
 
   <!-- TAB 1: 月次サマリ (既存コンテンツ) -->
@@ -1006,6 +1007,102 @@
   </div>
 
   </div><!-- /tab-forecast -->
+
+  <!-- TAB 5: 使い方ガイド -->
+  <div id="tab-guide" class="tab-panel">
+  <div class="section">
+    <div class="section-title"><span class="dot-both"></span>ダッシュボード 使い方ガイド</div>
+
+    <div style="display:grid;gap:16px">
+
+      <!-- 全体説明 -->
+      <div class="forecast-card">
+        <h3 style="color:#fcd34d">📊 このダッシュボードについて</h3>
+        <div style="font-size:13px;line-height:1.8;color:var(--text)">
+          インターシフト（INTER本体）とハブライド（HUBRIDE車両事業）の資金の流れを一画面で把握するためのツールです。<br>
+          データソースは<strong>入出金サマリExcel</strong>（城さん・心ちゃんが毎日更新）。ダッシュボードは現在<strong>週1更新</strong>です。
+        </div>
+      </div>
+
+      <!-- タブ1 -->
+      <div class="forecast-card">
+        <h3 style="color:#93c5fd">📋 月次サマリ</h3>
+        <div style="font-size:13px;line-height:1.8;color:var(--text)">
+          <strong>主要指標</strong> — 3月末残高、4月末予測、今期累計の入出金合計を表示。<br>
+          <strong>月次チャート</strong> — 棒グラフ（入出金）+ 折れ線（残高）で5ヶ月のトレンドを確認。<br>
+          <strong>比較表</strong> — INTER / HUBRIDE それぞれの月次入出金・差引を一覧比較。<br>
+          <strong>取引先別テーブル</strong> — 各カテゴリ（売上・借入・仕入など）の取引先別明細。<br>
+          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
+            💡 <strong>操作ポイント</strong><br>
+            ・「取引先別表示」セレクタで<strong>全体/INTER/HUBRIDE</strong>を切替可能<br>
+            ・各取引先テーブルは<strong>▼をクリックで展開/折りたたみ</strong><br>
+            ・折りたたみ時も<strong>月計サマリバー</strong>で概要を確認可能<br>
+            ・ヘッダーの「単位」セレクタで<strong>円/千円/百万円</strong>を切替可能<br>
+            ・列ヘッダーをクリックすると<strong>ソート</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- タブ2 -->
+      <div class="forecast-card">
+        <h3 style="color:#93c5fd">📅 月次報告</h3>
+        <div style="font-size:13px;line-height:1.8;color:var(--text)">
+          各月の<strong>10日・20日・末日時点の残高</strong>と、その期間の科目別入出金を表示します。<br>
+          Excelの「報告シート」に相当する内容です。
+          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
+            💡 <strong>操作ポイント</strong><br>
+            ・「表示」セレクタで<strong>全体/INTER/HUBRIDE</strong>を切替<br>
+            ・各ブレークポイント（10日/20日/末日）のカードにINTER・HUBRIDEの科目別内訳を表示
+          </div>
+        </div>
+      </div>
+
+      <!-- タブ3 -->
+      <div class="forecast-card">
+        <h3 style="color:#93c5fd">📈 日次推移</h3>
+        <div style="font-size:13px;line-height:1.8;color:var(--text)">
+          選択した月の<strong>日別の残高推移</strong>（折れ線）と<strong>入出金</strong>（棒グラフ）を表示します。<br>
+          Excelの「グラフ用シート」に相当する内容です。
+          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
+            💡 <strong>操作ポイント</strong><br>
+            ・「月選択」で<strong>11月〜3月</strong>を切替<br>
+            ・「表示」で<strong>全体/INTER/HUBRIDE</strong>を切替<br>
+            ・INTER/HUBRIDE単独表示時は「残高」ではなく<strong>累計NET</strong>（その月の累積差引）を表示<br>
+            ・チャートの下に<strong>日別テーブル</strong>も表示
+          </div>
+        </div>
+      </div>
+
+      <!-- タブ4 -->
+      <div class="forecast-card">
+        <h3 style="color:#93c5fd">🔮 予測・シミュレーション</h3>
+        <div style="font-size:13px;line-height:1.8;color:var(--text)">
+          <strong>4月末残高予測</strong> — INTER（1-2月平均）とHUBRIDE（KINTONE確定値）から4月末残高を予測。楽観/悲観レンジ付き。<br>
+          <strong>仕入可能台数シミュレーター</strong> — 4月の仕入以外の入出金を全部織込んだ上で「あと何台仕入れられるか」を逆算。
+          <div style="margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
+            💡 <strong>操作ポイント</strong><br>
+            ・<strong>台単価</strong>と<strong>最低維持残高</strong>を自由に変更可能（リアルタイム計算）<br>
+            ・<strong>借入あり/借入なし</strong>の2パターンを同時表示<br>
+            ・下部の内訳で計算根拠を確認可能
+          </div>
+        </div>
+      </div>
+
+      <!-- データ更新 -->
+      <div class="forecast-card" style="border-color:var(--yellow)">
+        <h3 style="color:#f59e0b">🔄 データ更新について</h3>
+        <div style="font-size:13px;line-height:1.8;color:var(--text)">
+          <strong>入出金サマリExcel</strong>は城さん・心ちゃんが毎日更新しています。<br>
+          ダッシュボードへの反映は現在<strong>週1回</strong>（まっち or Claude Codeが更新）。<br>
+          <div style="margin-top:8px;font-size:12px;color:var(--text2)">
+            更新日はヘッダーの「データ更新: YYYY年M月D日」で確認できます。
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  </div><!-- /tab-guide -->
 
   <!-- TAB 2: 月次報告 -->
   <div id="tab-report" class="tab-panel">
@@ -2558,7 +2655,7 @@ function switchTab(tabId) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tabId).classList.add('active');
   // Find matching button
-  const tabLabels = {summary:'月次サマリ', report:'月次報告', daily:'日次推移', forecast:'予測・シミュレーション'};
+  const tabLabels = {summary:'月次サマリ', report:'月次報告', daily:'日次推移', forecast:'予測・シミュレーション', guide:'使い方'};
   document.querySelectorAll('.tab-btn').forEach(b => {
     if (b.textContent === tabLabels[tabId]) b.classList.add('active');
   });
@@ -2848,7 +2945,6 @@ function buildDailyTable(daily, month, startBalance, filter) {
 document.addEventListener("DOMContentLoaded", () => {
   prepareData();
   renderAll();
-  openAllCollapsibles();
 });
 </script>
 </body>
