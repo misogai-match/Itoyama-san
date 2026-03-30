@@ -988,6 +988,7 @@
         </table>
       </div>
     </div>
+    <div id="inter-monthly-summary" class="table-wrap" style="margin-top:16px"></div>
   </div>
 
   <!-- SECTION 5: HUBRIDE DETAIL -->
@@ -1059,6 +1060,7 @@
         </table>
       </div>
     </div>
+    <div id="hubride-monthly-summary" class="table-wrap" style="margin-top:16px"></div>
   </div>
 
 
@@ -2587,6 +2589,59 @@ function renderAll() {
 
   buildForecast();
   updateSimulator();
+  buildEntityMonthlySummary();
+}
+
+function buildEntityMonthlySummary() {
+  const s = DATA.summary;
+
+  // INTER: 入金=売上+借入+その他入金, 出金=貸付+その他出金+給与
+  buildMonthlySummaryTable('inter-monthly-summary', MONTHS, m => {
+    return { in: s.INTER[m].in, out: s.INTER[m].out };
+  }, 'inter-col');
+
+  // HUBRIDE: 入金=売上+その他入金, 出金=仕入+その他出金
+  buildMonthlySummaryTable('hubride-monthly-summary', MONTHS, m => {
+    return { in: s.HUBRIDE[m].in, out: s.HUBRIDE[m].out };
+  }, 'hubride-col');
+}
+
+function buildMonthlySummaryTable(containerId, months, getData, colorClass) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const data = months.map(m => getData(m));
+  const totalIn = data.reduce((a, d) => a + d.in, 0);
+  const totalOut = data.reduce((a, d) => a + d.out, 0);
+  const totalCF = totalIn - totalOut;
+
+  const headerColor = colorClass === 'inter-col' ? 'var(--inter)' : 'var(--hubride)';
+  const label = colorClass === 'inter-col' ? 'INTER' : 'HUBRIDE';
+
+  let html = `<table>
+    <thead><tr style="background:rgba(59,130,246,0.1)">
+      <th style="cursor:default;text-align:left;color:${headerColor};font-weight:700">${label} 月次合計</th>
+      ${months.map(m => `<th style="cursor:default">${m}</th>`).join('')}
+    </tr></thead>
+    <tbody>
+    <tr>
+      <td style="font-weight:600;color:var(--income)">入金 計</td>
+      ${data.map(d => `<td class="positive">${fmt(d.in)}</td>`).join('')}
+    </tr>
+    <tr>
+      <td style="font-weight:600;color:var(--expense)">出金 計</td>
+      ${data.map(d => `<td class="negative">${fmt(d.out)}</td>`).join('')}
+    </tr>
+    <tr class="total-row">
+      <td style="font-weight:700">月次CF</td>
+      ${data.map(d => {
+        const cf = d.in - d.out;
+        return `<td style="font-weight:700">${fmtSigned(cf)}</td>`;
+      }).join('')}
+    </tr>
+    </tbody></table>`;
+
+  el.innerHTML = html;
 }
 
 function changeUnit(unit) {
