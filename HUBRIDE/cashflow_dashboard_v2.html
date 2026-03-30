@@ -1687,9 +1687,9 @@ function buildDetailTable(headId, bodyId, data, colorClass, vehicleCounts, aprTo
     ${MONTHS.map(m => `<td data-val="${colTotals[m]}">${colTotals[m] > 0 ? fmt(colTotals[m]) : "—"}</td>`).join("")}
   </tr>`;
   headEl.innerHTML = headerRow;
-  headEl.insertAdjacentHTML("afterend", summaryRow + vehicleRow);
 
-  let rows = data.map(row => {
+  let rows = summaryRow + vehicleRow;
+  rows += data.map(row => {
     const cells = MONTHS.map(m => cellVal(row[m] || 0)).join("");
     return `<tr>
       <td class="${colorClass || ''}" style="font-weight:500">${row.vendor}</td>
@@ -1724,9 +1724,8 @@ function buildGroupedTable(headId, bodyId, groupedData, colorClass, aprTotal) {
     ${MONTHS.map(m => `<td data-val="${grandTotals[m]}">${grandTotals[m] > 0 ? fmt(grandTotals[m]) : "—"}</td>`).join("")}
   </tr>`;
   headEl.innerHTML = headerRow;
-  headEl.insertAdjacentHTML("afterend", summaryRow);
 
-  let rows = "";
+  let rows = summaryRow;
 
   groupedData.forEach(group => {
 
