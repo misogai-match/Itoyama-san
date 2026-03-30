@@ -893,6 +893,14 @@
 
   <!-- TAB 2: 月次報告 -->
   <div id="tab-report" class="tab-panel">
+    <div class="daily-controls">
+      <label style="color:var(--text2);font-size:13px">表示:</label>
+      <select id="report-entity-filter" onchange="buildReportTab()">
+        <option value="ALL" selected>全体</option>
+        <option value="INTER">インターシフト</option>
+        <option value="HUBRIDE">ハブライド</option>
+      </select>
+    </div>
     <div id="report-content"></div>
   </div>
 
@@ -906,6 +914,12 @@
         <option value="1月">1月</option>
         <option value="2月">2月</option>
         <option value="3月" selected>3月</option>
+      </select>
+      <label style="color:var(--text2);font-size:13px;margin-left:12px">表示:</label>
+      <select id="daily-entity-filter" onchange="buildDailyChart()">
+        <option value="ALL" selected>全体</option>
+        <option value="INTER">インターシフト</option>
+        <option value="HUBRIDE">ハブライド</option>
       </select>
     </div>
     <div class="daily-chart-wrap">
@@ -2360,7 +2374,7 @@ function switchTab(tabId) {
     }
   });
   // Lazy build
-  if (tabId === 'report' && !document.getElementById('report-content').hasChildNodes()) {
+  if (tabId === 'report') {
     buildReportTab();
   }
   if (tabId === 'daily') {
@@ -2375,19 +2389,30 @@ const CAT_ORDER = ["売上","借入･回収","その他入金","仕入","貸付
 
 function buildReportTab() {
   const container = document.getElementById('report-content');
+  const filter = document.getElementById('report-entity-filter').value; // ALL, INTER, HUBRIDE
   const months = ["11月","12月","1月","2月","3月"];
   let html = '';
+
+  const dotClass = filter === 'INTER' ? 'dot-inter' : (filter === 'HUBRIDE' ? 'dot-hubride' : 'dot-both');
 
   months.forEach(m => {
     const rd = REPORT_DATA[m];
     if (!rd) return;
 
+    // フィルタに応じた合計値を計算
+    let totalIn = 0, totalOut = 0;
+    ["10日","20日","末日"].forEach(bp => {
+      const d = rd.breakpoints[bp].detail;
+      if (filter === 'ALL' || filter === 'INTER') { totalIn += d.INTER.total_in; totalOut += d.INTER.total_out; }
+      if (filter === 'ALL' || filter === 'HUBRIDE') { totalIn += d.HUBRIDE.total_in; totalOut += d.HUBRIDE.total_out; }
+    });
+
     html += `<div class="report-month-card">
-      <h3><span class="dot-both"></span>${m}（先月末 ${fmt(rd.start_balance)} → 月末 ${fmt(rd.end_balance)}）</h3>
+      <h3><span class="${dotClass}"></span>${m}（先月末 ${fmt(rd.start_balance)} → 月末 ${fmt(rd.end_balance)}）</h3>
       <div style="margin-bottom:12px;display:flex;gap:24px;font-size:13px">
-        <span>入金合計: <span class="positive">${fmt(rd.total_in)}</span></span>
-        <span>出金合計: <span class="negative">${fmt(rd.total_out)}</span></span>
-        <span>差引: ${fmtSigned(rd.total_in - rd.total_out)}</span>
+        <span>入金合計: <span class="positive">${fmt(totalIn)}</span></span>
+        <span>出金合計: <span class="negative">${fmt(totalOut)}</span></span>
+        <span>差引: ${fmtSigned(totalIn - totalOut)}</span>
       </div>
       <div class="report-bp-grid">`;
 
@@ -2395,20 +2420,26 @@ function buildReportTab() {
       const bpData = rd.breakpoints[bp];
       const periodLabel = bp === "10日" ? "1日〜10日" : (bp === "20日" ? "11日〜20日" : "21日〜末日");
 
+      // フィルタ済み期間合計
+      let pIn = 0, pOut = 0;
+      if (filter === 'ALL' || filter === 'INTER') { pIn += bpData.detail.INTER.total_in; pOut += bpData.detail.INTER.total_out; }
+      if (filter === 'ALL' || filter === 'HUBRIDE') { pIn += bpData.detail.HUBRIDE.total_in; pOut += bpData.detail.HUBRIDE.total_out; }
+
       html += `<div class="report-bp-card">
         <h4>${bp}時点 残高</h4>
         <div class="report-bp-balance">${fmt(bpData.balance)}</div>
         <div style="font-size:11px;color:var(--text2);margin-bottom:8px">${periodLabel}の入出金</div>`;
 
-      // INTER table
-      html += buildCatTable("INTER", bpData.detail.INTER, "inter-col");
-      // HUBRIDE table
-      html += buildCatTable("HUBRIDE", bpData.detail.HUBRIDE, "hubride-col");
+      if (filter === 'ALL' || filter === 'INTER') {
+        html += buildCatTable("INTER", bpData.detail.INTER, "inter-col");
+      }
+      if (filter === 'ALL' || filter === 'HUBRIDE') {
+        html += buildCatTable("HUBRIDE", bpData.detail.HUBRIDE, "hubride-col");
+      }
 
-      // Period totals
       html += `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;display:flex;justify-content:space-between">
         <span style="color:var(--text2)">期間計</span>
-        <span>入金 ${fmt(bpData.period_in)} / 出金 ${fmt(bpData.period_out)}</span>
+        <span>入金 ${fmt(pIn)} / 出金 ${fmt(pOut)}</span>
       </div>`;
 
       html += `</div>`;
@@ -2456,20 +2487,47 @@ function buildCatTable(entityLabel, entityData, colorClass) {
 // ============================================================
 function buildDailyChart() {
   const month = document.getElementById('daily-month-selector').value;
+  const filter = document.getElementById('daily-entity-filter').value; // ALL, INTER, HUBRIDE
   const mData = DAILY_DATA[month];
   if (!mData) return;
 
   const daily = mData.daily;
   const labels = daily.map(d => d.day + '日');
-  const balances = daily.map(d => d.balance / 1e6);
-  const inflows = daily.map(d => d.in / 1e6);
-  const outflows = daily.map(d => -d.out / 1e6);
+
+  // フィルタに応じたデータ選択
+  let inflows, outflows, balances;
+  if (filter === 'INTER') {
+    inflows = daily.map(d => d.inter_in / 1e6);
+    outflows = daily.map(d => -d.inter_out / 1e6);
+    // INTER単独の残高は累積計算
+    let running = 0;
+    balances = daily.map((d, i) => {
+      running += d.inter_in - d.inter_out;
+      return running / 1e6;
+    });
+  } else if (filter === 'HUBRIDE') {
+    inflows = daily.map(d => d.hubride_in / 1e6);
+    outflows = daily.map(d => -d.hubride_out / 1e6);
+    let running = 0;
+    balances = daily.map((d, i) => {
+      running += d.hubride_in - d.hubride_out;
+      return running / 1e6;
+    });
+  } else {
+    inflows = daily.map(d => d.in / 1e6);
+    outflows = daily.map(d => -d.out / 1e6);
+    balances = daily.map(d => d.balance / 1e6);
+  }
 
   // Destroy previous
   if (DAILY_CHART_INSTANCE) {
     DAILY_CHART_INSTANCE.destroy();
     DAILY_CHART_INSTANCE = null;
   }
+
+  const filterLabel = filter === 'INTER' ? 'INTER ' : (filter === 'HUBRIDE' ? 'HUBRIDE ' : '');
+  const inColor = filter === 'INTER' ? 'rgba(59,130,246,0.6)' : (filter === 'HUBRIDE' ? 'rgba(16,185,129,0.6)' : 'rgba(34,197,94,0.6)');
+  const lineColor = filter === 'INTER' ? '#3b82f6' : (filter === 'HUBRIDE' ? '#10b981' : '#f59e0b');
 
   const ctx = document.getElementById('dailyChart').getContext('2d');
   DAILY_CHART_INSTANCE = new Chart(ctx, {
@@ -2478,25 +2536,25 @@ function buildDailyChart() {
       labels: labels,
       datasets: [
         {
-          label: '入金 (百万円)',
+          label: filterLabel + '入金 (百万円)',
           data: inflows,
-          backgroundColor: 'rgba(34,197,94,0.6)',
+          backgroundColor: inColor,
           borderRadius: 2,
           order: 2
         },
         {
-          label: '出金 (百万円)',
+          label: filterLabel + '出金 (百万円)',
           data: outflows,
           backgroundColor: 'rgba(239,68,68,0.5)',
           borderRadius: 2,
           order: 3
         },
         {
-          label: '残高 (百万円)',
+          label: filterLabel + '残高 (百万円)',
           data: balances,
           type: 'line',
-          borderColor: '#f59e0b',
-          backgroundColor: 'rgba(245,158,11,0.1)',
+          borderColor: lineColor,
+          backgroundColor: lineColor.replace(')', ',0.1)').replace('rgb', 'rgba'),
           borderWidth: 2,
           pointRadius: 3,
           pointBackgroundColor: '#f59e0b',
@@ -2533,37 +2591,54 @@ function buildDailyChart() {
   });
 
   // Daily table
-  buildDailyTable(daily, month, mData.start_balance);
+  buildDailyTable(daily, month, mData.start_balance, filter);
 }
 
-function buildDailyTable(daily, month, startBalance) {
+function buildDailyTable(daily, month, startBalance, filter) {
   const wrap = document.getElementById('daily-table-wrap');
-  let html = `<table><thead><tr>
-    <th style="cursor:default">日付</th>
-    <th style="cursor:default">残高</th>
-    <th style="cursor:default">入金</th>
-    <th style="cursor:default">出金</th>
-    <th style="cursor:default">INTER入</th>
-    <th style="cursor:default">INTER出</th>
-    <th style="cursor:default">HUBRIDE入</th>
-    <th style="cursor:default">HUBRIDE出</th>
-  </tr></thead><tbody>`;
+  let headers, rowFn;
 
-  daily.forEach(d => {
-    const hasActivity = d.in > 0 || d.out > 0;
-    const opacity = hasActivity ? '' : 'style="opacity:0.4"';
-    html += `<tr ${opacity}>
-      <td style="text-align:left;font-weight:500">${d.day}日</td>
-      <td style="color:#fcd34d;font-weight:600">${fmt(d.balance)}</td>
-      <td>${d.in > 0 ? '<span class="positive">'+fmt(d.in)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
-      <td>${d.out > 0 ? '<span class="negative">'+fmt(d.out)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
-      <td class="inter-col">${d.inter_in > 0 ? fmt(d.inter_in) : '—'}</td>
-      <td class="inter-col">${d.inter_out > 0 ? fmt(d.inter_out) : '—'}</td>
-      <td class="hubride-col">${d.hubride_in > 0 ? fmt(d.hubride_in) : '—'}</td>
-      <td class="hubride-col">${d.hubride_out > 0 ? fmt(d.hubride_out) : '—'}</td>
-    </tr>`;
-  });
+  if (filter === 'ALL') {
+    headers = '<th style="cursor:default">日付</th><th style="cursor:default">残高</th><th style="cursor:default">入金</th><th style="cursor:default">出金</th><th style="cursor:default">INTER入</th><th style="cursor:default">INTER出</th><th style="cursor:default">HUBRIDE入</th><th style="cursor:default">HUBRIDE出</th>';
+    rowFn = d => {
+      const hasActivity = d.in > 0 || d.out > 0;
+      const op = hasActivity ? '' : 'style="opacity:0.4"';
+      return `<tr ${op}>
+        <td style="text-align:left;font-weight:500">${d.day}日</td>
+        <td style="color:#fcd34d;font-weight:600">${fmt(d.balance)}</td>
+        <td>${d.in > 0 ? '<span class="positive">'+fmt(d.in)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
+        <td>${d.out > 0 ? '<span class="negative">'+fmt(d.out)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
+        <td class="inter-col">${d.inter_in > 0 ? fmt(d.inter_in) : '—'}</td>
+        <td class="inter-col">${d.inter_out > 0 ? fmt(d.inter_out) : '—'}</td>
+        <td class="hubride-col">${d.hubride_in > 0 ? fmt(d.hubride_in) : '—'}</td>
+        <td class="hubride-col">${d.hubride_out > 0 ? fmt(d.hubride_out) : '—'}</td>
+      </tr>`;
+    };
+  } else {
+    const inKey = filter === 'INTER' ? 'inter_in' : 'hubride_in';
+    const outKey = filter === 'INTER' ? 'inter_out' : 'hubride_out';
+    const colClass = filter === 'INTER' ? 'inter-col' : 'hubride-col';
+    const lineColor = filter === 'INTER' ? '#93c5fd' : '#6ee7b7';
+    headers = `<th style="cursor:default">日付</th><th style="cursor:default">累計NET</th><th style="cursor:default">入金</th><th style="cursor:default">出金</th><th style="cursor:default">差引</th>`;
+    let running = 0;
+    const cumulative = daily.map(d => { running += d[inKey] - d[outKey]; return running; });
+    rowFn = (d, i) => {
+      const inVal = d[inKey], outVal = d[outKey];
+      const hasActivity = inVal > 0 || outVal > 0;
+      const op = hasActivity ? '' : 'style="opacity:0.4"';
+      const net = inVal - outVal;
+      return `<tr ${op}>
+        <td style="text-align:left;font-weight:500">${d.day}日</td>
+        <td style="color:${lineColor};font-weight:600">${fmt(cumulative[i])}</td>
+        <td>${inVal > 0 ? '<span class="positive">'+fmt(inVal)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
+        <td>${outVal > 0 ? '<span class="negative">'+fmt(outVal)+'</span>' : '<span style="color:var(--text2)">—</span>'}</td>
+        <td>${net !== 0 ? fmtSigned(net) : '<span style="color:var(--text2)">—</span>'}</td>
+      </tr>`;
+    };
+  }
 
+  let html = `<table><thead><tr>${headers}</tr></thead><tbody>`;
+  daily.forEach((d, i) => { html += rowFn(d, i); });
   html += '</tbody></table>';
   wrap.innerHTML = html;
 }
