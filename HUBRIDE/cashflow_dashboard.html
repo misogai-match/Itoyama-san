@@ -1957,7 +1957,7 @@ function buildKPI() {
       value: fmt(apr_end),
       sub: `HUBRIDE: ${af.hubride.sales_count}台入金 - ${af.hubride.purchase_count}台仕入 - 経費 / INTER: 1-2月平均 NET ${fmtSigned(af.inter.net)}`,
       badge: "KINTONE連動",
-      warning: `⚠ INTER内訳: 借入 ${fmt(af.inter.borrow_avg)} − 返済等 ${fmt(af.inter.lend_avg)} = Net ${fmtSigned(af.inter.borrow_net)}（借入なしの場合 4月末 ${fmt(af.apr_end - af.inter.borrow_net)}）`
+      warning: `⚠ INTER内訳:<br>　借入: ${fmt(af.inter.borrow_avg)}<br>　返済等: ${fmt(af.inter.lend_avg)}<br>　Net: ${fmtSigned(af.inter.borrow_net)}<br>（借入なしの場合 4月末 ${fmt(af.apr_end - af.inter.borrow_net)}）`
     },
     {
       cls: "kpi-income",
@@ -2592,15 +2592,14 @@ function updateSummaryBar(sectionId) {
 
   const vehicleData = KINTONE_VEHICLES[sectionId] || null;
 
-  // テーブルヘッダー（月名 + 合計を右端に）
-  let headerCells = '';
+  // テーブルヘッダー（合計を左端 + 月名 + 4月予）
+  let headerCells = '<th style="text-align:left;color:var(--text2)">合計</th>';
   MONTHS.forEach(m => {
     const isForecast = m === '4月予';
     const cls = isForecast ? ' class="forecast-col-bg"' : '';
     const badge = isForecast ? '<span class="forecast-badge" style="font-size:9px;padding:1px 4px;margin-left:2px">予測</span>' : '';
     headerCells += `<th${cls}>${m}${badge}</th>`;
   });
-  headerCells += '<th style="color:var(--yellow);font-weight:700">合計</th>';
 
   // 月計値（data-val属性から実数値を取得してfmt関数で表示）
   let monthCells = '';
@@ -2622,9 +2621,9 @@ function updateSummaryBar(sectionId) {
     }
   }
   const totalCell = grandTotal > 0
-    ? `<td style="color:#fcd34d;font-weight:700">${fmt(grandTotal)}</td>`
+    ? `<td style="color:#fcd34d;font-weight:700;text-align:left">${fmt(grandTotal)}</td>`
     : '<td style="color:var(--text2);font-weight:400">—</td>';
-  const valueCells = monthCells + totalCell;
+  const valueCells = totalCell + monthCells;
 
   bar.innerHTML = `<table><thead><tr>${headerCells}</tr></thead><tbody><tr>${valueCells}</tr></tbody></table>`;
 }
@@ -2823,7 +2822,8 @@ function updateSimulator() {
   document.getElementById('sim-result').innerHTML = `
     <div class="sim-scenarios">
       <div class="sim-scenario" style="border-color:#a78bfa">
-        <div class="sim-scenario-title" style="color:#a78bfa">借入あり<span style="font-size:11px;font-weight:400;opacity:0.8">（借入${fmt(af.inter.borrow_avg)} − 返済等${fmt(af.inter.lend_avg)} = Net ${fmtSigned(af.inter.borrow_net)}）</span></div>
+        <div class="sim-scenario-title" style="color:#a78bfa">借入あり</div>
+        <div style="font-size:11px;color:var(--text2);margin:-4px 0 8px;line-height:1.6">借入: ${fmt(af.inter.borrow_avg)}<br>返済等: ${fmt(af.inter.lend_avg)}<br>Net: ${fmtSigned(af.inter.borrow_net)}</div>
         <div class="sim-cars" style="color:#a78bfa">${cars1}<span>台</span></div>
         <div class="sim-detail">
           仕入額: ${fmt(cars1 * unitPrice)}<br>
