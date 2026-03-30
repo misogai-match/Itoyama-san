@@ -601,6 +601,103 @@
     .collapsible-content { display: block !important; }
     .total-row td { background: #f5f5f5; }
   }
+
+  /* SIMULATOR */
+  .sim-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+  .sim-card h3 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    color: var(--text1);
+  }
+  .sim-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .sim-field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+  .sim-field input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text1);
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .sim-scenarios {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .sim-scenario {
+    padding: 16px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .sim-scenario-title {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .sim-scenario .sim-cars {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .sim-scenario .sim-cars span {
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .sim-scenario .sim-detail {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+  .sim-breakdown {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.8;
+  }
+  .sim-breakdown .sim-line {
+    display: flex;
+    justify-content: space-between;
+  }
+  .sim-breakdown .sim-line-total {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding-top: 4px;
+    margin-top: 4px;
+    font-weight: 600;
+    color: var(--text1);
+  }
+  @media screen and (max-width: 600px) {
+    .sim-inputs { grid-template-columns: 1fr; }
+    .sim-scenarios { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -885,6 +982,28 @@
       </div>
       <div style="font-size: 11px; color: var(--text2); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border);">
         ※ 3月予測シートは月初に作成した全月計画値。実績との乖離は各セクションの明細で確認。
+      </div>
+    </div>
+
+    <!-- 仕入可能台数シミュレーター -->
+    <div class="sim-card">
+      <h3>🚗 仕入可能台数シミュレーター</h3>
+      <div style="font-size: 12px; color: var(--text2); margin-bottom: 12px;">
+        4月の仕入以外の入出金を織込んだ上で、仕入に回せる台数を逆算します
+      </div>
+      <div class="sim-inputs">
+        <div class="sim-field">
+          <label>台単価（円）</label>
+          <input type="text" id="sim-unit-price" value="855,000" oninput="updateSimulator()">
+        </div>
+        <div class="sim-field">
+          <label>最低維持残高（円）</label>
+          <input type="text" id="sim-min-balance" value="5,000,000" oninput="updateSimulator()">
+        </div>
+      </div>
+      <div id="sim-result"></div>
+      <div style="font-size: 11px; color: var(--text2); margin-top: 12px;">
+        ※ 3月末残高 + 4月入出金予測（仕入除く）から計算。売上入金はKINTONE 67台ベース。INTER差引は1-2月平均。
       </div>
     </div>
   </div>
@@ -2359,6 +2478,82 @@ const DAILY_DATA = {"11月":{"start_balance":17870415,"end_balance":31879953,"da
 let DAILY_CHART_INSTANCE = null;
 
 // ============================================================
+// SIMULATOR: 仕入可能台数
+// ============================================================
+function parseNumInput(id) {
+  const v = document.getElementById(id).value.replace(/[,，\s]/g, '');
+  return parseInt(v, 10) || 0;
+}
+function formatInput(el) {
+  const v = el.value.replace(/[,，\s]/g, '');
+  const n = parseInt(v, 10);
+  if (!isNaN(n)) el.value = n.toLocaleString();
+}
+function updateSimulator() {
+  const unitPrice = parseNumInput('sim-unit-price');
+  const minBalance = parseNumInput('sim-min-balance');
+  const af = DATA.apr_forecast;
+
+  // 仕入以外の入出金を積み上げ
+  const marEnd = af.mar_end;                    // 3,306,882
+  const interNet = af.inter.net;                // 4,341,986（借入込み）
+  const borrowNet = af.inter.borrow_net;        // 22,870,487（借入NET）
+  const interNetNoBorrow = interNet - borrowNet; // -18,528,501（借入なし）
+  const hubSalesIn = af.hubride.sales_in;       // 82,936,564
+  const hubOtherIn = af.hubride.other_in;       // 3,575,360
+  const hubOtherOut = af.hubride.other_out;     // 25,607,525
+
+  // パターン1: 借入あり
+  const base1 = marEnd + interNet + hubSalesIn + hubOtherIn - hubOtherOut;
+  const avail1 = base1 - minBalance;
+  const cars1 = unitPrice > 0 ? Math.max(0, Math.floor(avail1 / unitPrice)) : 0;
+  const after1 = base1 - (cars1 * unitPrice);
+
+  // パターン2: 借入なし
+  const base2 = marEnd + interNetNoBorrow + hubSalesIn + hubOtherIn - hubOtherOut;
+  const avail2 = base2 - minBalance;
+  const cars2 = unitPrice > 0 ? Math.max(0, Math.floor(avail2 / unitPrice)) : 0;
+  const after2 = base2 - (cars2 * unitPrice);
+
+  const fmt = n => '¥' + n.toLocaleString();
+  const sign = n => n >= 0 ? '+' + n.toLocaleString() : n.toLocaleString();
+
+  document.getElementById('sim-result').innerHTML = `
+    <div class="sim-scenarios">
+      <div class="sim-scenario" style="border-color:#a78bfa">
+        <div class="sim-scenario-title" style="color:#a78bfa">借入あり</div>
+        <div class="sim-cars" style="color:#a78bfa">${cars1}<span>台</span></div>
+        <div class="sim-detail">
+          仕入額: ${fmt(cars1 * unitPrice)}<br>
+          仕入後残高: <span style="color:${after1 >= minBalance ? 'var(--income)' : 'var(--expense)'}">${fmt(after1)}</span>
+        </div>
+      </div>
+      <div class="sim-scenario" style="border-color:#f59e0b">
+        <div class="sim-scenario-title" style="color:#f59e0b">借入なし</div>
+        <div class="sim-cars" style="color:#f59e0b">${cars2}<span>台</span></div>
+        <div class="sim-detail">
+          仕入額: ${fmt(cars2 * unitPrice)}<br>
+          仕入後残高: <span style="color:${after2 >= minBalance ? 'var(--income)' : 'var(--expense)'}">${fmt(after2)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="sim-breakdown">
+      <div class="sim-line"><span>3月末残高</span><span>${fmt(marEnd)}</span></div>
+      <div class="sim-line"><span>INTER差引（借入あり）</span><span style="color:${interNet >= 0 ? 'var(--income)' : 'var(--expense)'}">${sign(interNet)}</span></div>
+      <div class="sim-line" style="font-size:10px;padding-left:12px"><span>└ うち借入NET</span><span>+${borrowNet.toLocaleString()}</span></div>
+      <div class="sim-line"><span>HUBRIDE売上入金（67台）</span><span style="color:var(--income)">+${hubSalesIn.toLocaleString()}</span></div>
+      <div class="sim-line"><span>HUBRIDEその他入金</span><span style="color:var(--income)">+${hubOtherIn.toLocaleString()}</span></div>
+      <div class="sim-line"><span>HUBRIDEその他出金</span><span style="color:var(--expense)">-${hubOtherOut.toLocaleString()}</span></div>
+      <div class="sim-line-total"><span>仕入前残高（借入あり）</span><span>${fmt(base1)}</span></div>
+      <div class="sim-line-total"><span>仕入前残高（借入なし）</span><span>${fmt(base2)}</span></div>
+    </div>
+  `;
+
+  formatInput(document.getElementById('sim-unit-price'));
+  formatInput(document.getElementById('sim-min-balance'));
+}
+
+// ============================================================
 // TAB SWITCHING
 // ============================================================
 function switchTab(tabId) {
@@ -2646,6 +2841,7 @@ function buildDailyTable(daily, month, startBalance, filter) {
 document.addEventListener("DOMContentLoaded", () => {
   prepareData();
   renderAll();
+  updateSimulator();
   openAllCollapsibles();
 });
 </script>
