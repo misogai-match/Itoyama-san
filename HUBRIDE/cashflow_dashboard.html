@@ -2589,9 +2589,15 @@ function updateSummaryBar(sectionId) {
 
   const vehicleData = KINTONE_VEHICLES[sectionId] || null;
 
-  // テーブルヘッダー（月名）
-  let headerCells = '<th>合計</th>';
-  MONTHS.forEach(m => { headerCells += `<th>${m}</th>`; });
+  // テーブルヘッダー（月名 + 合計を右端に）
+  let headerCells = '';
+  MONTHS.forEach(m => {
+    const isForecast = m === '4月予';
+    const cls = isForecast ? ' class="forecast-col-bg"' : '';
+    const badge = isForecast ? '<span class="forecast-badge" style="font-size:9px;padding:1px 4px;margin-left:2px">予測</span>' : '';
+    headerCells += `<th${cls}>${m}${badge}</th>`;
+  });
+  headerCells += '<th style="color:var(--yellow);font-weight:700">合計</th>';
 
   // 月計値（data-val属性から実数値を取得してfmt関数で表示）
   let monthCells = '';
@@ -2599,21 +2605,23 @@ function updateSummaryBar(sectionId) {
   for (let i = 0; i < MONTHS.length; i++) {
     const cell = cells[i + 1];
     const n = cell && cell.dataset.val ? parseFloat(cell.dataset.val) : 0;
+    const isForecast = MONTHS[i] === '4月予';
+    const fcCls = isForecast ? ' class="forecast-col-bg"' : '';
     if (!isNaN(n) && n > 0) {
       let display = fmt(n);
       if (vehicleData && vehicleData[MONTHS[i]]) {
         display += '<br><span style="color:#a78bfa;font-size:10px;font-weight:400">' + vehicleData[MONTHS[i]] + '台</span>';
       }
-      monthCells += `<td>${display}</td>`;
+      monthCells += `<td${fcCls}>${display}</td>`;
       grandTotal += n;
     } else {
-      monthCells += '<td style="color:var(--text2);font-weight:400">—</td>';
+      monthCells += `<td${fcCls} style="color:var(--text2);font-weight:400">—</td>`;
     }
   }
   const totalCell = grandTotal > 0
-    ? `<td style="color:#fcd34d">${fmt(grandTotal)}</td>`
+    ? `<td style="color:#fcd34d;font-weight:700">${fmt(grandTotal)}</td>`
     : '<td style="color:var(--text2);font-weight:400">—</td>';
-  const valueCells = totalCell + monthCells;
+  const valueCells = monthCells + totalCell;
 
   bar.innerHTML = `<table><thead><tr>${headerCells}</tr></thead><tbody><tr>${valueCells}</tr></tbody></table>`;
 }
