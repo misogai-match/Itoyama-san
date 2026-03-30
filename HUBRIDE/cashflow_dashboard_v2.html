@@ -272,13 +272,45 @@
   .collapsible-wrap .collapsible-header { border-radius: 8px 8px 0 0; }
   .collapsible-wrap.open .collapsible-header { border-radius: 8px 8px 0 0; }
   .summary-bar {
-    background: rgba(30, 41, 59, 0.8);
-    padding: 6px 16px;
-    font-size: 12px;
-    color: #94a3b8;
+    background: rgba(30, 41, 59, 0.95);
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
+    display: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
+  .summary-bar table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+  }
+  .summary-bar th {
+    padding: 6px 14px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    border-bottom: none;
+    cursor: default;
+  }
+  .summary-bar th:first-child { text-align: left; }
+  .summary-bar td {
+    padding: 6px 14px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    color: #f59e0b;
+    border-bottom: none;
+    white-space: nowrap;
+  }
+  .summary-bar td:first-child {
+    text-align: left;
+    color: var(--text2);
+    font-weight: 400;
+    font-size: 11px;
+  }
+  /* 折りたたみ時のみ表示 */
+  .collapsible-wrap:not(.open) .summary-bar { display: block; }
 
   /* CATEGORY LABEL */
   .cat-label {
@@ -1918,51 +1950,51 @@ function sortTable(tableId, colIdx) {
 
 // KINTONE vehicle count data
 const KINTONE_VEHICLES = {
-  "hub-sales":    {"11月": 18, "12月": 24, "1月": 34, "2月": 29, "3月": 37, "4月": 67},
-  "hub-purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32}
+  "hub-sales":    {"11月": 18, "12月": 24, "1月": 34, "2月": 29, "3月": 37, "4月予": 67},
+  "hub-purchase": {"11月": 32, "12月": 38, "1月": 29, "2月": 50, "3月": 32, "4月予": 41}
 };
 
-// セクションの月別合計をtableのtotal-rowから取得し、summary-barを更新する
+// セクションの月別合計をsummary-barにテーブル形式で表示
 function updateSummaryBar(sectionId) {
   const content = document.getElementById(sectionId);
   const bar = document.getElementById("summary-" + sectionId);
   if (!content || !bar) return;
-  const totalRow = content.querySelector("tr.total-row");
-  if (!totalRow) return;
-  const cells = totalRow.querySelectorAll("td");
-  if (cells.length < 7) return;
 
-  const months = ["11月","12月","1月","2月","3月"];
+  // summary-rowまたはtotal-rowから月計を取得
+  const summaryRow = content.querySelector("tr.summary-row") || content.querySelector("tr.total-row");
+  if (!summaryRow) return;
+  const cells = summaryRow.querySelectorAll("td");
+  if (cells.length < 2) return;
+
   const vehicleData = KINTONE_VEHICLES[sectionId] || null;
-  const parts = [];
-  let grandTotal = 0;
-  let grandVehicles = 0;
 
-  for (let i = 1; i <= 5; i++) {
-    const txt = cells[i].textContent.replace(/[¥,\s]/g, "").replace("—", "");
+  // テーブルヘッダー（月名）
+  let headerCells = '<th>合計</th>';
+  MONTHS.forEach(m => { headerCells += `<th>${m}</th>`; });
+
+  // 月計値
+  let monthCells = '';
+  let grandTotal = 0;
+  for (let i = 0; i < MONTHS.length; i++) {
+    const txt = cells[i + 1] ? cells[i + 1].textContent.replace(/[¥,\s]/g, "").replace("—", "") : "";
     const n = parseFloat(txt);
     if (!isNaN(n) && n > 0) {
-      const mVal = (n / 1e6).toFixed(1);
-      let part = months[i-1] + " ¥" + mVal + "M";
-      if (vehicleData && vehicleData[months[i-1]]) {
-        part += " (" + vehicleData[months[i-1]] + "台)";
-        grandVehicles += vehicleData[months[i-1]];
+      let display = "¥" + (n / 1e6).toFixed(1) + "M";
+      if (vehicleData && vehicleData[MONTHS[i]]) {
+        display += '<br><span style="color:#a78bfa;font-size:10px;font-weight:400">' + vehicleData[MONTHS[i]] + '台</span>';
       }
-      parts.push(part);
+      monthCells += `<td>${display}</td>`;
       grandTotal += n;
+    } else {
+      monthCells += '<td style="color:var(--text2);font-weight:400">—</td>';
     }
   }
+  const totalCell = grandTotal > 0
+    ? `<td style="color:#fcd34d">¥${(grandTotal / 1e6).toFixed(1)}M</td>`
+    : '<td style="color:var(--text2);font-weight:400">—</td>';
+  const valueCells = totalCell + monthCells;
 
-  // 合計
-  if (grandTotal > 0) {
-    let totalPart = "合計 ¥" + (grandTotal / 1e6).toFixed(1) + "M";
-    if (vehicleData && grandVehicles > 0) {
-      totalPart += " (" + grandVehicles + "台)";
-    }
-    parts.push(totalPart);
-  }
-
-  bar.innerHTML = parts.length > 0 ? parts.join(" | ") : "";
+  bar.innerHTML = `<table><thead><tr>${headerCells}</tr></thead><tbody><tr>${valueCells}</tr></tbody></table>`;
 }
 
 function toggleCollapsible(id) {
@@ -1974,12 +2006,14 @@ function toggleCollapsible(id) {
   const willOpen = !isOpen;
   content.classList.toggle("open", willOpen);
   if (header) header.classList.toggle("open", willOpen);
+  if (wrap) wrap.classList.toggle("open", willOpen);
 }
 
 // Open all by default on load
 function openAllCollapsibles() {
   document.querySelectorAll(".collapsible-content").forEach(c => c.classList.add("open"));
   document.querySelectorAll(".collapsible-header").forEach(h => h.classList.add("open"));
+  document.querySelectorAll(".collapsible-wrap").forEach(w => w.classList.add("open"));
 }
 
 // ============================================================
