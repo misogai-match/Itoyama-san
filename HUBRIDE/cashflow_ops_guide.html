@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資金管理ダッシュボード 運用ガイド</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263347;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --inter: #3b82f6;
+    --hubride: #10b981;
+    --yellow: #f59e0b;
+    --income: #22c55e;
+    --expense: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; color: #fff; }
+  .header .subtitle { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .main { padding: 24px 32px; max-width: 1000px; margin: 0 auto; }
+  .section { margin-bottom: 32px; }
+  .section-title {
+    font-size: 18px; font-weight: 700; color: #fff;
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    font-size: 16px; font-weight: 700; color: #fff;
+    margin-bottom: 12px;
+  }
+  .card p, .card li { color: var(--text); font-size: 14px; line-height: 1.8; }
+  .card ul { padding-left: 20px; }
+  .card li { margin-bottom: 4px; }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .flow-step {
+    background: var(--card2);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 160px;
+    position: relative;
+  }
+  .flow-step .step-icon { font-size: 28px; margin-bottom: 6px; }
+  .flow-step .step-title { font-size: 14px; font-weight: 700; color: #fff; }
+  .flow-step .step-detail { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .flow-step .step-who {
+    font-size: 11px; color: var(--yellow); margin-top: 6px;
+    padding: 2px 8px; background: rgba(245,158,11,0.15);
+    border-radius: 4px; display: inline-block;
+  }
+  .flow-step.highlight { border-color: var(--inter); }
+  .flow-step.auto { border-color: var(--hubride); }
+  .flow-arrow {
+    font-size: 24px; color: var(--text2);
+    padding: 0 8px;
+    flex-shrink: 0;
+  }
+
+  /* SCHEDULE TABLE */
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+  .schedule-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    background: var(--card2);
+    border-bottom: 1px solid var(--border);
+  }
+  .schedule-table td {
+    padding: 10px 14px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(51,65,85,0.5);
+  }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-auto { background: rgba(16,185,129,0.2); color: var(--hubride); border: 1px solid var(--hubride); }
+  .badge-manual { background: rgba(245,158,11,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+  .badge-weekly { background: rgba(59,130,246,0.2); color: var(--inter); border: 1px solid var(--inter); }
+
+  /* URL BOX */
+  .url-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--inter);
+    word-break: break-all;
+  }
+  .url-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 8px 0 8px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(51,65,85,0.3);
+  }
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    color: var(--text2);
+    font-size: 16px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+
+  /* NOTE */
+  .note {
+    background: rgba(59,130,246,0.1);
+    border: 1px solid var(--inter);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .note-warn {
+    background: rgba(245,158,11,0.1);
+    border-color: var(--yellow);
+  }
+
+  .link { color: var(--inter); text-decoration: none; }
+  .link:hover { text-decoration: underline; }
+
+  .footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 12px;
+    margin-top: 32px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .main { padding: 16px 12px; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .flow-step { min-width: auto; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>資金管理ダッシュボード 運用ガイド</h1>
+  <div class="subtitle">インターシフト / ハブライド | 作成: 2026年3月30日</div>
+</div>
+
+<div class="main">
+
+  <!-- SECTION 1: URL -->
+  <div class="section">
+    <div class="section-title">📌 URL一覧</div>
+    <div class="card">
+      <div class="url-label">ダッシュボード（本番）</div>
+      <div class="url-box">
+        <a class="link" href="https://misogai-match.github.io/Itoyama-san/HUBRIDE/cashflow_dashboard.html" target="_blank">
+          https://misogai-match.github.io/Itoyama-san/HUBRIDE/cashflow_dashboard.html
+        </a>
+      </div>
+      <div style="margin-top:12px">
+        <div class="url-label">この運用ガイド</div>
+        <div class="url-box">
+          <a class="link" href="https://misogai-match.github.io/Itoyama-san/HUBRIDE/cashflow_ops_guide.html" target="_blank">
+            https://misogai-match.github.io/Itoyama-san/HUBRIDE/cashflow_ops_guide.html
+          </a>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px">
+        💡 糸山さん・鈴木さんにはダッシュボードURLをブックマークしてもらう。データ更新してもURLは変わらない。
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: DATA FLOW -->
+  <div class="section">
+    <div class="section-title">🔄 データフロー</div>
+    <div class="card">
+      <h3>Excel → ダッシュボード 更新パイプライン</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="step-icon">📊</div>
+          <div class="step-title">入出金サマリExcel</div>
+          <div class="step-detail">G:\マイドライブ\糸山さん\<br>HUBRIDE\financial\入出金サマリ</div>
+          <div class="step-who">城さん・心ちゃん（毎日）</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step auto">
+          <div class="step-icon">🐍</div>
+          <div class="step-title">Python抽出</div>
+          <div class="step-detail">extract_daily_data.py<br>日次・月次データをJSON化</div>
+          <div class="step-who">Claude Code（自動）</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step auto">
+          <div class="step-icon">🌐</div>
+          <div class="step-title">HTML更新</div>
+          <div class="step-detail">cashflow_dashboard.html<br>JSONデータを埋め込み</div>
+          <div class="step-who">Claude Code（自動）</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">
+          <div class="step-icon">🚀</div>
+          <div class="step-title">GitHub Pages</div>
+          <div class="step-detail">git push → 自動デプロイ<br>URL変わらず最新版に</div>
+          <div class="step-who">自動（push後数分）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SCHEDULE -->
+  <div class="section">
+    <div class="section-title">📅 更新スケジュール</div>
+    <div class="card">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>種類</th>
+            <th>頻度</th>
+            <th>タイミング</th>
+            <th>担当</th>
+            <th>内容</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-auto">日次</span> Excel更新</td>
+            <td>毎日</td>
+            <td>業務時間内</td>
+            <td>城さん・心ちゃん</td>
+            <td>入出金サマリExcelにトランザクション追記</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-weekly">週次</span> ダッシュボード更新</td>
+            <td>週1回</td>
+            <td>月曜朝</td>
+            <td>まっち → Claude Code</td>
+            <td>Excel→Python→HTML→deploy</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-manual">臨時</span> 即時更新</td>
+            <td>随時</td>
+            <td>必要に応じて</td>
+            <td>まっち → Claude Code</td>
+            <td>月末・資金タイト時など</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-manual">月次</span> 月替わり対応</td>
+            <td>月1回</td>
+            <td>月初</td>
+            <td>まっち + Claude Code</td>
+            <td>新月シート対応・予測値更新</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 4: WEEKLY UPDATE -->
+  <div class="section">
+    <div class="section-title">📋 週次更新手順</div>
+    <div class="card">
+      <h3>まっちがClaude Codeに依頼するだけ</h3>
+      <p style="margin-bottom:12px;color:var(--text2)">「ダッシュボード更新して」で以下が自動実行される：</p>
+      <ul class="checklist">
+        <li>最新の入出金サマリExcelをGドライブから読み込み</li>
+        <li>Python実行 → 日次データ(daily_data.json) + 報告データ(report_data.json) 生成</li>
+        <li>cashflow_dashboard.html のインラインデータを更新</li>
+        <li>ヘッダーの「データ: X/XX時点 | 更新: X/XX」を更新</li>
+        <li>git commit & push → GitHub Pages に反映（数分で反映）</li>
+        <li>URLを返す → まっちがブラウザで確認</li>
+      </ul>
+      <div class="note">
+        💡 所要時間: 約3〜5分。まっちの作業は「依頼」と「確認」だけ。
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: MONTHLY -->
+  <div class="section">
+    <div class="section-title">📋 月替わり対応手順</div>
+    <div class="card">
+      <h3>月初にやること（4月→5月の例）</h3>
+      <ul class="checklist">
+        <li>城さん・心ちゃんがExcelに新月シート（「2026年04月予測」）を追加</li>
+        <li>Python (extract_daily_data.py) に新月シートを追加対応</li>
+        <li>apr_forecast のデータを新月の予測値に更新
+          <ul style="margin-top:4px;font-size:13px;color:var(--text2)">
+            <li>INTER: 直近2ヶ月平均で更新</li>
+            <li>HUBRIDE売上: KINTONE登録の入金予定額を反映</li>
+            <li>HUBRIDE仕入: 鈴木さんと相談して台数確定</li>
+            <li>HUBRIDE経費: 直近3ヶ月平均で更新</li>
+          </ul>
+        </li>
+        <li>残高チェーン検証（前月末残高 → 当月末残高の整合性）</li>
+        <li>仕入シミュレーターの台単価を見直し（5ヶ月平均を更新）</li>
+        <li>デプロイ・動作確認</li>
+      </ul>
+      <div class="note note-warn">
+        ⚠ 月替わりは完全自動化が難しい（予測値の判断が必要）。まっち＋Cで対応。所要時間: 約30分。
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: DATA SOURCE -->
+  <div class="section">
+    <div class="section-title">📂 データソース</div>
+    <div class="card">
+      <h3>ファイル一覧</h3>
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>ファイル</th>
+            <th>場所</th>
+            <th>用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>入出金サマリ-インター_YYYYMMDD.xlsx</td>
+            <td>G:\マイドライブ\糸山さん\【糸山さんグループ】\HUBRIDE\financial\入出金サマリ</td>
+            <td>元データ（城さん・心ちゃん管理）</td>
+          </tr>
+          <tr>
+            <td>extract_daily_data.py</td>
+            <td>C:\Users\maiso\Downloads\</td>
+            <td>Excel → JSON 抽出スクリプト</td>
+          </tr>
+          <tr>
+            <td>cashflow_dashboard.html</td>
+            <td>C:\GitHub-repos\Itoyama-san\HUBRIDE\</td>
+            <td>ダッシュボード本体</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note" style="margin-top:12px">
+        💡 Excelファイル名の日付部分（YYYYMMDD）は城さん・心ちゃんが更新するたびに変わる。Python側で最新ファイルを自動検出する仕組みにする予定。
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: DASHBOARD FEATURES -->
+  <div class="section">
+    <div class="section-title">🖥 ダッシュボード機能一覧</div>
+    <div class="card">
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>タブ</th>
+            <th>内容</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600">月次サマリ</td>
+            <td>KPI・月次チャート・比較表・取引先別明細・月次合計</td>
+            <td>全体/INTER/HUBRIDE切替、単位切替（円/千円/百万円）、列ソート</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">月次報告</td>
+            <td>10日/20日/末日残高 + 科目別内訳</td>
+            <td>月選択、全体/INTER/HUBRIDE切替</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">日次推移</td>
+            <td>日別残高チャート + 入出金テーブル</td>
+            <td>月選択、全体/INTER/HUBRIDE切替</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">予測・シミュレーション</td>
+            <td>4月末残高予測 + 仕入可能台数シミュレーター</td>
+            <td>台単価・維持残高を変更可能、借入あり/なし2パターン</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 8: FUTURE -->
+  <div class="section">
+    <div class="section-title">🔮 今後の改善予定</div>
+    <div class="card">
+      <ul>
+        <li><strong>スケジュール自動実行</strong> — 毎週月曜にPython→HTML→deployを自動化</li>
+        <li><strong>残高アラート</strong> — 残高が閾値（例: ¥5M）以下の予測時にChatwork通知</li>
+        <li><strong>KINTONE連携</strong> — 売上入金予定をKINTONEから自動取得</li>
+        <li><strong>月替わり半自動化</strong> — 新月シート検出・予測値テンプレート生成</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Generated by Claude Code | Last updated: 2026年3月30日
+</div>
+
+</body>
+</html>
