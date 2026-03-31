@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>経営管理サポートのご提案 — 株式会社磯貝</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263347;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --accent: #3b82f6;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --purple: #a855f7;
+    --red: #ef4444;
+    --cyan: #06b6d4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 32px 32px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .header .tagline {
+    font-size: 16px;
+    color: var(--cyan);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .header .tagline2 {
+    font-size: 14px;
+    color: var(--text2);
+  }
+  .header .company {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  /* NAV */
+  .nav {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav a {
+    color: var(--text2);
+    text-decoration: none;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav a:hover, .nav a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 48px;
+  }
+  .section-num {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--cyan);
+    margin: 24px 0 12px;
+  }
+  .section p {
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .highlight {
+    color: var(--yellow);
+    font-weight: 600;
+  }
+  .emphasis-box {
+    background: rgba(6, 182, 212, 0.08);
+    border-left: 3px solid var(--cyan);
+    padding: 16px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 15px;
+  }
+  .emphasis-box strong {
+    color: var(--cyan);
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--yellow);
+    margin-bottom: 12px;
+  }
+
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-size: 14px;
+  }
+  th {
+    background: var(--card2);
+    color: var(--yellow);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background: rgba(30, 41, 59, 0.5);
+  }
+
+  /* SERVICE BOXES */
+  .service-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .service-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+  .service-box.svc-a::before { background: var(--accent); }
+  .service-box.svc-b::before { background: var(--green); }
+  .service-box .svc-label {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .svc-a .svc-label { background: rgba(59,130,246,0.2); color: var(--accent); }
+  .svc-b .svc-label { background: rgba(16,185,129,0.2); color: var(--green); }
+  .service-box h4 {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .service-box p {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+  .service-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .service-box ul li {
+    font-size: 13px;
+    color: var(--text);
+    padding: 3px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .service-box ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--text2);
+  }
+
+  /* FLOW ARROW */
+  .flow-arrow {
+    text-align: center;
+    font-size: 24px;
+    color: var(--yellow);
+    margin: 8px 0;
+    letter-spacing: 4px;
+  }
+
+  /* ROADMAP */
+  .roadmap {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .month-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+  }
+  .month-card .month-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .month-card h4 {
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .month-card p {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+  .ratio-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .ratio-bar .fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+  .ratio-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* STEPS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 16px 0;
+  }
+  .step-item {
+    display: grid;
+    grid-template-columns: 48px 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .step-before, .step-after {
+    font-size: 13px;
+  }
+  .step-before { color: var(--text2); }
+  .step-after { color: var(--green); }
+  .step-before-label, .step-after-label {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .step-before-label { color: var(--red); }
+  .step-after-label { color: var(--green); }
+
+  /* TWO LAYERS */
+  .layer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .layer-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .layer-box.layer1 { border-top: 3px solid var(--accent); }
+  .layer-box.layer2 { border-top: 3px solid var(--green); }
+  .layer-box h4 {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+  .layer1 h4 { color: var(--accent); }
+  .layer2 h4 { color: var(--green); }
+  .layer-box .layer-desc {
+    font-size: 13px;
+    color: var(--yellow);
+    margin-bottom: 12px;
+  }
+  .layer-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .layer-box ul li {
+    font-size: 13px;
+    padding: 4px 0 4px 16px;
+    position: relative;
+    color: var(--text);
+  }
+  .layer-box ul li::before {
+    content: '●';
+    position: absolute;
+    left: 0;
+    font-size: 8px;
+    top: 7px;
+  }
+  .layer1 ul li::before { color: var(--accent); }
+  .layer2 ul li::before { color: var(--green); }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-card .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cyan);
+  }
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  /* STRENGTH */
+  .strength-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .strength-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .strength-card h4 {
+    font-size: 14px;
+    color: var(--yellow);
+    margin-bottom: 8px;
+  }
+  .strength-card p {
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  /* PHASE */
+  .phase-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .phase-label {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .phase1 .phase-label { background: rgba(59,130,246,0.2); color: var(--accent); }
+  .phase2 .phase-label { background: rgba(16,185,129,0.2); color: var(--green); }
+  .phase-box h4 {
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .phase-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .phase-step {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .phase-step .ps-num {
+    background: var(--card2);
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .phase-step .ps-period {
+    color: var(--text2);
+    font-size: 12px;
+    white-space: nowrap;
+    min-width: 60px;
+  }
+
+  /* WARNING */
+  .warning-table td:first-child {
+    color: var(--red);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* RISK */
+  .risk-item {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+  .risk-icon {
+    color: var(--red);
+    font-size: 16px;
+  }
+
+  /* NEXT STEP */
+  .next-table {
+    margin: 16px 0;
+  }
+  .next-table td:nth-child(2) {
+    font-weight: 600;
+    color: #fff;
+  }
+
+  /* CTA */
+  .cta {
+    text-align: center;
+    background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    margin-top: 32px;
+  }
+  .cta p {
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .cta .cta-main {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-top: 16px;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--text2);
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .service-grid, .layer-grid, .strength-grid, .roadmap { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .step-item { grid-template-columns: 48px 1fr; }
+    .step-after { grid-column: 2; }
+    .nav { padding: 0 12px; }
+    .nav a { padding: 12px 14px; font-size: 12px; }
+    .main { padding: 24px 16px 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>会計事務所のための経営管理サポートのご提案</h1>
+  <p class="tagline">人もAIも最大限に力を発揮できる「環境」を作る。</p>
+  <p class="tagline2">人は、経営判断の支援に集中する。</p>
+  <p class="company">株式会社磯貝</p>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <a href="#challenge">課題</a>
+  <a href="#ai-era">AI時代</a>
+  <a href="#services">サービス</a>
+  <a href="#service-a">レクチャー</a>
+  <a href="#service-b">経営管理</a>
+  <a href="#track-record">実績</a>
+  <a href="#rollout">導入</a>
+  <a href="#next">Next</a>
+</div>
+
+<div class="main">
+
+  <!-- §1 課題 -->
+  <div class="section" id="challenge">
+    <span class="section-num">01</span>
+    <h2>会計事務所が今、直面している課題</h2>
+    <p>顧問先が増えるほど、本来やるべきことに時間を使えなくなっていませんか？</p>
+
+    <div class="steps">
+      <div class="step-item">
+        <div></div>
+        <div class="step-before"><div class="step-after-label">本来やりたいこと</div></div>
+        <div class="step-after"><div class="step-before-label">現実に時間を取られていること</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-after">顧問先の経営課題を一緒に考える</div>
+        <div class="step-before">請求書の収集（メール・LINE・チャットでバラバラ）</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-after">数字を使った経営判断のサポート</div>
+        <div class="step-before">仕訳の手入力（属人的、ミスのリスク）</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-after">事業計画や資金繰りの相談対応</div>
+        <div class="step-before">チェック作業（目視、ダブルチェックに人手）</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-after">顧問先との信頼関係の深化</div>
+        <div class="step-before">承認フロー（メールや紙で回す、追いかける）</div>
+      </div>
+    </div>
+
+    <p>顧問先が増えるたびに「右側」が膨れ上がり、「左側」に割ける時間がどんどん減っていく。<br>
+    この構造を変えない限り、人を増やしても同じ問題が繰り返されます。</p>
+
+    <div class="emphasis-box">
+      <strong>必要なのは、AIやシステムの導入ではありません。</strong><br>
+      人もAIも迷わず作業できる「環境」を先に整えることです。
+    </div>
+  </div>
+
+  <!-- §2 AI時代 -->
+  <div class="section" id="ai-era">
+    <span class="section-num">02</span>
+    <h2>もうひとつの課題：AI時代への対応</h2>
+    <p>AIの進化は、会計業界に2つの変化をもたらしています。</p>
+
+    <table>
+      <tr>
+        <th>変化</th>
+        <th>具体的な影響</th>
+      </tr>
+      <tr>
+        <td><span class="highlight">顧問先からの期待値の上昇</span></td>
+        <td>「AIで効率化できるのに、なぜ顧問料は変わらないのか？」という声</td>
+      </tr>
+      <tr>
+        <td><span class="highlight">スタッフの業務変革の必要性</span></td>
+        <td>単純作業はAIが代替。人に求められるスキルが変わってきている</td>
+      </tr>
+    </table>
+
+    <div class="emphasis-box">
+      人に売る前に、まず自分たちで使いこなす。<br>
+      <strong>その実践知こそが、顧問先への新しい価値提案の源泉になります。</strong>
+    </div>
+  </div>
+
+  <!-- §3 サービス全体像 -->
+  <div class="section" id="services">
+    <span class="section-num">03</span>
+    <h2>ご提案：2つのサービス</h2>
+
+    <div class="service-grid">
+      <div class="service-box svc-a">
+        <span class="svc-label">サービスA</span>
+        <h4>AI活用レクチャー</h4>
+        <p>「事務所のAI活用力を底上げする」</p>
+        <ul>
+          <li>毎日30分の朝礼形式</li>
+          <li>3ヶ月のロードマップ</li>
+          <li>AIリテラシー教育（顧客情報保護）</li>
+        </ul>
+      </div>
+      <div class="service-box svc-b">
+        <span class="svc-label">サービスB</span>
+        <h4>経営管理サポート</h4>
+        <p>「顧問先に新しい価値を提供する」</p>
+        <ul>
+          <li>制度会計オペレーションの仕組化</li>
+          <li>管理会計の導入</li>
+          <li>横展開マニュアル</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="flow-arrow">A → B</div>
+    <p style="text-align:center;color:var(--text2);font-size:14px;">
+      サービスAで「自分たちが使えるようになる」→ サービスBで「顧問先に価値を提供する」<br>
+      この順番で進めることで、無理なく、着実にAI時代の会計事務所へ変革できます。
+    </p>
+  </div>
+
+  <!-- §4 サービスA -->
+  <div class="section" id="service-a">
+    <span class="section-num">04</span>
+    <h2>サービスA：AI活用レクチャー</h2>
+
+    <h3>概要</h3>
+    <table>
+      <tr><th>形式</th><td>毎日9:15〜9:45（30分）朝礼形式・オンライン</td></tr>
+      <tr><th>期間</th><td>3ヶ月（4月〜6月）をワンクール</td></tr>
+      <tr><th>対象</th><td>事務所スタッフ全員（参加希望者は自由参加）</td></tr>
+      <tr><th>内容</th><td>INPUT（知識習得）＋ OUTPUT（実務実践）</td></tr>
+      <tr><th>付帯</th><td>毎回の議事録作成・共有、質問フォーム対応</td></tr>
+    </table>
+
+    <h3>3ヶ月ロードマップ</h3>
+    <div class="roadmap">
+      <div class="month-card">
+        <div class="month-label">Month 1（4月）</div>
+        <h4>基礎固め</h4>
+        <p>AIの基本操作、AIリテラシー（⚠️顧客情報保護）、プロンプトの基本、文書作成・要約、データ処理入門</p>
+        <div class="ratio-bar">
+          <div class="fill" style="width:70%;background:var(--accent);"></div>
+        </div>
+        <div class="ratio-label">
+          <span>INPUT 70%</span><span>OUTPUT 30%</span>
+        </div>
+      </div>
+      <div class="month-card">
+        <div class="month-label">Month 2（5月）</div>
+        <h4>実務適用</h4>
+        <p>会計業務×AI（仕訳効率化、税務リサーチ補助）、業務フロー改善、ペーパーレス推進、応用テクニック</p>
+        <div class="ratio-bar">
+          <div class="fill" style="width:30%;background:var(--accent);"></div>
+        </div>
+        <div class="ratio-label">
+          <span>INPUT 30%</span><span>OUTPUT 70%</span>
+        </div>
+      </div>
+      <div class="month-card">
+        <div class="month-label">Month 3（6月）</div>
+        <h4>自走化</h4>
+        <p>各自の業務でAI活用を実践、横展開準備、マイプロンプト集作成、総まとめ・成果発表</p>
+        <div class="ratio-bar">
+          <div class="fill" style="width:10%;background:var(--accent);"></div>
+        </div>
+        <div class="ratio-label">
+          <span>INPUT 10%</span><span>OUTPUT 90%</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>⚠️ AIリテラシー教育：顧客情報保護</h3>
+    <p>AI活用で最大限気をつけなければならないのは、<span class="highlight">顧客情報の流出</span>です。</p>
+
+    <table class="warning-table">
+      <tr>
+        <th>項目</th>
+        <th>内容</th>
+      </tr>
+      <tr>
+        <td>絶対NG行動</td>
+        <td>顧客名・マイナンバー・口座番号等の直接入力、確定申告書のそのままアップロード</td>
+      </tr>
+      <tr>
+        <td>事前準備</td>
+        <td>チャット履歴OFF設定、API利用と通常利用の違い、データマスキングルールの策定</td>
+      </tr>
+      <tr>
+        <td>リスク行動</td>
+        <td>履歴ONのまま機密情報を入力、個人情報を含むファイルのアップロード、AIの回答を検証なしで採用</td>
+      </tr>
+      <tr>
+        <td>社内ルール</td>
+        <td>AI利用ガイドラインの策定、インシデント対応フロー、クライアントへの説明体制</td>
+      </tr>
+    </table>
+
+    <h3>進捗の見える化</h3>
+    <p>受講者ごとにスキル習得チェックリストで進捗を管理します。</p>
+    <table>
+      <tr><th>レベル</th><th>意味</th></tr>
+      <tr><td>☐ 未着手</td><td>まだ取り組んでいない</td></tr>
+      <tr><td>△ 学習中</td><td>INPUTは理解したがOUTPUTが不十分</td></tr>
+      <tr><td>◯ 基本習得</td><td>指導ありでできる</td></tr>
+      <tr><td>◎ 自走可能</td><td>一人でできる</td></tr>
+      <tr><td>★ 指導可能</td><td>他者に教えられるレベル</td></tr>
+    </table>
+    <p>Month 3終了時に全員が「<span class="highlight">◎ 自走可能</span>」以上を目指します。</p>
+
+    <h3>質問フォーム</h3>
+    <table>
+      <tr><th>投稿方法</th><td>Googleフォーム or LINEグループで事前投稿</td></tr>
+      <tr><th>投稿期限</th><td>前日18:00まで</td></tr>
+      <tr><th>回答方式</th><td>翌朝のレクチャー冒頭5分で優先回答</td></tr>
+      <tr><th>匿名対応</th><td>可（聞きにくいことも気軽に）</td></tr>
+    </table>
+
+    <h3>議事録サービス</h3>
+    <table>
+      <tr><th>形式</th><td>Gamma（リンクで閲覧可能、LINEでも見られる）</td></tr>
+      <tr><th>内容</th><td>当日のテーマ、講義内容の要約、獲得スキル一覧、質問と回答、次回の予告</td></tr>
+      <tr><th>目的</th><td>欠席者が一覧で内容確認できる。当日獲得したスキルが明確に分かる</td></tr>
+    </table>
+  </div>
+
+  <!-- §5 サービスB -->
+  <div class="section" id="service-b">
+    <span class="section-num">05</span>
+    <h2>サービスB：経営管理サポート</h2>
+
+    <h3>業務フローの仕組化（5ステップ）</h3>
+    <div class="steps">
+      <div class="step-item">
+        <div></div>
+        <div class="step-before"><div class="step-before-label">今の現実</div></div>
+        <div class="step-after"><div class="step-after-label">仕組み化後</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">①</div>
+        <div class="step-before">請求書がメール・LINE・チャットでバラバラに届く</div>
+        <div class="step-after">窓口一元化＋自動収集の仕組み</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">②</div>
+        <div class="step-before">手入力、属人的。担当者が休むと止まる</div>
+        <div class="step-after">過去仕訳＋銀行データからAIで基礎データ自動生成</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">③</div>
+        <div class="step-before">目視、ダブルチェックに人手を使う</div>
+        <div class="step-after">AI突合（給与×請求書、振込×請求書、勤怠×管理会計）</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">④</div>
+        <div class="step-before">メールや紙で回す。誰が止めているか分からない</div>
+        <div class="step-after">フロー標準化。ステータスが一目で分かる仕組み</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">⑤</div>
+        <div class="step-before">試算表を出して終わり</div>
+        <div class="step-after">管理会計レポート（PL・BS・CF連動、個人別損益、KPI）</div>
+      </div>
+    </div>
+
+    <h3>2つの層</h3>
+    <div class="layer-grid">
+      <div class="layer-box layer1">
+        <h4>層1：制度会計オペレーションの仕組化</h4>
+        <div class="layer-desc">「今の業務が楽になる」</div>
+        <ul>
+          <li>請求書収集の一元化</li>
+          <li>AIによる仕訳基礎データ自動生成</li>
+          <li>給与・振込・請求書のAI突合チェック</li>
+          <li>勤怠データの管理会計ドライバー化</li>
+          <li>承認フローの標準化</li>
+        </ul>
+      </div>
+      <div class="layer-box layer2">
+        <h4>層2：管理会計の導入</h4>
+        <div class="layer-desc">「顧問先に新しい価値を提供できる」</div>
+        <ul>
+          <li>PL・BS・CF連動レポート構築</li>
+          <li>個人別損益テンプレート策定</li>
+          <li>入出金管理システム構築</li>
+          <li>KPIダッシュボード設計</li>
+          <li>経営判断に使える月次レポート</li>
+        </ul>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text2);">層1で「回る仕組み」を作ってから層2を載せることも、両方同時に進めることも可能です。</p>
+  </div>
+
+  <!-- §6 実績 -->
+  <div class="section" id="track-record">
+    <span class="section-num">06</span>
+    <h2>実績：13社のグループ経営管理</h2>
+    <p>本サービスの基盤となる仕組みは、グループ13社での経営管理サポートを通じて構築・実証済みです。</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">13</div>
+        <div class="stat-label">サポート企業</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">1,374h</div>
+        <div class="stat-label">年間稼働</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">6</div>
+        <div class="stat-label">業務領域</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">✓</div>
+        <div class="stat-label">標準化済み</div>
+      </div>
+    </div>
+
+    <h3>構築済みフレームワーク</h3>
+    <table>
+      <tr>
+        <th>領域</th>
+        <th>内容</th>
+        <th>状態</th>
+      </tr>
+      <tr>
+        <td>税務会計</td>
+        <td>PL・BS・CF連動レポート構築</td>
+        <td style="color:var(--green);">グループ横展開済み</td>
+      </tr>
+      <tr>
+        <td>管理会計</td>
+        <td>個人別損益テンプレート策定</td>
+        <td style="color:var(--green);">グループ横展開済み</td>
+      </tr>
+      <tr>
+        <td>財務管理</td>
+        <td>入出金管理システム構築</td>
+        <td style="color:var(--green);">グループ横展開済み</td>
+      </tr>
+    </table>
+
+    <h3>磯貝の強み</h3>
+    <div class="strength-grid">
+      <div class="strength-card">
+        <h4>会計事務所での実務経験</h4>
+        <p>記帳・チェック・承認の現場で苦労してきた当事者。課題を肌で知っている</p>
+      </div>
+      <div class="strength-card">
+        <h4>CFOとしての管理会計構築力</h4>
+        <p>13社のグループ経営管理を一人で設計・運用。PL・BS・CF連動からKPIまで</p>
+      </div>
+      <div class="strength-card">
+        <h4>仕組みの標準化と横展開</h4>
+        <p>1社で仕組みを作り、マニュアル化してグループ全体に展開する方法論を確立済み</p>
+      </div>
+      <div class="strength-card">
+        <h4>AIの実務活用</h4>
+        <p>AIを「魔法の道具」ではなく「整理された環境で力を発揮するツール」として活用</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- §7 導入の進め方 -->
+  <div class="section" id="rollout">
+    <span class="section-num">07</span>
+    <h2>導入の進め方</h2>
+    <p>まず自分たちの事務所で実践し、成功事例を作る。そこから顧問先へ横展開する。</p>
+
+    <div class="phase-box phase1">
+      <span class="phase-label">Phase 1</span>
+      <h4>自分たちが使えるようになる（4月〜6月）</h4>
+      <div class="phase-steps">
+        <div class="phase-step">
+          <span class="ps-num">Step 1</span>
+          <span>AIレクチャー開始。まず事務所内の業務効率化に集中</span>
+          <span class="ps-period">4月〜</span>
+        </div>
+        <div class="phase-step">
+          <span class="ps-num">Step 2</span>
+          <span>事務所業務のペーパーレス化・定型化を実践</span>
+          <span class="ps-period">4月〜5月</span>
+        </div>
+        <div class="phase-step">
+          <span class="ps-num">Step 3</span>
+          <span>スタッフが自走できる状態まで磨き込む</span>
+          <span class="ps-period">5月〜6月</span>
+        </div>
+        <div class="phase-step">
+          <span class="ps-num">Step 4</span>
+          <span>3ヶ月の成果を振り返り、次フェーズの計画策定</span>
+          <span class="ps-period">6月末</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">▼</div>
+
+    <div class="phase-box phase2">
+      <span class="phase-label">Phase 2</span>
+      <h4>顧問先に価値を提供する（7月〜）</h4>
+      <div class="phase-steps">
+        <div class="phase-step">
+          <span class="ps-num">Step 5</span>
+          <span>顧問先1社を選定し、経営管理サポートを導入</span>
+        </div>
+        <div class="phase-step">
+          <span class="ps-num">Step 6</span>
+          <span>1社で確立した仕組みをマニュアル化</span>
+        </div>
+        <div class="phase-step">
+          <span class="ps-num">Step 7</span>
+          <span>他の顧問先に横展開。顧問先が増えても「仕組みのコピー」で対応可能に</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="emphasis-box">
+      <strong>ポイント：Phase 1で自分たちが体験したからこそ、顧問先に自信を持って提案できる。</strong><br>
+      これが「人に売る前にまず自分」の意味です。
+    </div>
+  </div>
+
+  <!-- §9 次のステップ -->
+  <div class="section" id="next">
+    <span class="section-num">08</span>
+    <h2>次のステップ</h2>
+    <p>まずはPhase 1から始めましょう。</p>
+
+    <table class="next-table">
+      <tr>
+        <th>No.</th>
+        <th>アクション</th>
+        <th>担当</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td style="color:#fff;font-weight:600;">契約書の締結（NDA・業務委託基本契約・覚書）</td>
+        <td>双方</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td style="color:#fff;font-weight:600;">AIレクチャー開始（4月〜、毎日9:15〜9:45）</td>
+        <td>磯貝</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td style="color:#fff;font-weight:600;">3ヶ月後の成果振り返り・Phase 2の計画策定</td>
+        <td>双方</td>
+      </tr>
+    </table>
+
+    <div class="cta">
+      <p>仕組みが単純作業を引き受ける。</p>
+      <p>人は、顧問先の経営を良くすることに集中する。</p>
+      <p class="cta-main">その環境を、一緒に作りませんか。</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  CONFIDENTIAL — &copy; 2026 株式会社磯貝　無断転用禁止
+</div>
+
+<script>
+// Scroll spy for nav
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav a');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    const top = s.offsetTop - 80;
+    if (window.scrollY >= top) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>
