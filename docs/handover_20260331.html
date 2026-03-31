@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>引継書 | 2026年3月31日（火）</title>
+<style>
+  :root {
+    --primary: #1a365d;
+    --primary-light: #2b6cb0;
+    --accent: #e53e3e;
+    --warning: #dd6b20;
+    --success: #38a169;
+    --gray-50: #f7fafc;
+    --gray-100: #edf2f7;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e0;
+    --gray-600: #718096;
+    --gray-700: #4a5568;
+    --gray-800: #2d3748;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    line-height: 1.7;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, #2c5282 100%);
+    color: white;
+    padding: 36px 0;
+    margin-bottom: 28px;
+  }
+  .header-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+  .header p { font-size: 14px; opacity: 0.85; }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: white; font-weight: 700; flex-shrink: 0;
+  }
+  .card-title { font-size: 16px; font-weight: 700; color: var(--primary); }
+  .card-body { padding: 16px 20px; font-size: 14px; }
+  .card-body p { margin-bottom: 10px; }
+  .card-body p:last-child { margin-bottom: 0; }
+
+  .status {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-done { background: #c6f6d5; color: #276749; }
+  .status-wait { background: #feebc8; color: #9c4221; }
+  .status-next { background: #bee3f8; color: #2b6cb0; }
+  .status-urgent { background: #fed7d7; color: #c53030; }
+
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+  thead th {
+    background: var(--gray-100);
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--gray-700);
+    border-bottom: 2px solid var(--gray-300);
+  }
+  tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-700);
+    margin: 14px 0 8px;
+    padding-left: 10px;
+    border-left: 3px solid var(--primary-light);
+  }
+  h3:first-child { margin-top: 0; }
+  ul { padding-left: 18px; margin: 6px 0; }
+  li { margin: 3px 0; }
+
+  .alert {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    font-size: 13px;
+  }
+  .alert-info { background: #ebf8ff; border-left: 4px solid #3182ce; }
+  .alert-warning { background: #fffaf0; border-left: 4px solid var(--warning); }
+
+  .file-link {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12px;
+    background: var(--gray-100);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--gray-700);
+    word-break: break-all;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 10px 0;
+  }
+  .summary-item {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .summary-item .num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .summary-item .label {
+    font-size: 12px;
+    color: var(--gray-600);
+    margin-top: 2px;
+  }
+
+  @media print {
+    body { background: white; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>Daily Handover &mdash; 2026年3月31日（火）</h1>
+    <p>磯貝（CFO） &times; Claude Code</p>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ===== サマリー ===== -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background: var(--primary);">S</div>
+    <div class="card-title">本日のサマリー</div>
+  </div>
+  <div class="card-body">
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="num">4</div>
+        <div class="label">完了タスク</div>
+      </div>
+      <div class="summary-item">
+        <div class="num">61</div>
+        <div class="label">Delvance移行ファイル</div>
+      </div>
+      <div class="summary-item">
+        <div class="num">3</div>
+        <div class="label">議事録作成</div>
+      </div>
+      <div class="summary-item">
+        <div class="num">5</div>
+        <div class="label">明日以降の宿題</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 1. SES個人別損益 ===== -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background: var(--success);">1</div>
+    <div class="card-title">SES個人別損益 — スピン・ワンテック・悟空</div>
+  </div>
+  <div class="card-body">
+    <table>
+      <thead>
+        <tr><th>作業</th><th>状態</th><th>詳細</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>新卒均等按分行の実装</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td>3社 &times; 3ヶ月 = 全9パターンで進捗シート突合一致（差異ゼロ）</td>
+        </tr>
+        <tr>
+          <td><strong>FC週次比較レポート</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td>0324→0331のFC変更分析レポートを3社分作成</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>修正した主要バグ</h3>
+    <ul>
+      <li>spin：新卒の入替後売上に端数未加算 / 入替前売上=0でD5不一致</li>
+      <li>onetech：AE1にAF1（突発離任）が二重計上</li>
+      <li>gokoku：退場者がsort_for_plで除外され、Σ入替前 ≠ FC個人H → P&L逆算方式に変更</li>
+    </ul>
+
+    <h3>出力ファイル</h3>
+    <ul>
+      <li><span class="file-link">spin_pl_v5_20260331.xlsx</span></li>
+      <li><span class="file-link">onetech_pl_v5_20260331.xlsx</span></li>
+      <li><span class="file-link">gokoku_pl_v4_20260331.xlsx</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== 2. Delvance移行 ===== -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background: var(--primary-light);">2</div>
+    <div class="card-title">Delvance — Claude Code移行</div>
+  </div>
+  <div class="card-body">
+    <table>
+      <thead>
+        <tr><th>作業</th><th>状態</th><th>詳細</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>プロジェクト構築</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td>delvance-cfo/ ディレクトリ作成、CLAUDE.md配置</td>
+        </tr>
+        <tr>
+          <td><strong>ファイル配置</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td>ZIPから全61ファイル展開・配置（漏れゼロ）</td>
+        </tr>
+        <tr>
+          <td><strong>メモリ登録</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td>project_delvance.md作成、MEMORY.mdにインデックス追加</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>配置済みファイル内訳</h3>
+    <table>
+      <thead>
+        <tr><th>フォルダ</th><th>数</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>manuals/</td><td>2</td><td>個人別損益マニュアル、入出金管理マニュアルv23</td></tr>
+        <tr><td>excel/</td><td>2</td><td>P&L v15（最新）、入出金管理v23</td></tr>
+        <tr><td>excel/archive/</td><td>4</td><td>v10, v11, v12, 入出金v13</td></tr>
+        <tr><td>source_data/</td><td>8+</td><td>売上粗利、仕訳、入社日、試算表PL、CF、給与PDF等</td></tr>
+        <tr><td>reference/</td><td>11+</td><td>推移表、決算書、元帳、バトルクライ、Pronetix等</td></tr>
+        <tr><td>minutes/</td><td>19</td><td>5回分（Gamma用md + Geminiメモ/文字起こし + 元メモtxt）</td></tr>
+        <tr><td>kickoff/</td><td>4</td><td>台本v1〜v5</td></tr>
+        <tr><td>gas/</td><td>2</td><td>シート保護/解除</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <strong>場所：</strong><span class="file-link">G:\マイドライブ\糸山さん\【糸山さんグループ】\ディルバンス\delvance-cfo\</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3. 議事録 ===== -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background: #805ad5;">3</div>
+    <div class="card-title">議事録作成 &amp; GitHub Pages公開</div>
+  </div>
+  <div class="card-body">
+    <table>
+      <thead>
+        <tr><th>議事録</th><th>状態</th><th>GitHub Pages URL</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ライトフィット &times; Delvance 定例</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td><a href="https://misogai-match.github.io/Itoyama-san/ディルバンス/20260331_定例.html" style="color: var(--primary-light); font-size:13px;">ディルバンス/20260331_定例.html</a></td>
+        </tr>
+        <tr>
+          <td><strong>インターシフト定例</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td><a href="https://misogai-match.github.io/Itoyama-san/docs/meetings/議事録_インターシフト定例_20260331.html" style="color: var(--primary-light); font-size:13px;">docs/meetings/インターシフト定例.html</a></td>
+        </tr>
+        <tr>
+          <td><strong>パートナー定例</strong></td>
+          <td><span class="status status-done">完了</span></td>
+          <td><a href="https://misogai-match.github.io/Itoyama-san/docs/meetings/議事録_パートナー定例_20260331.html" style="color: var(--primary-light); font-size:13px;">docs/meetings/パートナー定例.html</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 4. 明日以降の宿題 ===== -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background: var(--warning);">4</div>
+    <div class="card-title">明日以降の宿題・残タスク</div>
+  </div>
+  <div class="card-body">
+
+    <h3>磯貝の宿題（本日MTGから）</h3>
+    <table>
+      <thead>
+        <tr><th>タスク</th><th>期日</th><th>状態</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ライトフィットCF作成</strong>（2月〜3月分）</td>
+          <td>本日中</td>
+          <td><span class="status status-urgent">要対応</span></td>
+        </tr>
+        <tr>
+          <td><strong>Delvance 2月反映</strong>（BS推移到着次第）</td>
+          <td>BS到着後即日</td>
+          <td><span class="status status-wait">待ちデータ</span></td>
+        </tr>
+        <tr>
+          <td><strong>2社連結シミュレーション</strong>（バーンレート・黒字化ロードマップ）</td>
+          <td>来週MTGまで</td>
+          <td><span class="status status-next">次ステップ</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>他メンバーの宿題（4/4金曜期日）</h3>
+    <table>
+      <thead>
+        <tr><th>担当</th><th>タスク</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>高橋さん</strong></td><td>ライトフィット財務書類（12-3月）提出 / 通帳記帳 / HP作成（4月中）/ 入替計画一覧表</td></tr>
+        <tr><td><strong>田中さん</strong></td><td>BS推移表提出（早急）/ 就業規則スキャン→AI確認 / 高橋さんへ補足伝達</td></tr>
+        <tr><td><strong>本間さん</strong></td><td>糸山会長に統合スキーム確認（銀行対応）/ 社名変更承認 / 2社PL把握</td></tr>
+      </tbody>
+    </table>
+
+    <h3>SES関連の残タスク</h3>
+    <table>
+      <thead>
+        <tr><th>タスク</th><th>状態</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>週次レポート自動生成の仕組化（build_weekly_report.py）</td><td><span class="status status-next">次ステップ</span></td></tr>
+        <tr><td>リクソル build_riksol.py 作成</td><td><span class="status status-next">次ステップ</span></td></tr>
+        <tr><td>config.py共通化（3社ビルドスクリプト）</td><td><span class="status status-next">次ステップ</span></td></tr>
+        <tr><td>新卒売上単価の確認（糸山さんに確認）</td><td><span class="status status-wait">次回MTG</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 5. プロジェクト移行進捗 ===== -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background: #319795;">5</div>
+    <div class="card-title">Claude Chat → Code 移行進捗</div>
+  </div>
+  <div class="card-body">
+    <table>
+      <thead>
+        <tr><th>プロジェクト</th><th>状態</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>SES個人別損益（悟空・スピン・ワンテック・リクソル）</td><td><span class="status status-done">完了</span></td><td>3/28移行</td></tr>
+        <tr><td>マーケットレポート</td><td><span class="status status-done">完了</span></td><td>C:\GitHub\</td></tr>
+        <tr><td>HUBRIDE</td><td><span class="status status-done">完了</span></td><td>ダッシュボード + Chatworkアラート</td></tr>
+        <tr><td>キャリアビジョン</td><td><span class="status status-done">完了</span></td><td>CLAUDE.md配置済み</td></tr>
+        <tr><td>決算チェック・ENB・ProNetix・AIレクチャー</td><td><span class="status status-done">完了</span></td><td></td></tr>
+        <tr><td><strong>Delvance CFO支援</strong></td><td><span class="status status-done">本日完了</span></td><td>全61ファイル配置</td></tr>
+        <tr><td>その他（約20プロジェクト）</td><td><span class="status status-wait">未着手</span></td><td>順次対応</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="text-align: center; color: var(--gray-600); font-size: 12px; padding: 20px 0; border-top: 1px solid var(--gray-200); margin-top: 12px;">
+  Generated by Claude Code | 2026-03-31
+</div>
+
+</div>
+</body>
+</html>
