@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インターシフト定例 議事録 — 2026/03/31</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #263347;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --accent: #3b82f6;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --cyan: #06b6d4;
+    --red: #ef4444;
+    --purple: #a855f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px;
+    text-align: center;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .header-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .header-meta span { display: flex; align-items: center; gap: 6px; }
+
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  .section {
+    margin-bottom: 40px;
+  }
+  .section-label {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cyan);
+    margin: 20px 0 10px;
+  }
+  .section p {
+    margin-bottom: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-size: 14px;
+  }
+  th {
+    background: var(--card2);
+    color: var(--yellow);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background: rgba(30, 41, 59, 0.5);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--yellow);
+    margin-bottom: 10px;
+  }
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+  .card ul li {
+    padding: 4px 0 4px 18px;
+    position: relative;
+    font-size: 14px;
+  }
+  .card ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--text2);
+  }
+
+  .emphasis-box {
+    background: rgba(6, 182, 212, 0.08);
+    border-left: 3px solid var(--cyan);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .emphasis-box strong { color: var(--cyan); }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .badge-kayama { background: rgba(168,85,247,0.2); color: var(--purple); }
+  .badge-matchi { background: rgba(59,130,246,0.2); color: var(--accent); }
+
+  .task-row td:first-child { text-align: center; font-weight: 700; color: var(--text2); }
+  .task-row .badge { white-space: nowrap; }
+
+  .arrow-list {
+    list-style: none;
+    padding: 0;
+  }
+  .arrow-list li {
+    padding: 8px 0 8px 20px;
+    position: relative;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .arrow-list li:last-child { border-bottom: none; }
+  .arrow-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--text2);
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+
+  @media (max-width: 768px) {
+    .main { padding: 20px 14px 48px; }
+    .header-meta { flex-direction: column; align-items: center; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>インターシフト定例 議事録</h1>
+  <div class="header-meta">
+    <span>📅 2026年3月31日（月）9:33〜</span>
+    <span>👥 磯貝（まっち）、香山さん（大山先生・アルファーム）</span>
+    <span>💻 オンライン</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 議題サマリー -->
+  <div class="section">
+    <span class="section-label">SUMMARY</span>
+    <h2>議題サマリー</h2>
+    <table>
+      <tr><th>#</th><th>議題</th><th>結論</th></tr>
+      <tr>
+        <td>1</td>
+        <td>HUBRIDEダッシュボードのデモ</td>
+        <td>Claude Codeで2日で作成。業務知識×AIの掛け算が価値</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>大山先生事務所へのAI活用支援提案</td>
+        <td>株式会社忙との契約を提案。香山さん前向き、大山先生と要調整</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>鈴木先生事務所へのClaude導入方針</td>
+        <td>AI未経験者が多い → Claude Web版のクローズド環境から開始が安全</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>今後のMTG形式</td>
+        <td>Web会議を基本（エージェント化で会話→ナレッジ自動格納のため）</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>インターシフトの支払い状況</td>
+        <td>塩止先生への支払いが長期継続 → ジさんにLINE確認</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>バトルクライ・テクノロジー部門</td>
+        <td>売却予定（500万円着金済み）。決算申告担当を中田社長に確認</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 詳細 -->
+  <div class="section">
+    <span class="section-label">DETAIL</span>
+    <h2>詳細</h2>
+
+    <div class="card">
+      <h4>2-1. HUBRIDEダッシュボードのデモ</h4>
+      <ul>
+        <li>まっちがClaude Code（バイブコーディング）で作成したHUBRIDE資金管理ダッシュボードをデモ</li>
+        <li><strong style="color:var(--cyan);">機能：</strong> 全体/HUBRIDE切替、台数表示、月次報告、車両購入シミュレーション（余裕資金→購入可能台数）</li>
+        <li><strong style="color:var(--cyan);">開発期間：</strong> 整合性チェック含めて2日。チェック不要なら1日</li>
+      </ul>
+      <div class="emphasis-box">
+        <strong>「AIの時代こそ人間力が試される」</strong> — AIを知っているだけでは不十分。業務を深く理解していることが鍵。
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>2-2. 大山先生事務所へのAI活用支援</h4>
+      <h3>課題（香山さん）</h3>
+      <ul>
+        <li>未経験入社の社員が多く、仕訳チェックの品質に課題</li>
+        <li>香山さん・先生がチェック・修正に時間を取られ、社員の成長につながっていない</li>
+        <li>5〜6月に未経験の新入社員が入る予定 → 研修段階からAI活用したい</li>
+      </ul>
+      <h3>提案（まっち）</h3>
+      <ul>
+        <li>株式会社忙との業務委託契約を締結</li>
+        <li>コミットメントを持って支援するため、契約した方が効率的</li>
+        <li>会計事務所・企業経理の経験あり、インプット段階からサポート可能</li>
+        <li>鈴木先生との契約に続く第2件目</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h4>2-3. Claude導入方針（鈴木先生事務所向け）</h4>
+      <ul>
+        <li>Claude Code（GitHub・Googleドライブ連携等）は高度すぎる → ファイル構造が変わるリスク</li>
+        <li><strong style="color:var(--green);">推奨：</strong> Claude Web版のプロジェクト機能（ナレッジ・ファイルをクローズドに蓄積）から開始</li>
+        <li>チームプランの検討は段階的に</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h4>2-4. インターシフトの支払い状況</h4>
+      <ul>
+        <li>11月からアルファームで請求開始しているが、塩止先生への支払いがまだ多く残っている</li>
+        <li>インターシフトは「尻食い法人」的な位置づけ → 利益率調整や費用付け替えの可能性</li>
+        <li><strong style="color:var(--red);">確認事項：</strong> 何に対して払っているのか、インター分なのか</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h4>2-5. バトルクライ・テクノロジー部門</h4>
+      <ul>
+        <li>テクノロジー部門は売却予定。500万円の着金あり</li>
+        <li>MFに仕訳は入力中だが、経費スプレッドシートが未完成 → 詳細な分類が未完了</li>
+        <li>今期（3月決算）の申告を高橋先生が担当するかどうか未確定</li>
+        <li>中田社長は「認識が抜けている」可能性 → 改めて確認が必要</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 宿題一覧 -->
+  <div class="section">
+    <span class="section-label" style="background:var(--red);">TODO</span>
+    <h2>宿題一覧</h2>
+    <table>
+      <tr><th>#</th><th>担当</th><th>タスク</th><th>期限・備考</th></tr>
+      <tr class="task-row">
+        <td>1</td>
+        <td><span class="badge badge-kayama">香山さん</span></td>
+        <td>株式会社忙との契約について、大山先生とスケジュール確認</td>
+        <td>なるべく早め</td>
+      </tr>
+      <tr class="task-row">
+        <td>2</td>
+        <td><span class="badge badge-kayama">香山さん</span></td>
+        <td>まっちとの打ち合わせをWeb会議で日程調整（大山先生同席）</td>
+        <td>—</td>
+      </tr>
+      <tr class="task-row">
+        <td>3</td>
+        <td><span class="badge badge-kayama">香山さん</span></td>
+        <td>インターシフトの塩止先生への支払い内容をジさんにLINE確認</td>
+        <td>本日中</td>
+      </tr>
+      <tr class="task-row">
+        <td>4</td>
+        <td><span class="badge badge-kayama">香山さん</span></td>
+        <td>テクノロジー側の経費スプレッドシート作成状況を中田社長に確認</td>
+        <td>—</td>
+      </tr>
+      <tr class="task-row">
+        <td>5</td>
+        <td><span class="badge badge-kayama">香山さん</span></td>
+        <td>テクノロジーの決算申告を高橋先生が担当するか中田社長に確認</td>
+        <td>—</td>
+      </tr>
+      <tr class="task-row">
+        <td>6</td>
+        <td><span class="badge badge-kayama">香山さん</span></td>
+        <td>テクノロジー仕訳完了後、中田社長とのフォローアップMTGを設定</td>
+        <td>仕訳完了後</td>
+      </tr>
+      <tr class="task-row">
+        <td>7</td>
+        <td><span class="badge badge-matchi">まっち</span></td>
+        <td>糸山さんMTG（4/2）でデイリーブリーフィング提案</td>
+        <td>4/2</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 次回アクション -->
+  <div class="section">
+    <span class="section-label" style="background:var(--green);">NEXT</span>
+    <h2>次回アクション</h2>
+    <ul class="arrow-list">
+      <li><strong>香山さん → 大山先生：</strong> 株式会社忙との契約・AI活用支援の相談</li>
+      <li><strong>香山さん → ジさん（LINE）：</strong> インターシフト支払い内容の確認</li>
+      <li><strong>香山さん → 中田社長：</strong> テクノロジー部門の決算対応確認</li>
+      <li><strong>次回MTG：</strong> Web会議で調整（大山先生・香山さん・まっち）</li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="footer">
+  作成: 2026/03/31 — Claude Code自動生成（Geminiメモ＋文字起こしより）
+</div>
+
+</body>
+</html>
