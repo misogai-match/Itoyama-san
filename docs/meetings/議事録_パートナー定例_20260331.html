@@ -3,451 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>パートナー定例 議事録 — 2026/03/31</title>
+<title>パートナー定例 議事録 | 2026年3月31日</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f172a;
-    --card: #1e293b;
-    --card2: #263347;
-    --border: #334155;
-    --text: #e2e8f0;
-    --text2: #94a3b8;
-    --accent: #3b82f6;
-    --green: #10b981;
-    --yellow: #f59e0b;
-    --cyan: #06b6d4;
-    --red: #ef4444;
-    --purple: #a855f7;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.8;
-  }
+:root {
+  --bg: #f8f9fb;
+  --card: #ffffff;
+  --border: #e8eaed;
+  --text1: #1a1a2e;
+  --text2: #5f6368;
+  --text3: #9aa0a6;
+  --red: #c5221f;
+  --red-bg: rgba(197,34,31,0.06);
+  --green: #137333;
+  --green-bg: rgba(19,115,51,0.06);
+  --blue: #1a73e8;
+  --blue-bg: #e8f0fe;
+  --orange: #e37400;
+  --orange-bg: rgba(227,116,0,0.07);
+  --yellow: #f9ab00;
+  --yellow-bg: rgba(249,171,0,0.07);
+  --purple: #7b1fa2;
+  --purple-bg: rgba(123,31,162,0.06);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text1); line-height:1.9; font-size:16px; }
+.container { max-width:800px; margin:0 auto; padding:32px 24px; }
+.header { margin-bottom:32px; }
+.header .tag { display:inline-block; background:var(--blue-bg); color:var(--blue); font-size:13px; font-weight:600; padding:4px 12px; border-radius:20px; margin-bottom:12px; letter-spacing:0.5px; }
+.header h1 { font-size:26px; font-weight:700; margin-bottom:8px; line-height:1.4; }
+.header .meta { font-size:14px; color:var(--text3); }
+.header .meta span { margin-right:16px; }
+.status-bar { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+.status-item { display:flex; align-items:center; gap:6px; font-size:14px; padding:6px 14px; border-radius:8px; font-weight:500; }
+.status-red { background:var(--red-bg); color:var(--red); }
+.status-green { background:var(--green-bg); color:var(--green); }
+.status-blue { background:var(--blue-bg); color:var(--blue); }
+.status-purple { background:var(--purple-bg); color:var(--purple); }
 
-  .header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 32px;
-    text-align: center;
-  }
-  .header h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 12px;
-  }
-  .header-meta {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-    font-size: 13px;
-    color: var(--text2);
-  }
-  .header-meta span { display: flex; align-items: center; gap: 6px; }
+.agenda-table { width:100%; border-collapse:collapse; margin-bottom:32px; background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.agenda-table th { background:#f1f3f4; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text2); padding:10px 16px; text-align:left; font-weight:600; }
+.agenda-table td { padding:10px 16px; border-top:1px solid var(--border); font-size:15px; }
+.agenda-table tr:hover { background:#f8f9fb; }
+.badge { display:inline-block; font-size:10px; font-weight:600; padding:2px 8px; border-radius:4px; }
+.badge-red { background:var(--red-bg); color:var(--red); }
+.badge-yellow { background:var(--yellow-bg); color:var(--orange); }
+.badge-orange { background:var(--orange-bg); color:var(--orange); }
+.badge-green { background:var(--green-bg); color:var(--green); }
+.badge-blue { background:var(--blue-bg); color:var(--blue); }
 
-  .main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 32px 24px 64px;
-  }
+.section { margin-bottom:32px; }
+.section-title { font-size:18px; font-weight:700; margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--blue); display:flex; align-items:center; gap:8px; }
+.section-num { background:var(--blue); color:#fff; font-size:14px; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
 
-  .section {
-    margin-bottom: 40px;
-  }
-  .section-label {
-    display: inline-block;
-    background: var(--accent);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 10px;
-    border-radius: 4px;
-    margin-bottom: 8px;
-  }
-  .section h2 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 16px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-  .section h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--cyan);
-    margin: 20px 0 10px;
-  }
-  .section p {
-    margin-bottom: 10px;
-  }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
+.card h3 { font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text1); }
+.card p, .card li { font-size:15px; color:var(--text2); line-height:1.7; }
+.card ul { padding-left:20px; }
+.card li { margin-bottom:4px; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 12px 0 16px;
-    font-size: 14px;
-  }
-  th {
-    background: var(--card2);
-    color: var(--yellow);
-    font-weight: 600;
-    text-align: left;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  td {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    vertical-align: top;
-  }
-  tr:nth-child(even) td {
-    background: rgba(30, 41, 59, 0.5);
-  }
+.quote { border-left:3px solid var(--blue); padding:12px 16px; margin:12px 0; background:var(--blue-bg); border-radius:0 8px 8px 0; font-size:15px; color:var(--text1); font-style:italic; }
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-  .card h4 {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--yellow);
-    margin-bottom: 10px;
-  }
-  .card ul {
-    list-style: none;
-    padding: 0;
-  }
-  .card ul li {
-    padding: 4px 0 4px 18px;
-    position: relative;
-    font-size: 14px;
-  }
-  .card ul li::before {
-    content: '\25B8';
-    position: absolute;
-    left: 0;
-    color: var(--text2);
-  }
+.task-table { width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:16px; }
+.task-table th { background:#f1f3f4; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text2); padding:8px 12px; text-align:left; font-weight:600; }
+.task-table td { padding:8px 12px; border-top:1px solid var(--border); font-size:14px; }
 
-  .emphasis-box {
-    background: rgba(6, 182, 212, 0.08);
-    border-left: 3px solid var(--cyan);
-    padding: 14px 18px;
-    border-radius: 0 8px 8px 0;
-    margin: 12px 0;
-    font-size: 14px;
-  }
-  .emphasis-box strong { color: var(--cyan); }
+.callout { padding:16px 20px; border-radius:12px; margin:16px 0; font-size:15px; }
+.callout-red { background:var(--red-bg); border-left:3px solid var(--red); }
+.callout-blue { background:var(--blue-bg); border-left:3px solid var(--blue); }
+.callout-orange { background:var(--orange-bg); border-left:3px solid var(--orange); }
+.callout-green { background:var(--green-bg); border-left:3px solid var(--green); }
 
-  .badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-  .badge-sato { background: rgba(168,85,247,0.2); color: var(--purple); }
-  .badge-isogai { background: rgba(59,130,246,0.2); color: var(--accent); }
+.summary-section { margin-top:40px; }
+.summary-title { font-size:18px; font-weight:700; margin-bottom:20px; text-align:center; }
 
-  .task-row td:first-child { text-align: center; font-weight: 700; color: var(--text2); }
-  .task-row .badge { white-space: nowrap; }
+.data-table { width:100%; border-collapse:collapse; background:var(--card); border-radius:12px; overflow:hidden; border:1px solid var(--border); margin:12px 0 16px; }
+.data-table th { background:#f1f3f4; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text2); padding:10px 14px; text-align:left; font-weight:600; }
+.data-table td { padding:10px 14px; border-top:1px solid var(--border); font-size:14px; }
+.data-table tr:hover { background:#f8f9fb; }
 
-  .arrow-list {
-    list-style: none;
-    padding: 0;
-  }
-  .arrow-list li {
-    padding: 8px 0 8px 20px;
-    position: relative;
-    font-size: 14px;
-    border-bottom: 1px solid var(--border);
-  }
-  .arrow-list li:last-child { border-bottom: none; }
-  .arrow-list li::before {
-    content: '\2192';
-    position: absolute;
-    left: 0;
-    color: var(--green);
-    font-weight: 700;
-  }
+.next-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:12px; border-left:3px solid var(--blue); }
+.next-card h4 { font-size:15px; font-weight:600; color:var(--blue); margin-bottom:8px; }
+.next-card p { font-size:15px; color:var(--text2); line-height:1.7; }
 
-  .status-done { color: var(--green); font-weight: 600; }
-  .status-new { color: var(--yellow); font-weight: 600; }
+.priority-label { font-size:14px; font-weight:700; margin:20px 0 8px; padding:6px 12px; border-radius:6px; display:inline-block; }
+.priority-high { background:var(--red-bg); color:var(--red); }
+.priority-now { background:var(--orange-bg); color:var(--orange); }
+.priority-mid { background:var(--blue-bg); color:var(--blue); }
 
-  .footer {
-    text-align: center;
-    padding: 24px;
-    font-size: 12px;
-    color: var(--text2);
-    border-top: 1px solid var(--border);
-    margin-top: 48px;
-  }
+.footer { margin-top:40px; padding-top:20px; border-top:1px solid var(--border); font-size:13px; color:var(--text3); text-align:center; }
 
-  @media (max-width: 768px) {
-    .main { padding: 20px 14px 48px; }
-    .header-meta { flex-direction: column; align-items: center; gap: 8px; }
-  }
+@media (max-width:600px) {
+  .container { padding:16px; }
+  .header h1 { font-size:18px; }
+  .status-bar { flex-direction:column; }
+}
 </style>
 </head>
 <body>
+<div class="container">
 
 <div class="header">
+  <div class="tag">Meeting Minutes</div>
   <h1>パートナー定例 議事録</h1>
-  <div class="header-meta">
-    <span>📅 2026年3月31日（火）18:00〜</span>
-    <span>👥 佐藤桂介、磯貝政文</span>
-    <span>📌 次回：4月8日（火）18:00</span>
+  <div class="meta">
+    <span>2026年3月31日（火）18:00〜</span>
+    <span>佐藤桂介・磯貝政文</span>
   </div>
 </div>
 
-<div class="main">
+<div class="status-bar">
+  <div class="status-item status-green">&#x2705; 前回宿題：消費税クレカ分 完了</div>
+  <div class="status-item status-blue">&#x1F4CB; 新規決定：freeeデータ共有ルール</div>
+  <div class="status-item status-purple">&#x1F4C5; 次回：4月8日（火）18:00</div>
+</div>
 
-  <!-- 議題サマリー -->
-  <div class="section">
-    <span class="section-label">SUMMARY</span>
-    <h2>議題サマリー</h2>
-    <table>
-      <tr><th>#</th><th>議題</th><th>結論</th></tr>
-      <tr>
-        <td>1</td>
-        <td>前回宿題の確認</td>
-        <td>消費税（クレカ分）→ 税理士に渡し済み。処理待ち</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>freeeデータの共有ルール</td>
-        <td>税理士MTG後に毎回4点（BS・PL・資金繰り・仕訳帳）を送付</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>AI活用の共有</td>
-        <td>Claude Codeで資金繰りダッシュボードをデモ。議事録もURL共有型に移行</td>
-      </tr>
-      <tr>
-        <td>4</td>
-        <td>HP・採用の進捗</td>
-        <td>HP修正中。新卒5名募集、4/1初回面接</td>
-      </tr>
-      <tr>
-        <td>5</td>
-        <td>ナンバー2候補</td>
-        <td>不採用確定。代理店として協力継続</td>
-      </tr>
-      <tr>
-        <td>6</td>
-        <td>電気販売事業</td>
-        <td>既存広告は順調。4/1から抽選型Web広告（50万円）開始</td>
-      </tr>
-      <tr>
-        <td>7</td>
-        <td>離職者対応とデータ活用</td>
-        <td>面談記録の文字起こし・AI活用を開始</td>
-      </tr>
-    </table>
+<!-- アジェンダ一覧 -->
+<table class="agenda-table">
+<tr><th>#</th><th>アジェンダ</th><th>ステータス</th></tr>
+<tr><td>1</td><td>前回宿題の確認</td><td><span class="badge badge-green">完了</span></td></tr>
+<tr><td>2</td><td>freeeデータの共有ルール</td><td><span class="badge badge-red">新規決定</span></td></tr>
+<tr><td>3</td><td>AI活用の共有（Claude Code）</td><td><span class="badge badge-blue">共有</span></td></tr>
+<tr><td>4</td><td>HP・採用の進捗</td><td><span class="badge badge-yellow">進行中</span></td></tr>
+<tr><td>5</td><td>ナンバー2候補</td><td><span class="badge badge-orange">不採用確定</span></td></tr>
+<tr><td>6</td><td>電気販売事業</td><td><span class="badge badge-yellow">新規施策あり</span></td></tr>
+<tr><td>7</td><td>離職者対応とデータ活用</td><td><span class="badge badge-red">新規提案</span></td></tr>
+</table>
+
+<!-- セクション1 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">1</div> 前回宿題の確認</div>
+
+  <div class="callout callout-green">
+    <strong>&#x2705; 完了：</strong> 消費税（クレカ分）の履歴を社内で発見し、税理士に渡し済み。税理士から「ありがとうございます」の返答あり。処理タイミングで反映される見込み。
   </div>
+</div>
 
-  <!-- 詳細 -->
-  <div class="section">
-    <span class="section-label">DETAIL</span>
-    <h2>詳細</h2>
+<!-- セクション2 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">2</div> freeeデータの共有ルール【新規決定】</div>
 
-    <div class="card">
-      <h4>1. 前回宿題の確認</h4>
-      <ul>
-        <li><span class="status-done">✅ 完了</span> — 消費税（クレカ分）の履歴を社内で発見し、税理士に渡し済み</li>
-        <li>税理士から「ありがとうございます」の返答あり</li>
-        <li>税理士の処理タイミングで反映される見込み</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h4>2. freeeデータの共有ルール【新規決定】</h4>
-      <h3>背景</h3>
-      <ul>
-        <li>磯貝がfreeeからデータをダウンロードすると、加藤さんのメールに送信されてしまう問題が発生</li>
-        <li>現状はコピー＆ペーストで対応しており非効率</li>
-      </ul>
-      <h3>決定事項</h3>
-      <p>税理士MTG後に毎回、以下4点をfreeeから出力して磯貝に送付する：</p>
-      <table>
-        <tr><th>#</th><th>データ名</th><th>freee上の名称</th><th>用途</th></tr>
-        <tr>
-          <td>1</td>
-          <td><strong>貸借対照表（月次推移）</strong></td>
-          <td>BS推移</td>
-          <td>財務分析・AI分析</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td><strong>損益計算書（月次推移）</strong></td>
-          <td>PL推移</td>
-          <td>予実管理・部門分析</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td><strong>資金繰りレポート</strong></td>
-          <td>資金繰りシート</td>
-          <td>CF予測・入出金分析</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td><strong>仕訳帳</strong></td>
-          <td>仕訳日誌</td>
-          <td>最小単位データ。AI分析の精度向上に不可欠</td>
-        </tr>
-      </table>
-      <div class="emphasis-box">
-        <strong>なぜ仕訳が必要か：</strong> 仕訳データには取引先ごとの売上日・入金日が記録されており、AIが自動的にサイト日数を判断し、より正確なキャッシュフロー予測が可能になる。BS/PLだけでは集計済みデータのため、詳細分析に限界がある。
-      </div>
-    </div>
-
-    <div class="card">
-      <h4>3. AI活用の共有（Claude Code紹介）</h4>
-      <ul>
-        <li>磯貝がClaude Codeを導入し、資金繰りダッシュボード（予測機能付き）をデモ</li>
-        <li><strong style="color:var(--cyan);">機能：</strong> 取引先別の入出金推移、月別の台数購入シミュレーション、グラフ・タブ切替付きのインタラクティブUI</li>
-        <li><strong style="color:var(--green);">Excel一切触らずにAIだけで生成</strong>した事例を共有</li>
-        <li>佐藤さんも既にClaudeでPLを分析しており、仕訳データを活用すればさらに精度向上が見込める</li>
-      </ul>
-      <div class="emphasis-box">
-        <strong>議事録の進化：</strong> 今後はGamma形式からURL共有型（GitHub Pages等）に移行予定。AIのコンテキストに蓄積され、MTGを重ねるほど分析精度が向上する仕組み。
-      </div>
-    </div>
-
-    <div class="card">
-      <h4>4. HP・採用の進捗</h4>
-      <h3>ホームページ</h3>
-      <ul>
-        <li>完全に新しいものに作り替え済み</li>
-        <li>現在、採用に効くよう細かい修正を実施中</li>
-        <li>修正完了後に差し替え予定</li>
-      </ul>
-      <h3>新卒採用</h3>
-      <ul>
-        <li>5名程度の募集を継続中（本さんに依頼済み）</li>
-        <li><strong style="color:var(--yellow);">初回面接は明日（4/1）の予定</strong></li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h4>5. ナンバー2候補 → 不採用</h4>
-      <ul>
-        <li>候補者は「自分で会社経営をするのが一番良い」という目標を持っていた</li>
-        <li><strong style="color:var(--purple);">代理店として協力関係は継続</strong> — 取次・代理店としてくっつき、売上・利益に貢献する意向</li>
-        <li>引き続きナンバー2の採用は課題</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h4>6. 電気販売事業</h4>
-      <h3>既存広告運用</h3>
-      <ul>
-        <li>毎日、1件あたり単価・注文数をチェック → <span class="status-done">問題なく推移</span></li>
-        <li>糸山さんからも「パートナーはちゃんとやっている」と評価</li>
-      </ul>
-      <h3>新規：抽選形式Web広告 <span class="status-new">【新規】</span></h3>
-      <ul>
-        <li>会長からの指示で、新しいWeb広告を<strong style="color:var(--yellow);">明日（4/1）から開始</strong></li>
-        <li>形式：「抽選に当たりました」型のアンケート広告 → 回線獲得</li>
-        <li>広告費：<strong style="color:var(--red);">50万円相当</strong></li>
-        <li>既存の広告実績が評価されての追加施策</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h4>7. 離職者対応とデータ活用 <span class="status-new">【新規提案】</span></h4>
-      <h3>現状</h3>
-      <ul>
-        <li>3月末日・4月末日で業務委託の離職者が発生（または予定）</li>
-        <li>派遣会社からは「4月は人が出せる」との回答あり、補充の見込みはある</li>
-      </ul>
-      <h3>提案：面談記録のAI活用</h3>
-      <ul>
-        <li>離職者面談の記録（可能であれば文字起こし）を取ることを依頼</li>
-        <li>データをAIに蓄積することで：離職傾向の分析、ハイパフォーマーの相関関係の発見、見えていない兆候の早期検出</li>
-        <li>精神的理由で出勤不可の場合は電話・LINEの記録でもOK</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- 宿題一覧 -->
-  <div class="section">
-    <span class="section-label" style="background:var(--red);">TODO</span>
-    <h2>宿題・アクション一覧</h2>
-    <table>
-      <tr><th>#</th><th>担当</th><th>タスク</th><th>期限・備考</th></tr>
-      <tr class="task-row">
-        <td>1</td>
-        <td><span class="badge badge-sato">佐藤さん</span></td>
-        <td>税理士MTG（4/7）後、freeeから4点データ（BS推移・PL推移・資金繰り・仕訳帳）を出力して磯貝に送付</td>
-        <td>4/7以降</td>
-      </tr>
-      <tr class="task-row">
-        <td>2</td>
-        <td><span class="badge badge-sato">佐藤さん</span></td>
-        <td>離職者面談の記録を文字起こし・録音で残し、データとして蓄積する</td>
-        <td>随時</td>
-      </tr>
-      <tr class="task-row">
-        <td>3</td>
-        <td><span class="badge badge-sato">佐藤さん</span></td>
-        <td>HP修正完了後に差し替え</td>
-        <td>継続</td>
-      </tr>
-      <tr class="task-row">
-        <td>4</td>
-        <td><span class="badge badge-sato">佐藤さん</span></td>
-        <td>新卒採用の面接・選考を進める（5名目標）</td>
-        <td>継続</td>
-      </tr>
-      <tr class="task-row">
-        <td>5</td>
-        <td><span class="badge badge-sato">佐藤さん</span></td>
-        <td>抽選形式Web広告の運用開始・効果モニタリング</td>
-        <td>4/1〜</td>
-      </tr>
-      <tr class="task-row">
-        <td>6</td>
-        <td><span class="badge badge-isogai">磯貝</span></td>
-        <td>受領データをもとにAI分析ダッシュボード構築・フィードバック</td>
-        <td>データ受領後</td>
-      </tr>
-      <tr class="task-row">
-        <td>7</td>
-        <td><span class="badge badge-isogai">磯貝</span></td>
-        <td>議事録を送付（本議事録）</td>
-        <td>本日中</td>
-      </tr>
-    </table>
-  </div>
-
-  <!-- 次回MTG -->
-  <div class="section">
-    <span class="section-label" style="background:var(--green);">NEXT</span>
-    <h2>次回MTG</h2>
-    <ul class="arrow-list">
-      <li><strong>日時：</strong> 2026年4月8日（火）18:00</li>
-      <li><strong>背景：</strong> 税理士MTGが4/7のため翌日に設定</li>
-      <li><strong>議題：</strong> freeeデータの受領確認、2〜4月の財務レビュー、採用・広告の進捗</li>
+  <div class="card">
+    <h3>背景</h3>
+    <ul>
+      <li>磯貝がfreeeからデータをダウンロードすると、加藤さんのメールに送信されてしまう問題が発生</li>
+      <li>現状はコピー＆ペーストで対応しており非効率</li>
     </ul>
   </div>
 
+  <div class="callout callout-blue">
+    <strong>決定事項：</strong> 税理士MTG後に毎回、以下4点をfreeeから出力して磯貝に送付する。
+  </div>
+
+  <table class="data-table">
+  <tr><th>#</th><th>データ名</th><th>freee上の名称</th><th>用途</th></tr>
+  <tr><td>1</td><td><strong>貸借対照表（月次推移）</strong></td><td>BS推移</td><td>財務分析・AI分析</td></tr>
+  <tr><td>2</td><td><strong>損益計算書（月次推移）</strong></td><td>PL推移</td><td>予実管理・部門分析</td></tr>
+  <tr><td>3</td><td><strong>資金繰りレポート</strong></td><td>資金繰りシート</td><td>CF予測・入出金分析</td></tr>
+  <tr><td>4</td><td><strong>仕訳帳</strong></td><td>仕訳日誌</td><td>最小単位データ。AI分析に不可欠</td></tr>
+  </table>
+
+  <div class="quote">仕訳データには取引先ごとの売上日・入金日が記録されており、AIが自動的にサイト日数を判断し、より正確なキャッシュフロー予測が可能になる。BS/PLだけでは集計済みデータのため、詳細分析に限界がある。</div>
+</div>
+
+<!-- セクション3 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">3</div> AI活用の共有（Claude Code紹介）</div>
+
+  <div class="card">
+    <h3>デモ内容</h3>
+    <ul>
+      <li>磯貝がClaude Codeを導入し、資金繰りダッシュボード（予測機能付き）をデモ</li>
+      <li>取引先別の入出金推移、月別の台数購入シミュレーション、グラフ・タブ切替付きインタラクティブUI</li>
+      <li><strong>Excel一切触らずにAIだけで生成</strong>した事例を共有</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>今後の方向性</h3>
+    <ul>
+      <li>佐藤さんも既にClaudeでPLを分析しており、仕訳データを活用すればさらに精度向上が見込める</li>
+      <li>議事録もGamma形式からURL共有型（GitHub Pages等）に移行予定</li>
+      <li>AIのコンテキストに蓄積され、MTGを重ねるほど分析精度が向上する仕組み</li>
+    </ul>
+  </div>
+</div>
+
+<!-- セクション4 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">4</div> HP・採用の進捗</div>
+
+  <div class="card">
+    <h3>ホームページ</h3>
+    <ul>
+      <li>完全に新しいものに作り替え済み</li>
+      <li>現在、採用に効くよう細かい修正を実施中</li>
+      <li>修正完了後に差し替え予定</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>新卒採用</h3>
+    <ul>
+      <li>5名程度の募集を継続中（本さんに依頼済み）</li>
+      <li><strong>初回面接は4/1の予定</strong></li>
+    </ul>
+  </div>
+</div>
+
+<!-- セクション5 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">5</div> ナンバー2候補 → 不採用確定</div>
+
+  <div class="card">
+    <ul>
+      <li>候補者は「自分で会社経営をするのが一番良い」という目標を持っていた</li>
+      <li><strong>代理店として協力関係は継続</strong> &#x2014; 取次・代理店として売上・利益に貢献する意向</li>
+      <li>引き続きナンバー2の採用は課題</li>
+    </ul>
+  </div>
+</div>
+
+<!-- セクション6 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">6</div> 電気販売事業</div>
+
+  <div class="card">
+    <h3>既存広告運用</h3>
+    <ul>
+      <li>毎日、1件あたり単価・注文数をチェック → <strong style="color:var(--green);">問題なく推移</strong></li>
+      <li>糸山さんからも「パートナーはちゃんとやっている」と評価</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>新規：抽選形式Web広告【4/1開始】</h3>
+    <ul>
+      <li>会長からの指示で、新しいWeb広告を4/1から開始</li>
+      <li>形式：「抽選に当たりました」型のアンケート広告 → 回線獲得</li>
+      <li>広告費：<strong>50万円相当</strong></li>
+      <li>既存の広告実績が評価されての追加施策</li>
+    </ul>
+  </div>
+</div>
+
+<!-- セクション7 -->
+<div class="section">
+  <div class="section-title"><div class="section-num">7</div> 離職者対応とデータ活用【新規提案】</div>
+
+  <div class="card">
+    <h3>現状</h3>
+    <ul>
+      <li>3月末日・4月末日で業務委託の離職者が発生（または予定）</li>
+      <li>派遣会社からは「4月は人が出せる」との回答あり、補充の見込みはある</li>
+    </ul>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>提案：面談記録のAI活用</strong> &#x2014; 離職者面談の記録（文字起こし）をAIに蓄積し、離職傾向の分析・ハイパフォーマーの相関関係発見・兆候の早期検出に活用する。精神的理由で出勤不可の場合は電話・LINEの記録でもOK。
+  </div>
+</div>
+
+<!-- 全宿題一覧 -->
+<div class="summary-section">
+  <div class="summary-title">宿題・アクション一覧</div>
+
+  <div class="priority-label priority-high">&#x1F534; 佐藤さん担当</div>
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>期限</th></tr>
+  <tr><td>1</td><td>税理士MTG（4/7）後、freeeから4点データ（BS推移・PL推移・資金繰り・仕訳帳）を出力して磯貝に送付</td><td>4/7以降</td></tr>
+  <tr><td>2</td><td>離職者面談の記録を文字起こし・録音で残し、データとして蓄積する</td><td>随時</td></tr>
+  <tr><td>3</td><td>HP修正完了後に差し替え</td><td>継続</td></tr>
+  <tr><td>4</td><td>新卒採用の面接・選考を進める（5名目標）</td><td>継続</td></tr>
+  <tr><td>5</td><td>抽選形式Web広告の運用開始・効果モニタリング</td><td>4/1〜</td></tr>
+  </table>
+
+  <div class="priority-label priority-mid">&#x1F535; 磯貝担当</div>
+  <table class="task-table">
+  <tr><th>#</th><th>タスク</th><th>期限</th></tr>
+  <tr><td>6</td><td>受領データをもとにAI分析ダッシュボード構築・フィードバック</td><td>データ受領後</td></tr>
+  <tr><td>7</td><td>議事録を送付（本議事録）</td><td>本日中</td></tr>
+  </table>
+</div>
+
+<!-- 次回MTG -->
+<div class="summary-section">
+  <div class="summary-title">次回MTG</div>
+
+  <div class="next-card">
+    <h4>2026年4月8日（火）18:00</h4>
+    <p>税理士MTGが4/7のため翌日に設定。freeeデータの受領確認、2〜4月の財務レビュー、採用・広告の進捗を議題とする。</p>
+  </div>
 </div>
 
 <div class="footer">
-  作成: 2026/03/31 — Claude Code自動生成（Geminiメモ＋文字起こしより）
+  会議トランスクリプト＋Gemini議事録を統合し、Claude Code が作成<br>
+  2026年3月31日 ｜ パートナー定例
 </div>
 
+</div>
 </body>
 </html>
