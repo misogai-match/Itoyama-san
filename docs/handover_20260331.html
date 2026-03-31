@@ -184,7 +184,7 @@
         <div class="label">議事録作成</div>
       </div>
       <div class="summary-item">
-        <div class="num">5</div>
+        <div class="num">6</div>
         <div class="label">明日以降の宿題</div>
       </div>
     </div>
@@ -285,6 +285,53 @@
   </div>
 </div>
 
+<!-- ===== 2.5 ライトフィット事業計画 ===== -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background: #d69e2e;">&#9733;</div>
+    <div class="card-title">ライトフィット事業計画 受領・格納</div>
+  </div>
+  <div class="card-body">
+    <p>本間さんから<strong>途中変更【ライトフィット_事業計画】.xlsx</strong>を受領。delvance-cfoプロジェクトに格納済み。</p>
+
+    <h3>ファイル構成（8シート）</h3>
+    <table>
+      <thead>
+        <tr><th>シート</th><th>内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1期計画 2512-2611</td><td>1期PL計画</td></tr>
+        <tr><td>CF 1期計画 2501-2512</td><td>1期CF</td></tr>
+        <tr><td><strong>2期計画 2601-2612</strong></td><td>2期PL計画（現年度）</td></tr>
+        <tr><td><strong>CF 2期計画 2601-2612</strong></td><td>2期CF（ベースファイル）</td></tr>
+        <tr><td>3期計画 / 4期計画</td><td>将来計画</td></tr>
+        <tr><td><strong>稼働表</strong></td><td>1月: 6名（経験者1/未経験5）、売上295万</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-warning">
+      <strong>注意：計画値と実態に乖離あり。</strong>CF 2期は計画ベースの数字（1月売上1,880万等）。<br>
+      MTGでの実態は12〜3月売上ゼロ・残高約1,000万。金曜に届く実績データでこのファイルを更新する。
+    </div>
+
+    <h3>最終形のイメージ</h3>
+    <table>
+      <thead>
+        <tr><th>#</th><th>成果物</th><th>データソース</th><th>状態</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td><strong>ライトフィット単体CF</strong></td><td>本ファイル + 高橋さんの実績データ</td><td><span class="status status-wait">4/4待ち</span></td></tr>
+        <tr><td>2</td><td><strong>Delvance単体CF</strong></td><td>磯貝フォーマット既存 + 田中さんBS推移</td><td><span class="status status-wait">BS待ち</span></td></tr>
+        <tr><td>3</td><td><strong>2社連結CF</strong></td><td>上記1 + 2をマージ</td><td><span class="status status-next">次ステップ</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <strong>格納先：</strong><span class="file-link">delvance-cfo/source_data/lightfit/途中変更【ライトフィット_事業計画】.xlsx</span>
+    </div>
+  </div>
+</div>
+
 <!-- ===== 3. 議事録 ===== -->
 <div class="card">
   <div class="card-header">
@@ -332,17 +379,22 @@
       </thead>
       <tbody>
         <tr>
-          <td><strong>ライトフィットCF作成</strong>（2月〜3月分）</td>
-          <td>本日中</td>
-          <td><span class="status status-urgent">要対応</span></td>
+          <td><strong>ライトフィット単体CF</strong>（事業計画ファイルに実績マージ）</td>
+          <td>高橋さんデータ到着後（4/4目標）</td>
+          <td><span class="status status-wait">データ待ち</span></td>
         </tr>
         <tr>
-          <td><strong>Delvance 2月反映</strong>（BS推移到着次第）</td>
-          <td>BS到着後即日</td>
-          <td><span class="status status-wait">待ちデータ</span></td>
+          <td><strong>Delvance単体CF</strong>（BS推移到着次第、磯貝フォーマットに2月反映）</td>
+          <td>田中さんBS到着後即日</td>
+          <td><span class="status status-wait">データ待ち</span></td>
         </tr>
         <tr>
-          <td><strong>2社連結シミュレーション</strong>（バーンレート・黒字化ロードマップ）</td>
+          <td><strong>2社連結CF・バーンレート</strong>（ライトフィット+Delvance）</td>
+          <td>上記2つ完了後</td>
+          <td><span class="status status-next">次ステップ</span></td>
+        </tr>
+        <tr>
+          <td><strong>黒字化ロードマップ</strong>（入替+新規シミュレーション）</td>
           <td>来週MTGまで</td>
           <td><span class="status status-next">次ステップ</span></td>
         </tr>
