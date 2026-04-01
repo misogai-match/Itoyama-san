@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アントレッドコンサルティング 引継ぎMTG — 2026/4/1</title>
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --border: #e0e0e0;
+    --text: #2c2c2c;
+    --muted: #6c757d;
+    --green: #28a745;
+    --orange: #fd7e14;
+    --red: #dc3545;
+    --blue: #007bff;
+    --yellow-bg: #fff9c4;
+    --green-bg: #e8f5e9;
+    --blue-bg: #e3f2fd;
+    --orange-bg: #fff3e0;
+    --red-bg: #fce4ec;
+    --purple-bg: #f3e5f5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Yu Gothic UI', 'Meiryo UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 20px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent2) 100%);
+    color: white;
+    padding: 32px 40px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+  .header h1 { font-size: 1.7rem; margin-bottom: 8px; letter-spacing: 0.02em; }
+  .header .subtitle { font-size: 0.95rem; opacity: 0.85; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 24px;
+    margin-top: 16px; font-size: 0.9rem; opacity: 0.9;
+  }
+  .meta-row span { display: flex; align-items: center; gap: 6px; }
+
+  /* Navigation */
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+  }
+  .toc h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 12px; }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 6px 24px;
+  }
+  .toc a {
+    color: var(--accent2);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 4px 0;
+    display: block;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Section */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .section h2 {
+    font-size: 1.25rem;
+    color: var(--primary);
+    border-left: 4px solid var(--accent);
+    padding-left: 14px;
+    margin-bottom: 18px;
+  }
+  .section h3 {
+    font-size: 1.05rem;
+    color: var(--accent2);
+    margin: 18px 0 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section h3:first-of-type { margin-top: 8px; }
+
+  /* Lists */
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; font-size: 0.95rem; }
+  li strong { color: var(--primary); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.9rem;
+  }
+  th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: #f5f7ff; }
+  .table-wrap { overflow-x: auto; }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-red { background: var(--red-bg); color: var(--red); }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-blue { background: var(--blue-bg); color: var(--blue); }
+  .badge-orange { background: var(--orange-bg); color: var(--orange); }
+  .badge-purple { background: var(--purple-bg); color: #7b1fa2; }
+
+  /* Highlight boxes */
+  .highlight {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 0.93rem;
+  }
+  .highlight-blue { background: var(--blue-bg); border-left: 4px solid var(--blue); }
+  .highlight-green { background: var(--green-bg); border-left: 4px solid var(--green); }
+  .highlight-orange { background: var(--orange-bg); border-left: 4px solid var(--orange); }
+  .highlight-red { background: var(--red-bg); border-left: 4px solid var(--accent); }
+  .highlight-yellow { background: var(--yellow-bg); border-left: 4px solid #f9a825; }
+  .highlight-purple { background: var(--purple-bg); border-left: 4px solid #7b1fa2; }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0;
+    font-size: 0.88rem;
+  }
+  .flow-step {
+    background: var(--blue-bg);
+    color: var(--accent2);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .flow-arrow { color: var(--muted); font-size: 1.2rem; }
+
+  /* Confidential */
+  .confidential {
+    background: #1a1a2e;
+    color: #f0f0f0;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .confidential h2 {
+    color: var(--accent);
+    border-left: 4px solid var(--accent);
+    padding-left: 14px;
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+  }
+  .confidential ol { padding-left: 1.4em; }
+  .confidential li { margin: 10px 0; font-size: 0.93rem; line-height: 1.7; }
+  .confidential strong { color: #ffcdd2; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* Print */
+  @media print {
+    body { padding: 0; background: white; }
+    .container { max-width: 100%; }
+    .section, .toc, .confidential { break-inside: avoid; border: 1px solid #ccc; }
+    .header { background: var(--primary) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .section, .toc { padding: 18px; }
+    .header { padding: 24px; }
+    .toc-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Header -->
+<div class="header">
+  <h1>アントレッドコンサルティング 引継ぎMTG</h1>
+  <div class="subtitle">PJ H質問表に基づくQ&A + 事業引継ぎに向けた現状共有</div>
+  <div class="meta-row">
+    <span>&#x1f4c5; 2026年4月1日（火）18:55〜</span>
+    <span>&#x1f465; 森太佑（質問者／5月入社予定）・佐藤秀（質問者／10月頃入社予定）・岡田（回答者／引継ぎ担当）・磯貝政文（CFO／議事録）</span>
+  </div>
+  <div style="margin-top:10px; font-size:0.85rem; opacity:0.75;">
+    ※ 森さん・佐藤さんは現在M&amp;A総研所属。岡田さんが現体制の情報を引き継ぐ場。<br>
+    ※ 基本構成：森さん・佐藤さんが質問 → 岡田さんが回答。磯貝は議事録のみ。
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h2>目次</h2>
+  <div class="toc-grid">
+    <a href="#sec1">1. オフィス・新体制の準備状況</a>
+    <a href="#sec2">2. 経費構造の整理</a>
+    <a href="#sec3">3. 財務状況・資金調達</a>
+    <a href="#sec4">4. 経費精算・法人カード</a>
+    <a href="#sec5">5. コミュニケーションツール</a>
+    <a href="#sec6">6. 役員・外部パートナーの扱い</a>
+    <a href="#sec7">7. 顧客管理（Kintone）</a>
+    <a href="#sec8">8. 就業規則・社内ルール</a>
+    <a href="#sec9">9. テレアポ・新規開拓</a>
+    <a href="#sec10">10. 採用戦略・組織づくり</a>
+    <a href="#sec11">11. MA仲介の新エコシステム構想</a>
+    <a href="#sec12">12. IT支援のビジネスモデル</a>
+    <a href="#sec13">13. その他</a>
+    <a href="#todo">宿題一覧</a>
+    <a href="#decisions">決定事項ログ</a>
+    <a href="#confidential">重要事項（機密）</a>
+  </div>
+</div>
+
+<!-- 1 -->
+<div class="section" id="sec1">
+  <h2>1. オフィス・新体制の準備状況</h2>
+  <h3>オフィス移転</h3>
+  <ul>
+    <li>渋谷オフィスは <strong>解約済み（6月末まで）</strong>。3ヶ月前通知で手続き完了</li>
+    <li>新オフィス（大手町エリア）は契約完了。教育費込みで <strong>月額35万円</strong></li>
+    <li>現行家賃60万円 → 35万円で <strong>年間約240万円の削減</strong></li>
+    <li>磯貝は5月からジョイン前向き。新PCも手配済み（岡田さんが手配）</li>
+  </ul>
+  <h3>IT環境</h3>
+  <ul>
+    <li>OS: <strong>Windows + M365</strong>（磯貝もWindows使用）</li>
+    <li>Google Workspace も併用中（M&amp;A総研側もGoogle）</li>
+  </ul>
+</div>
+
+<!-- 2 -->
+<div class="section" id="sec2">
+  <h2>2. 経費構造の整理 <span class="badge badge-blue">質問表 No.1, 7, 8</span></h2>
+  <h3>必要経費 vs 不要経費</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>項目</th><th>判断</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td>接待交際費</td><td><span class="badge badge-red">不要</span></td><td>今後はゼロで問題なし。過去の高額計上は関係者への支払い</td></tr>
+        <tr><td>外注費</td><td><span class="badge badge-orange">不要なものは解約</span></td><td>関係ベースの支出は糸山会長判断で終了</td></tr>
+        <tr><td>旅費交通費</td><td><span class="badge badge-green">1人5万円/月</span></td><td>首都圏近郊の営業前提</td></tr>
+        <tr><td>GymGym費用</td><td><span class="badge badge-red">今後発生しない</span></td><td>グループ利用のパーソナルジム、アントレッド負担は終了</td></tr>
+        <tr><td>パートナー社（外注費）</td><td><span class="badge badge-red">今後発生しない</span></td><td>会長指示。実質的な成果物なし</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>実態の収益力</h3>
+  <div class="highlight highlight-green">
+    <strong>不要経費を除いた製造収益力: プラス2,000〜3,000万円</strong><br>
+    EBITDA: 4,000〜5,000万円と推定<br>
+    6月までに2件の案件見込み（約1,000万 + 3,000〜4,000万）
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="section" id="sec3">
+  <h2>3. 財務状況・資金調達 <span class="badge badge-blue">質問表 No.6, 11</span></h2>
+  <h3>現状</h3>
+  <ul>
+    <li>借入: <strong>3,000万円</strong>（磯貝が契約内容を再確認予定）</li>
+    <li>会計: <strong>freee会計</strong>。経理はトーストン社（石岡氏）にアウトソーシング</li>
+  </ul>
+  <h3>資金調達</h3>
+  <div class="highlight highlight-blue">
+    <strong>りそな銀行と無担保で1億円の融資交渉中</strong><br>
+    最終着地: 3,000〜5,000万円を想定<br>
+    個人の連帯保証なし（保証協会付きの可能性あり）
+  </div>
+  <h3>freee会計の管理</h3>
+  <ul>
+    <li>石岡氏（トーストン社）が経理・総務・入退社手続きを一括担当</li>
+    <li>USCPA保有、フルリモート勤務</li>
+    <li>月額約20万円</li>
+    <li><strong>今後の内製化 vs 継続は森さん・佐藤さんの判断に委ねる</strong></li>
+  </ul>
+</div>
+
+<!-- 4 -->
+<div class="section" id="sec4">
+  <h2>4. 経費精算・法人カード <span class="badge badge-blue">質問表 No.8</span></h2>
+  <h3>現状</h3>
+  <ul>
+    <li>経費精算: <strong>freee</strong>で処理（石岡氏が担当）</li>
+    <li>法人カード: <strong>りそなカード</strong>を発行したばかり</li>
+    <li>交通費の社内ルールなし</li>
+  </ul>
+  <h3>推奨: UpSider</h3>
+  <div class="highlight highlight-yellow">
+    <strong>UpSider</strong>を推奨（岡田さん推薦。ボードルアでも採用実績あり）
+    <ul style="margin-top:6px;">
+      <li>上限額が高い（個人カードと紐づかない）</li>
+      <li>アプリで写真撮影 → その場で経費申請可能</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="section" id="sec5">
+  <h2>5. コミュニケーションツール <span class="badge badge-blue">質問表 No.4</span></h2>
+  <ul>
+    <li>現行: <strong>Slack</strong>を使用中</li>
+    <li>検討: Chatwork導入案 → <strong>Slackを継続</strong>に決定</li>
+    <li>理由: API連携のしやすさ（Claude等のAIツール連携）</li>
+  </ul>
+  <div class="highlight highlight-green">
+    <strong>岡田さんが法人契約 → アカウント発行を即日対応</strong>
+  </div>
+</div>
+
+<!-- 6 -->
+<div class="section" id="sec6">
+  <h2>6. 役員・外部パートナーの扱い <span class="badge badge-blue">質問表 No.3, 10, 12</span></h2>
+  <h3>岡部チームの現状</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>項目</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>契約形態</td><td>業務委託（役員登記あり）</td></tr>
+        <tr><td>月額費用</td><td>60万円 × 2〜3名 = <strong>月100〜150万円</strong></td></tr>
+        <tr><td>成果報酬</td><td>20〜50%（案件により異なる）</td></tr>
+        <tr><td>担当案件</td><td>冨永さん・糸山さん案件</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>課題・決定事項</h3>
+  <ul>
+    <li>役員登記だが報酬が業務委託費 → <strong>整理が必要</strong></li>
+    <li>既存案件終了後の <strong>段階的な契約解消を検討</strong></li>
+    <li>条件面の交渉には <strong>磯貝も参加</strong></li>
+    <li>森さん・佐藤さんがやりやすい形を優先する</li>
+  </ul>
+  <h3>山澤さんのインセンティブ</h3>
+  <ul>
+    <li>1億円の案件成約時に20%を支払い済み → <strong>会長との個別合意（社内特例なし）</strong></li>
+    <li>役員の案件は保守で報酬なし</li>
+    <li><strong>インセンティブ設計はゼロベースで新規作成</strong> → 森さん・佐藤さんに委任</li>
+  </ul>
+  <h3>その他外注</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>外注先</th><th>内容</th><th>ステータス</th></tr></thead>
+      <tbody>
+        <tr><td>バトルクライ</td><td>営業代行</td><td><span class="badge badge-red">終了</span></td></tr>
+        <tr><td>kanaDe</td><td>人事代行</td><td><span class="badge badge-red">終了</span></td></tr>
+        <tr><td>コムチュア</td><td>Kintone保守</td><td><span class="badge badge-green">継続中</span></td></tr>
+        <tr><td>松澤氏</td><td>資料作成</td><td><span class="badge badge-orange">4月で終了</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="section" id="sec7">
+  <h2>7. 顧客管理 <span class="badge badge-blue">質問表 No.9</span></h2>
+  <ul>
+    <li>現行: <strong>Kintone</strong>（ペアキャピタルから引継ぎ、コムチュアが構築）</li>
+    <li>月額費用が発生中</li>
+    <li><strong>今後の方針: 本間さんと相談の上、継続 or 1から構築を判断</strong></li>
+    <li>アカウントは発行するので、まず中身を確認してもらう</li>
+  </ul>
+</div>
+
+<!-- 8 -->
+<div class="section" id="sec8">
+  <h2>8. 就業規則・社内ルール <span class="badge badge-blue">質問表 No.5</span></h2>
+  <h3>現状</h3>
+  <ul>
+    <li>就業規則は <strong>労働局に未届出</strong></li>
+    <li>社内ルール（交際費・経費利用等）も <strong>未策定</strong></li>
+  </ul>
+  <h3>決定事項</h3>
+  <div class="highlight highlight-orange">
+    <ul>
+      <li><strong>ゼロベースで新規作成</strong>（M&amp;A総研のものを参考にしてもよい）</li>
+      <li>労働時間・勤務ルール含め森さん・佐藤さんの方針で策定</li>
+      <li>作成後、岡田さんが労働局へ届出</li>
+      <li>弁護士（岡島氏、元PwC、会長の知人）にも確認可能</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 9 -->
+<div class="section" id="sec9">
+  <h2>9. テレアポ・新規開拓 <span class="badge badge-blue">質問表 No.2, 10</span></h2>
+  <h3>過去の実績</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>チャネル</th><th>アポ数</th><th>AD締結</th><th>成約</th><th>費用</th></tr></thead>
+      <tbody>
+        <tr><td>インバウンド（広告）</td><td>30</td><td>2（+1リーガルチェック中）</td><td>0</td><td>400〜500万円</td></tr>
+        <tr><td>アウトバウンド（テレアポ）</td><td>903</td><td>25</td><td>2（+3件見込み）</td><td>テレアポ部隊月額</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>課題</h3>
+  <ul>
+    <li>テレアポ部隊（糸山さん経由）は成約率が低い</li>
+    <li>月額固定報酬 → アポが取れなくても同じ収入 → モチベーション問題</li>
+    <li><strong>結局、自社の組織文化に染まったチームが本気でやらないと成約しない</strong></li>
+  </ul>
+  <h3>方向性</h3>
+  <ul>
+    <li>自社でテレアポチームを構築する方向で検討</li>
+    <li>ベストパートナーズのモデルを参考（専属テレアポチーム）</li>
+    <li><strong>報酬設計を工夫</strong>（アポ単価のインセンティブ等）→ 糸山さんと相談</li>
+    <li>MA前提でテレアポすると、MA仲介よりも入り口が広い（採用・営業支援等）</li>
+  </ul>
+</div>
+
+<!-- 10 -->
+<div class="section" id="sec10">
+  <h2>10. 採用戦略・組織づくり</h2>
+  <h3>M&amp;A総研の教訓</h3>
+  <div class="highlight highlight-red">
+    大量採用 → 教育リソース不足 → 質の低下 → <strong>組織崩壊リスク</strong><br>
+    株価下落・人材流出の要因に
+  </div>
+  <h3>アントレッドの方針</h3>
+  <ul>
+    <li><strong>少数精鋭で慎重に</strong></li>
+    <li>リーダー1人 × メンバー5人の体制を段階的に構築</li>
+    <li>成約5件でリーダー昇格 → リーダーが増えたら5人採用のサイクル</li>
+    <li><strong>スケールを犠牲にしてでも採用を厳選</strong> → 企業文化の希薄化を防ぐ</li>
+  </ul>
+  <h3>エグジット想定</h3>
+  <div class="highlight highlight-purple">
+    <strong>IPOを想定、4〜5年以内</strong>（ベンチマーク: 最速3年）
+  </div>
+</div>
+
+<!-- 11 -->
+<div class="section" id="sec11">
+  <h2>11. MA仲介の新エコシステム構想</h2>
+  <h3>コンセプト</h3>
+  <p style="margin-bottom:12px;"><strong>MA前提のバリューアップ支援 → エグジットまで伴走</strong></p>
+  <div class="flow">
+    <div class="flow-step">テレアポ / 広告</div>
+    <span class="flow-arrow">&#x279C;</span>
+    <div class="flow-step">初回面談</div>
+    <span class="flow-arrow">&#x279C;</span>
+    <div class="flow-step">営業支援<br><small>コンシエス等</small></div>
+    <span class="flow-arrow">&#x279C;</span>
+    <div class="flow-step">採用支援</div>
+    <span class="flow-arrow">&#x279C;</span>
+    <div class="flow-step">IT支援<br><small>SESエンジニア投入</small></div>
+    <span class="flow-arrow">&#x279C;</span>
+    <div class="flow-step" style="background:var(--green-bg); color:var(--green);">バリューアップ<br><small>EBITDA向上</small></div>
+    <span class="flow-arrow">&#x279C;</span>
+    <div class="flow-step" style="background:var(--orange-bg); color:var(--orange);">MA提案<br><small>エグジット</small></div>
+  </div>
+  <h3>差別化ポイント</h3>
+  <ul>
+    <li>営業支援 + 採用支援 + IT支援を <strong>グループ内で一気通貫</strong></li>
+    <li>PMI（統合後支援）も含めた長期伴走ができる</li>
+    <li>バリューアップ前後の <strong>企業価値比較</strong> を見せて夢を共有</li>
+    <li>EBITDA × マルチプルで企業価値向上を定量化</li>
+    <li><strong>競合（他のMA仲介）にはこの機能がない</strong></li>
+  </ul>
+  <h3>ターゲット</h3>
+  <ul>
+    <li>ITに困っている中小企業（特に地方の建設業等）</li>
+    <li>資金力はあるがITリテラシーが低い企業</li>
+    <li>利益が薄い・経験者と未経験者の入替に苦しむIT企業の若い社長</li>
+  </ul>
+  <h3>グループ連携</h3>
+  <ul>
+    <li>コンシエス: 営業支援部隊</li>
+    <li>スピン: IT領域の案件紹介・経営者交流会ルート</li>
+    <li>将来的に自社でも同種の部隊を保有したい</li>
+  </ul>
+</div>
+
+<!-- 12 -->
+<div class="section" id="sec12">
+  <h2>12. IT支援のビジネスモデル</h2>
+  <ul>
+    <li><strong>準委任契約 or 派遣契約</strong>（月額フィー）</li>
+    <li>顧客に不足するエンジニアを提案 → 客先常駐</li>
+    <li>課題: 中間マージンが大きく抜かれている → 顧客先の利益向上施策が必要</li>
+    <li>エンジニア自身のスキル向上も並行して推進</li>
+    <li>システム周りの支援はいつでも対応可能（岡田さんより）</li>
+  </ul>
+</div>
+
+<!-- 13 -->
+<div class="section" id="sec13">
+  <h2>13. その他</h2>
+  <h3>AIツール</h3>
+  <ul>
+    <li>アントレッド法人ではClaude未契約</li>
+    <li>岡田さんは個人でClaude Code等を活用中（議事録作成含む）</li>
+    <li>Claude活用の提案書作成が話題に（投資銀行フォーマットを読み込ませる等）</li>
+  </ul>
+</div>
+
+<!-- 宿題 -->
+<div class="section" id="todo">
+  <h2>宿題一覧</h2>
+
+  <h3>森さん・佐藤さん（入社準備）</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>宿題</th><th>詳細</th><th>期日</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>就業規則の策定</td><td>ゼロベースで作成。M&amp;A総研のものを参考に</td><td>入社後早期</td></tr>
+        <tr><td>2</td><td>社内ルール策定</td><td>交際費・経費利用ルール・勤務時間等</td><td>入社後早期</td></tr>
+        <tr><td>3</td><td>岡部チームの扱い決定</td><td>条件交渉。磯貝と共同で対応</td><td>入社後</td></tr>
+        <tr><td>4</td><td>法人カード選定</td><td>UpSider等を検討</td><td>入社前</td></tr>
+        <tr><td>5</td><td>テレアポ部隊の報酬設計</td><td>糸山さんと相談</td><td>入社後</td></tr>
+        <tr><td>6</td><td>Kintoneの確認・方針決定</td><td>本間さんと相談。継続 or 再構築</td><td>入社後</td></tr>
+        <tr><td>7</td><td>石岡氏（トーストン）との面談</td><td>経理業務の引継ぎ or 継続を判断</td><td>入社後</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>岡田さん（引継ぎ元）</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>宿題</th><th>詳細</th><th>期日</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>就業規則の届出</td><td>森さん・佐藤さんが策定後、労働局へ届出</td><td>策定後</td></tr>
+        <tr><td>2</td><td>既存案件の継続対応</td><td>進行中ディールは前提を変えずに継続</td><td>随時</td></tr>
+        <tr><td>3</td><td>山澤さんとの会食セッティング</td><td>森さん・佐藤さんとの顔合わせ</td><td>来週以降</td></tr>
+        <tr><td>4</td><td>借入3,000万の契約内容確認</td><td>りそな銀行の既存借入条件を再確認</td><td><span class="badge badge-red">早急</span></td></tr>
+        <tr><td>5</td><td>Slackアカウント発行</td><td>法人契約 → 森さん・佐藤さんのアカウント作成</td><td><span class="badge badge-red">即日</span></td></tr>
+        <tr><td>6</td><td>石岡氏への橋渡し</td><td>森さん・佐藤さんとトーストン社を繋ぐ</td><td><span class="badge badge-red">早急</span></td></tr>
+        <tr><td>7</td><td>コンシエス・スピンのサービス研究</td><td>自社で同種の部隊構築に向けた学習</td><td>継続</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 決定事項 -->
+<div class="section" id="decisions">
+  <h2>決定事項ログ</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>決定事項</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>コミュニケーションツールは <strong>Slack</strong> を継続</td><td>API連携（Claude等）の利便性</td></tr>
+        <tr><td>2</td><td>インセンティブ設計は <strong>ゼロベースで新規作成</strong></td><td>森さん・佐藤さんに委任</td></tr>
+        <tr><td>3</td><td>接待交際費は <strong>基本ゼロ</strong></td><td>必要に応じて森さん・佐藤さんが予算設定</td></tr>
+        <tr><td>4</td><td>就業規則・社内ルールは <strong>ゼロベースで策定</strong></td><td>M&amp;A総研を参考に</td></tr>
+        <tr><td>5</td><td>岡部チームは <strong>既存案件終了後に段階的に解消</strong></td><td>条件交渉は磯貝も参加</td></tr>
+        <tr><td>6</td><td>採用は <strong>少数精鋭</strong>（リーダー1×メンバー5）</td><td>組織崩壊を防ぐ</td></tr>
+        <tr><td>7</td><td>テレアポは <strong>自社チーム構築</strong> の方向で検討</td><td>報酬設計を糸山さんと相談</td></tr>
+        <tr><td>8</td><td>法人カードは <strong>UpSiderを軸に検討</strong></td><td>りそなカードは発行済み</td></tr>
+        <tr><td>9</td><td>MA前提の <strong>バリューアップ支援エコシステム</strong> を構築</td><td>グループ連携で差別化</td></tr>
+        <tr><td>10</td><td>エグジット想定: <strong>IPO、4〜5年以内</strong></td><td>ベンチマーク最速3年</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 機密 -->
+<div class="confidential" id="confidential">
+  <h2>重要事項（非公開・機密）</h2>
+  <ol>
+    <li><strong>森さん・佐藤さんはまだM&amp;A総研在籍中。</strong> MTGに参加していること自体がバレるとまずい状況。特にGPS等で位置情報が追跡されている（全員）。入社時期（森: 5月、佐藤: 10月頃）まで慎重に対応が必要</li>
+    <li><strong>岡部チームのランニングコスト（月100〜150万）は重い。</strong> 既存案件終了後の契約解消を急ぐべきだが、岡田さんなしでは森さん・佐藤さんだけで回せるかは未知数。段階的な移行が現実的</li>
+    <li><strong>パートナー社への外注費（月1,000万×2回）は実質的な成果物なし。</strong> 会長指示で今後は発生しないが、過去の処理について財務上の整理が必要になる可能性あり</li>
+    <li><strong>りそな銀行の融資交渉（無担保1億）は磯貝が主導。</strong> 着地3,000〜5,000万想定。連帯保証なしを維持することが重要</li>
+    <li><strong>M&amp;A総研の組織崩壊を間近で見ている2人だからこそ、少数精鋭の方針は本気。</strong> この教訓をアントレッドの成長戦略に活かすことが競争優位になり得る</li>
+  </ol>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  作成日: 2026/4/1 ｜ 作成者: CFO 磯貝 ｜ ソース: Gemini文字起こし + PJ H質問表
+</div>
+
+</div>
+</body>
+</html>
