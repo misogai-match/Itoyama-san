@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vialevo 初回MTG 議事録 — 2026/4/2</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --blue: #3b82f6;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --purple: #a855f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.8;
+  }
+  .header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 32px;
+  }
+  .header-inner { max-width: 860px; margin: 0 auto; }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .header-meta {
+    font-size: 13px;
+    color: var(--text2);
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--yellow);
+    margin: 20px 0 8px 0;
+  }
+  h3:first-child { margin-top: 0; }
+  p { margin-bottom: 12px; font-size: 14px; }
+  ul { margin: 8px 0 16px 20px; font-size: 14px; }
+  li { margin-bottom: 6px; }
+  .highlight {
+    background: rgba(245,158,11,0.1);
+    border-left: 3px solid var(--yellow);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .alert {
+    background: rgba(239,68,68,0.1);
+    border-left: 3px solid var(--red);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .action-item {
+    background: rgba(59,130,246,0.1);
+    border-left: 3px solid var(--blue);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 8px 0;
+    font-size: 14px;
+  }
+  .action-item .label {
+    font-weight: 700;
+    color: var(--blue);
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .action-item .deadline {
+    font-size: 12px;
+    color: var(--yellow);
+    margin-top: 4px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px 16px;
+    font-size: 14px;
+  }
+  .info-grid dt { color: var(--text2); font-weight: 600; }
+  .info-grid dd { color: var(--text); }
+  .footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--text2);
+    border-top: 1px solid var(--border);
+  }
+  @media screen and (max-width: 768px) {
+    .header { padding: 24px 16px; }
+    .header h1 { font-size: 20px; }
+    .main { padding: 20px 12px; }
+    .section { padding: 16px; }
+    .info-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <h1>株式会社Vialevo（ヴィアエヴォ） 初回MTG 議事録</h1>
+    <div class="header-meta">
+      <span>2026年4月2日（木）10:55〜</span>
+      <span>Google Meet</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- 参加者 -->
+  <div class="section">
+    <div class="section-title">参加者</div>
+    <ul>
+      <li>加藤眞史（Vialevo 代表）</li>
+      <li>工藤かれん（Vialevo 経理担当）</li>
+      <li>磯貝政文（CFO / 経営管理サポート）</li>
+    </ul>
+  </div>
+
+  <!-- 会社概要 -->
+  <div class="section">
+    <div class="section-title">会社概要（初回ヒアリング）</div>
+    <dl class="info-grid">
+      <dt>社名</dt><dd>株式会社Vialevo（ヴィアエヴォ）</dd>
+      <dt>事業内容</dt><dd>施工管理の人材派遣</dd>
+      <dt>設立</dt><dd>2025年12月1日</dd>
+      <dt>決算月</dt><dd>11月末</dd>
+      <dt>出資者</dt><dd>糸山会長（2025年10月に知り合い→12月に出資・設立）</dd>
+      <dt>従業員</dt><dd>21名が稼働中（施工管理グループ4社中トップ）</dd>
+      <dt>連携先</dt><dd>ProNetix（プロネ）の名前を借りて営業中</dd>
+      <dt>会計ソフト</dt><dd>freee（フリー）</dd>
+      <dt>税理士</dt><dd>大山先生（予定）</dd>
+      <dt>銀行</dt><dd>三井住友銀行</dd>
+    </dl>
+  </div>
+
+  <!-- 現状と課題 -->
+  <div class="section">
+    <div class="section-title">現状と課題</div>
+
+    <h3>1. 経理の現状</h3>
+    <ul>
+      <li>工藤さんが経理を担当しているが、経理経験ゼロ（前職はマーケティング）</li>
+      <li>freeeに3月途中まで入力済みだが、残高が約10万円ずれている</li>
+      <li>ずれの原因：加藤さんの個人口座→会社口座への移動、クレジットカード利用、経費精算、振込手数料の調整漏れ</li>
+    </ul>
+
+    <h3>2. 発生主義ができていない</h3>
+    <div class="alert">
+      <strong>重要：</strong>未払金を使わず、請求書の日付を操作して計上している状態。会計は発生ベース（発生主義）で行うべき。請求書が届いた月に未払金として計上し、支払い時に未払金を消す処理が必要。
+    </div>
+
+    <h3>3. PL/CFの管理不足</h3>
+    <ul>
+      <li>PL・CFの形は作成しているが、十分に理解・管理できていない</li>
+      <li>決算（11月末）に向けて何をすべきか不明確</li>
+    </ul>
+
+    <h3>4. 税理士不在</h3>
+    <ul>
+      <li>加藤さんは磯貝を税理士と誤解していた</li>
+      <li>磯貝は税理士ではなく、経営管理・データ加工・アドバイスが役割</li>
+      <li>税理士は糸山会長経由で紹介予定（大山先生の可能性）</li>
+    </ul>
+
+    <h3>5. 法定調書・源泉徴収</h3>
+    <ul>
+      <li>12月設立のため、12月分の給与は翌年1月支給→その年度の源泉徴収は不要の可能性が高い</li>
+      <li>法定調書（年間報酬支払いのまとめ）は本来1月末までに税務署に提出が必要</li>
+      <li>源泉徴収は原則毎月納付だが、小規模向けに半年ごとの納期特例あり</li>
+    </ul>
+  </div>
+
+  <!-- 磯貝の支援内容 -->
+  <div class="section">
+    <div class="section-title">磯貝の支援内容</div>
+
+    <h3>資金管理フォーマットの導入</h3>
+    <p>HUBRIDE・ディルバンス等で使用中のフォーマットと同様のものを提供。freeeのデータを取り込んで自動反映させる。入力ガイド・FAQも付属。</p>
+
+    <h3>個人別粗利表の作成</h3>
+    <p>施工管理の派遣事業は人件費と派遣単価で粗利が決まるため、労務データがあれば簡単に作成可能。</p>
+
+    <h3>発生主義への移行指導</h3>
+    <p>未払金・売掛金の正しい使い方を工藤さんに指導。freeeでの処理方法を具体的にレクチャー。</p>
+
+    <h3>決算準備サポート</h3>
+    <p>提出されたデータをもとに、決算に向けた整理・確認を進める。取引先ごとのサイト（回収・支払い期間）の把握が重要。</p>
+
+    <div class="highlight">
+      <strong>賞与引当金について：</strong>加藤さんは2期目から導入予定。毎月12分の1を計上する方向だが、社会保険料も考慮に入れるべき。
+    </div>
+  </div>
+
+  <!-- 宿題・ネクストアクション -->
+  <div class="section">
+    <div class="section-title">宿題・ネクストアクション</div>
+
+    <div class="action-item">
+      <div class="label">工藤さん → 磯貝</div>
+      freeeから以下4点をCSVで送付：
+      <ul style="margin-top:8px;">
+        <li>仕訳帳</li>
+        <li>貸借対照表（月次推移）</li>
+        <li>損益計算書（月次推移）</li>
+        <li>資金繰りレポート</li>
+      </ul>
+      <div class="deadline">期限：次回MTGまで（4/10）</div>
+    </div>
+
+    <div class="action-item">
+      <div class="label">加藤さん → 磯貝</div>
+      従業員別の売上・粗利管理データ一覧（氏名・給与支給額・請求額）をLINEで送付
+      <div class="deadline">期限：次回MTGまで（4/10）</div>
+    </div>
+
+    <div class="action-item">
+      <div class="label">工藤さん → 磯貝</div>
+      銀行の入出金データ（12月〜最新分）をPDF等で送付
+      <div class="deadline">期限：次回MTGまで（4/10）</div>
+    </div>
+
+    <div class="action-item">
+      <div class="label">磯貝</div>
+      受領データをもとに資金管理フォーマットにデータ反映 + 個人別粗利表のひな形作成
+    </div>
+
+    <div class="action-item">
+      <div class="label">工藤さん</div>
+      freeeの入力を発生主義に修正（未払金・売掛金を使う）。12月分からレシート・経費を見直し
+    </div>
+
+    <div class="action-item">
+      <div class="label">工藤さん</div>
+      次回MTGを設定し、磯貝をカレンダーに招待
+    </div>
+  </div>
+
+  <!-- 次回MTG -->
+  <div class="section">
+    <div class="section-title">次回MTG</div>
+    <div class="highlight">
+      <strong>日時：</strong>2026年4月10日（金）11:00<br>
+      <strong>内容：</strong>提出データの確認・freeeの整理状況の確認・資金管理フォーマットの導入・粗利表の共有
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  株式会社Vialevo 議事録 — 磯貝政文 | Powered by Claude Code
+</div>
+
+</body>
+</html>
