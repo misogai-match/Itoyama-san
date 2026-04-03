@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>誉キャピタル コールセンター構築MTG — 2026/4/3</title>
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --border: #e0e0e0;
+    --text: #2c2c2c;
+    --muted: #6c757d;
+    --green: #28a745;
+    --orange: #fd7e14;
+    --red: #dc3545;
+    --blue: #007bff;
+    --yellow-bg: #fff9c4;
+    --green-bg: #e8f5e9;
+    --blue-bg: #e3f2fd;
+    --orange-bg: #fff3e0;
+    --red-bg: #fce4ec;
+    --purple-bg: #f3e5f5;
+    --gold: #b8860b;
+    --gold-bg: #fdf6e3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Yu Gothic UI', 'Meiryo UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 20px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent2) 100%);
+    color: white;
+    padding: 32px 40px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+  .header h1 { font-size: 1.7rem; margin-bottom: 8px; letter-spacing: 0.02em; }
+  .header .subtitle { font-size: 0.95rem; opacity: 0.85; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 24px;
+    margin-top: 16px; font-size: 0.9rem; opacity: 0.9;
+  }
+  .meta-row span { display: flex; align-items: center; gap: 6px; }
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+  }
+  .toc h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 12px; }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 6px 24px;
+  }
+  .toc a {
+    color: var(--accent2);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 4px 0;
+    display: block;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .section h2 {
+    font-size: 1.25rem;
+    color: var(--primary);
+    border-left: 4px solid var(--accent);
+    padding-left: 14px;
+    margin-bottom: 18px;
+  }
+  .section h3 {
+    font-size: 1.05rem;
+    color: var(--accent2);
+    margin: 18px 0 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section h3:first-of-type { margin-top: 8px; }
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; font-size: 0.95rem; }
+  li strong { color: var(--primary); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.9rem;
+  }
+  th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: #f5f7ff; }
+  .table-wrap { overflow-x: auto; }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-red { background: var(--red-bg); color: var(--red); }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-blue { background: var(--blue-bg); color: var(--blue); }
+  .badge-orange { background: var(--orange-bg); color: var(--orange); }
+  .badge-purple { background: var(--purple-bg); color: #7b1fa2; }
+  .badge-gold { background: var(--gold-bg); color: var(--gold); }
+  .highlight {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 0.93rem;
+  }
+  .highlight-blue { background: var(--blue-bg); border-left: 4px solid var(--blue); }
+  .highlight-green { background: var(--green-bg); border-left: 4px solid var(--green); }
+  .highlight-orange { background: var(--orange-bg); border-left: 4px solid var(--orange); }
+  .highlight-red { background: var(--red-bg); border-left: 4px solid var(--accent); }
+  .highlight-yellow { background: var(--yellow-bg); border-left: 4px solid #f9a825; }
+  .highlight-purple { background: var(--purple-bg); border-left: 4px solid #7b1fa2; }
+  .highlight-gold { background: var(--gold-bg); border-left: 4px solid var(--gold); }
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+  @media print {
+    body { padding: 0; background: white; }
+    .section { break-inside: avoid; border: 1px solid #ccc; }
+    .header { background: var(--primary) !important; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <h1>誉キャピタル コールセンター構築MTG</h1>
+  <div class="subtitle">M&A事業の組織構築・報酬体系・AI活用・商号変更を包括的に議論</div>
+  <div class="meta-row">
+    <span>&#128197; 2026年4月3日（木）15:58〜 約1時間54分</span>
+    <span>&#128101; 糸山会長、森（5月入社予定）、寛太、磯貝（議事録）</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <h2>&#128209; 目次</h2>
+  <div class="toc-grid">
+    <a href="#sec1">1. M&Aプレイヤー育成方針</a>
+    <a href="#sec2">2. コールセンター報酬体系</a>
+    <a href="#sec3">3. 外部アドバイザー報酬見直し</a>
+    <a href="#sec4">4. Web集客戦略の転換</a>
+    <a href="#sec5">5. テレアポ戦略</a>
+    <a href="#sec6">6. ローボール交渉戦術</a>
+    <a href="#sec7">7. インセンティブ設計と組織方針</a>
+    <a href="#sec8">8. AI活用計画</a>
+    <a href="#sec9">9. 商号変更・代表変更</a>
+    <a href="#sec10">10. 管理体制・ツール</a>
+    <a href="#sec11">11. 採用・人事</a>
+    <a href="#sec12">12. 身だしなみ・プロフェッショナリズム</a>
+    <a href="#actions">ネクストアクション</a>
+    <a href="#notes">補足メモ</a>
+  </div>
+</div>
+
+<!-- 1. M&Aプレイヤー育成 -->
+<div class="section" id="sec1">
+  <h2>1. M&Aプレイヤー育成方針</h2>
+  <h3>寛太・泰司の一人立ち</h3>
+  <ul>
+    <li>森さんが今後 <strong>半年間</strong> で寛太・泰司をM&Aプレイヤーとして一人立ちさせる教育を徹底</li>
+    <li>森さんの相談に同席させ、寛太・泰司の相談にも同行。<strong>ロールプレイング</strong>を重ねて育成</li>
+    <li>面談当日より <strong>面談までの準備が80%を決める</strong>。資料作成・話し方のアドバイスを森さんが提供</li>
+    <li>逐次連絡を取り合い、案件ごとに具体的な指導を行う</li>
+  </ul>
+  <h3>泰司の現状と課題</h3>
+  <ul>
+    <li>プルデンシャル出身で <strong>個人主義的</strong> な傾向。組織系のカルチャーに馴染めていない</li>
+    <li>岡部の影響を受けているが、森さんが入ってからは <strong>色の入れ直し（マインドセット修正）</strong> が必要</li>
+    <li>来週、森さん・寛太が <strong>泰司と食事</strong> に行き、本人の考えを確認する</li>
+    <li>ディール進行の知識・経験はあるが、一人で飛び込む勇気と知識の深さが課題</li>
+  </ul>
+  <div class="highlight highlight-blue">
+    <strong>&#128161; ポイント：</strong>森さんが寛太・泰司に自分のディールを見せながら実践的に教育。半年で一人立ちが目標。
+  </div>
+</div>
+
+<!-- 2. コールセンター報酬体系 -->
+<div class="section" id="sec2">
+  <h2>2. コールセンター報酬体系</h2>
+  <h3>給与設計 <span class="badge badge-green">決定</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>項目</th><th>内容</th></tr>
+      <tr><td>ベース給</td><td><strong>35万円</strong>（社保込で約35.6万円）</td></tr>
+      <tr><td>インセンティブ</td><td><strong>アポ獲得に紐づくもののみ</strong></td></tr>
+      <tr><td>雇用形態</td><td><strong>コンシエンス雇用</strong>（最初は）</td></tr>
+      <tr><td>アポの定義</td><td><strong>決済権者（マジョリティ株主）のみカウント</strong></td></tr>
+    </table>
+  </div>
+  <h3>インセンティブ設計の方針</h3>
+  <ul>
+    <li>決済権者以外のアポは <strong>カウントしない</strong>。決済権者アポ1件につき <strong>1万円程度</strong> を検討</li>
+    <li>アポの質に応じてフィーに差をつける（年商・利益・オーナーかどうか等で区分）</li>
+    <li>案件が進行し中間報酬・成功報酬が入ったタイミングで <strong>追加インセンティブ</strong> を検討</li>
+  </ul>
+  <h3>コールセンターの位置づけ</h3>
+  <div class="highlight highlight-purple">
+    単なるテレアポ部隊ではなく <strong>M&A事業部への配属</strong> という見せ方。<br>
+    キャリアパス：テレアポ修行 &#8594; M&Aアドバイザーとして現場へ
+  </div>
+  <ul>
+    <li>森さんがアポに同席させ、現場意識を持たせる</li>
+    <li>優秀な人材はM&Aプレイヤーとして引き上げ、または <strong>リーダーとしてコールセンター部隊を拡大</strong></li>
+  </ul>
+  <h3>スケジュール</h3>
+  <ul>
+    <li><strong>4月中旬</strong>：コールセンター3名配属</li>
+    <li><strong>5月1日</strong>：新入社員（未経験）入社 &#8594; 森さんが研修に同席して確認</li>
+    <li>配属先はコンシエンス本社。森さんが入るまでは寛太が教育担当</li>
+  </ul>
+</div>
+
+<!-- 3. 外部アドバイザー -->
+<div class="section" id="sec3">
+  <h2>3. 外部アドバイザー（岡部）の報酬見直し</h2>
+  <h3>現状の問題</h3>
+  <ul>
+    <li>岡部を含む外部アドバイザー3名に <strong>固定費（推定：月60万円程度）</strong> が発生</li>
+    <li>うち1名は実質的に何もしていない</li>
+    <li>固定費が寛太・泰司への <strong>インセンティブ原資を圧迫</strong></li>
+  </ul>
+  <h3>決定事項 <span class="badge badge-green">決定</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>項目</th><th>方針</th></tr>
+      <tr><td>月額固定費</td><td><strong>廃止</strong></td></tr>
+      <tr><td>既存進行案件（2件）</td><td>岡部が <strong>成功報酬ベース</strong> でクロージングまで担当</td></tr>
+      <tr><td>今後の関わり方</td><td>案件ベースの協力（交通費・諸経費はアントレッド負担、成功案分）</td></tr>
+      <tr><td>森さんジョイン後</td><td>森さんが泰司・寛太の面倒を見るため、岡部の固定的関与は不要</td></tr>
+    </table>
+  </div>
+  <div class="highlight highlight-orange">
+    <strong>&#9200; 本日対応：</strong>糸山さんが18時に岡部と会い、固定費廃止・成功報酬ベースへの切替を伝達
+  </div>
+</div>
+
+<!-- 4. Web集客 -->
+<div class="section" id="sec4">
+  <h2>4. Web集客戦略の転換</h2>
+  <h3>比較サイト &#8594; 業種別専門サイトへ</h3>
+  <ul>
+    <li>現在の比較サイトでは反響の質が低下傾向</li>
+    <li><strong>業種別の専門サイト</strong> を構築する方が、コアな顧客が来る可能性が高い</li>
+    <li>対象業種：<span class="badge badge-blue">製造業</span> <span class="badge badge-blue">IT</span> <span class="badge badge-blue">建設</span></li>
+    <li>CPAも専門サイトの方が安い見込み</li>
+  </ul>
+  <div class="highlight highlight-red">
+    <strong>&#9888; 注意：</strong>建設業のうち <strong>ハウスビルダーは狙わない</strong>（資材高騰で利益が出にくい状況）
+  </div>
+  <h3>ホームページ</h3>
+  <ul>
+    <li>新商号に合わせてHP刷新が必要</li>
+    <li>AIコンサルタント（森さんをモデルにしたAIキャラクター）を作成し、ショート動画で発信</li>
+    <li><strong>5月中に整備 &#8594; 6月から本格スタート</strong></li>
+  </ul>
+</div>
+
+<!-- 5. テレアポ戦略 -->
+<div class="section" id="sec5">
+  <h2>5. テレアポ戦略</h2>
+  <h3>リスト戦略</h3>
+  <ul>
+    <li><strong>TSR（東京商工リサーチ）</strong> との打ち合わせを実施し、費用対効果を確認</li>
+    <li>既存リスト（3〜4年前）はAIで代表者情報等を補完すれば利用可能</li>
+    <li>TSRから新規購入時は既存リストを提出し、<strong>重複排除</strong> を依頼</li>
+    <li>現在のリストは建設・ITに偏っている &#8594; <strong>製造・運送・不動産</strong> にも拡大</li>
+    <li>リストのセグメント（売上基準等での絞り込み）は <strong>糸山さんが方針決定</strong></li>
+  </ul>
+  <h3>スクリプト</h3>
+  <div class="highlight highlight-green">
+    <strong>&#128172; アプローチの切り口：</strong>「プライム上場企業の方から御社に興味を持っている」<br>
+    &#8594; 企業名は伏せつつ、具体性を持たせたスクリプトを作成
+  </div>
+  <ul>
+    <li>プライム企業からの具体的なM&Aニーズに基づくアプローチ</li>
+    <li><strong>寛太がスクリプトを作成し、森さん・糸山さんに確認</strong></li>
+  </ul>
+</div>
+
+<!-- 6. ローボール交渉 -->
+<div class="section" id="sec6">
+  <h2>6. ローボール交渉戦術</h2>
+  <ul>
+    <li>売り手に対して意図的に <strong>低い意向表明書（ローボール）</strong> を提出</li>
+    <li>目的：<strong>目線調整</strong></li>
+    <li>相手企業の課題を指摘し、単純な倍率計算では低い評価になることを示す</li>
+    <li>その上でシナジーを探し出し、実際の提示額を調整していく</li>
+    <li>ローボールより高い条件が他社から出てきても、<strong>ストーリー（シナジー）があれば勝てる</strong></li>
+  </ul>
+  <div class="highlight highlight-blue">
+    <strong>&#128161; 適用範囲：</strong>業種を問わず有効。特にアナログ領域の企業に「ITの力で変える」ストーリーが刺さる。
+  </div>
+</div>
+
+<!-- 7. インセンティブ設計 -->
+<div class="section" id="sec7">
+  <h2>7. インセンティブ設計と組織方針</h2>
+  <h3>基本方針</h3>
+  <ul>
+    <li><strong>個人インセンティブにキャップ（上限）</strong> を設ける</li>
+    <li>キャップ超過分は <strong>マネジメント・チームビルディング</strong> の成果で報いる体系</li>
+    <li>「リーダーになりたい」という動機を生み出す設計</li>
+    <li>自分勝手な個人プレイヤーの集団ではなく、<strong>同じ方向を向いた組織</strong> を目指す</li>
+  </ul>
+  <h3>リーダー昇格基準（案）</h3>
+  <div class="highlight highlight-gold">
+    &#127942; <strong>自力で5件成約</strong> &#8594; リーダーに昇格<br>
+    &#128101; リーダーが自分の主導で <strong>5名を採用</strong> し、チームを構築
+  </div>
+  <ul>
+    <li>ベストパートナーズのように個人インセンティブ最大40%のモデルは <strong>取らない</strong></li>
+  </ul>
+  <h3>パーヘッド売上目標</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>指標</th><th>現状</th><th>目標</th></tr>
+      <tr><td>パーヘッド売上</td><td>約3,000万円</td><td><strong>1億円</strong>（ベストパートナーズ水準）</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 8. AI活用 -->
+<div class="section" id="sec8">
+  <h2>8. AI活用計画</h2>
+  <h3>面談分析・マニュアル化</h3>
+  <ul>
+    <li>初回面談から成約に至るまでの <strong>全プロセスを録音 &#8594; AIで分析</strong></li>
+    <li>良い面談・ダメな面談を <strong>言語化・マニュアル化</strong></li>
+    <li>分析観点：声のトーン、話し方、特定キーワード、失注率との相関</li>
+    <li>森さんの「職人芸」を言語化し、誰でも使えるマニュアルにする</li>
+    <li>対面はICレコーダー、ZoomはMTG録画で対応</li>
+  </ul>
+  <h3>AIコンサルタント</h3>
+  <ul>
+    <li>森さんをモデルにした <strong>AIコンサルタント</strong> を作成し、ショート動画で発信</li>
+    <li>M&A関連の情報発信メディアとして活用</li>
+  </ul>
+  <h3>AIO（AI Optimization）</h3>
+  <div class="highlight highlight-purple">
+    Google検索の頻度低下を受け、SEO &#8594; <strong>AIO</strong> への移行を検討。<br>
+    AI検索で「M&A仲介会社」と聞いた時に会社名が上位に出る戦略が必要。
+  </div>
+</div>
+
+<!-- 9. 商号変更 -->
+<div class="section" id="sec9">
+  <h2>9. 商号変更・代表変更</h2>
+  <h3>決定事項 <span class="badge badge-green">決定</span></h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>項目</th><th>内容</th></tr>
+      <tr><td>新商号</td><td><strong>大国キャピタル</strong>（大国主の神 = 国作り・土台作りのイメージ）</td></tr>
+      <tr><td>代表者</td><td><strong>岡本さん</strong> が代表に</td></tr>
+      <tr><td>HP対応</td><td>代表者のフルネームは <strong>当面非公開</strong>（M&A総研への配慮）</td></tr>
+    </table>
+  </div>
+  <h3>周知対応</h3>
+  <ul>
+    <li>エージェントに対し、社名・代表者変更を伝達（本間さんが対応）</li>
+    <li>理解できない社員がいても仕方ない、という姿勢</li>
+  </ul>
+  <h3>ロゴイメージ</h3>
+  <ul>
+    <li><strong>白背景 &times; 金文字</strong> で「誉」の筆文字</li>
+    <li>太陽・富士山モチーフのデザインイメージ</li>
+  </ul>
+</div>
+
+<!-- 10. 管理体制 -->
+<div class="section" id="sec10">
+  <h2>10. 管理体制・ツール</h2>
+  <div class="table-wrap">
+    <table>
+      <tr><th>項目</th><th>決定内容</th></tr>
+      <tr><td>チャットツール</td><td><strong>Slack</strong></td></tr>
+      <tr><td>会計ソフト</td><td><strong>freee</strong>（MCP連携で自動インポート）</td></tr>
+      <tr><td>経理担当</td><td><strong>大山先生</strong> に外注（スピード重視。尾中先生は税務調査向き）</td></tr>
+      <tr><td>CRM・進捗管理</td><td>既存システムを参考に <strong>新規構築</strong></td></tr>
+      <tr><td>オフィス</td><td><strong>大手町</strong>（5月から利用可能、教育費込み月額38万円）</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 11. 採用・人事 -->
+<div class="section" id="sec11">
+  <h2>11. 採用・人事</h2>
+  <h3>5月入社の新入社員</h3>
+  <ul>
+    <li>未経験。紹介フィー350万円</li>
+    <li>まず糸山会長に1ヶ月預けた後、コンシエンスで研修</li>
+    <li>糸山さんが研修に同席して適性を確認</li>
+    <li><strong>向いていない場合は試用期間中に解雇</strong> も視野</li>
+  </ul>
+  <h3>採用媒体</h3>
+  <ul>
+    <li><strong>ビズリーチ</strong> でプラチナスカウトを毎日送信中</li>
+    <li>エージェント経由の費用対効果を確認する必要あり</li>
+    <li>採用資料にPバンド・サーチバンドの違い等の情報を追加</li>
+  </ul>
+  <h3>給与水準</h3>
+  <div class="highlight highlight-orange">
+    現状：600万円程度 &#8594; 森さん：「<strong>1,000万円目標は目線が低い</strong>」と指摘
+  </div>
+</div>
+
+<!-- 12. 身だしなみ -->
+<div class="section" id="sec12">
+  <h2>12. 身だしなみ・プロフェッショナリズム</h2>
+  <h3>森さんからの強い指導</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>項目</th><th>指示内容</th></tr>
+      <tr><td><strong>髪型</strong></td><td>建設業のオーナー層（昭和世代）に合わせ <strong>ショートカット必須</strong>。経験・貫禄がないうちは爽やかさが武器</td></tr>
+      <tr><td><strong>スーツ</strong></td><td>既製品（スーツセレクト等）ではなく <strong>オーダースーツ</strong></td></tr>
+      <tr><td><strong>シャツ</strong></td><td><strong>白シャツ一択</strong>。水色・柄物は不可</td></tr>
+      <tr><td><strong>ネクタイ</strong></td><td>ソリッド（無地）のネイビー系。斜めライン・華やかなデザインは不可</td></tr>
+      <tr><td><strong>時計</strong></td><td>覚悟を決めるために <strong>ロレックスをフルローンで購入</strong> を推奨。ミーティング中はスマホではなく時計で時間確認</td></tr>
+    </table>
+  </div>
+  <div class="highlight highlight-yellow">
+    <strong>&#127775; 森さんの持論：</strong>「700万で終わるか、もっと上を目指すか。やれるのにやらないのがもったいない。髪型ひとつで売上が変わる。」
+  </div>
+</div>
+
+<!-- ネクストアクション -->
+<div class="section" id="actions">
+  <h2>&#9989; ネクストアクション</h2>
+  <div class="table-wrap">
+    <table>
+      <tr><th>担当</th><th>アクション</th><th>期限</th></tr>
+      <tr><td><strong>森さん</strong></td><td>寛太・泰司への個別フォローアップ連絡</td><td>随時</td></tr>
+      <tr><td><strong>森さん</strong></td><td>リストのセグメント方針決定</td><td>継続</td></tr>
+      <tr><td><strong>森さん</strong></td><td>新入社員（5/1入社）の研修に同席・適性確認</td><td>5月</td></tr>
+      <tr><td><strong>寛太</strong></td><td>テレアポ用スクリプト作成 &#8594; 森さん・糸山さんに確認</td><td>今週中</td></tr>
+      <tr><td><strong>森さん・寛太</strong></td><td>泰司と食事（マインドセット確認）</td><td>来週</td></tr>
+      <tr><td><strong>森さん・寛太</strong></td><td>初回面談の録音・AI分析の仕組み構築</td><td>継続</td></tr>
+      <tr><td><strong>糸山さん</strong></td><td>岡部に固定費廃止・成功報酬ベースへの切替を伝達</td><td><span class="badge badge-red">本日18時</span></td></tr>
+      <tr><td><strong>森さん</strong></td><td>ホームページのコンテンツ構成作成</td><td>5月中</td></tr>
+      <tr><td><strong>森さん</strong></td><td>AIコンサルタント（森さんモデル）作成・ショート動画</td><td>5月中</td></tr>
+      <tr><td><strong>森さん</strong></td><td>CRM・進捗管理システム構築</td><td>要調整</td></tr>
+      <tr><td><strong>森さん</strong></td><td>TSRとの打ち合わせ（リスト費用対効果確認）</td><td>要調整</td></tr>
+      <tr><td><strong>本間さん</strong></td><td>エージェントに社名・代表者変更を周知</td><td>近日</td></tr>
+      <tr><td><strong>森さん</strong></td><td>身だしなみ指導（オーダースーツ・白シャツ・髪型）</td><td>継続</td></tr>
+      <tr><td><strong>泰司</strong></td><td>髪を短くする（ショートヘア）</td><td>来週まで</td></tr>
+      <tr><td><strong>大山先生</strong></td><td>freee会計での経理業務開始</td><td>5月〜</td></tr>
+      <tr><td><strong>全員</strong></td><td>採用資料の更新（Pバンド・サーチバンド情報追加）</td><td>要調整</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 補足メモ -->
+<div class="section" id="notes">
+  <h2>&#128221; 補足メモ</h2>
+  <ul>
+    <li><strong>競合：ベストパートナーズ</strong> — キャピタル出身の2名が設立。上場を目指さずインセンティブ最大化。コールセンター構築で成功。パーヘッド売上1億円弱</li>
+    <li>5月1日入社予定者の適性は未確認。森さんが研修で直接見て判断</li>
+    <li>大阪でのテスト運用（コールセンター）は成功実績あり &#8594; 自社直接管理に移行</li>
+    <li>均等（CRMシステム）は保守契約で30万円/30時間分が残っている。完成後解約</li>
+    <li>サフラン栽培案件の話題あり（痛み止めテープの原料、メルク社が購入先）。冨永さんに議事録送付済み</li>
+  </ul>
+</div>
+
+<div class="footer">
+  議事録作成：磯貝政文（CFO） / Claude Code &nbsp;|&nbsp; 音声文字起こし：Gemini &nbsp;|&nbsp; 2026年4月3日
+</div>
+
+</div>
+</body>
+</html>
